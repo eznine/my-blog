@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://github.com/eznine</loc>
-    <lastmod>Mon, 31 Aug 2026 15:24:23 GMT</lastmod>
+    <loc>https://eznine.github.io/my-blog/my-blog</loc>
+    <lastmod>Mon, 31 Aug 2026 16:46:23 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/</loc>
-    <lastmod>Mon, 31 Aug 2026 15:24:23 GMT</lastmod>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/</loc>
+    <lastmod>Mon, 31 Aug 2026 16:46:23 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/research/</loc>
-    <lastmod>Mon, 31 Aug 2026 15:24:23 GMT</lastmod>
+    <loc>https://eznine.github.io/my-blog/my-blog/research/</loc>
+    <lastmod>Mon, 31 Aug 2026 16:46:23 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/projects/</loc>
-    <lastmod>Mon, 31 Aug 2026 15:24:23 GMT</lastmod>
+    <loc>https://eznine.github.io/my-blog/my-blog/projects/</loc>
+    <lastmod>Mon, 31 Aug 2026 16:46:23 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/archive/</loc>
-    <lastmod>Mon, 31 Aug 2026 15:24:23 GMT</lastmod>
+    <loc>https://eznine.github.io/my-blog/my-blog/archive/</loc>
+    <lastmod>Mon, 31 Aug 2026 16:46:23 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/about/</loc>
-    <lastmod>Mon, 31 Aug 2026 15:24:23 GMT</lastmod>
+    <loc>https://eznine.github.io/my-blog/my-blog/about/</loc>
+    <lastmod>Mon, 31 Aug 2026 16:46:23 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/search/</loc>
-    <lastmod>Mon, 31 Aug 2026 15:24:23 GMT</lastmod>
+    <loc>https://eznine.github.io/my-blog/my-blog/search/</loc>
+    <lastmod>Mon, 31 Aug 2026 16:46:23 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/xgboost-shap/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/xgboost-shap/</loc>
     <lastmod>Wed, 12 Aug 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/insar-basics/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/insar-basics/</loc>
     <lastmod>Mon, 15 Jun 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/maplibre-basics/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/maplibre-basics/</loc>
     <lastmod>Tue, 02 Jun 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/moran-i/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/moran-i/</loc>
     <lastmod>Mon, 18 May 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/gee-landsat-cloud/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/gee-landsat-cloud/</loc>
     <lastmod>Tue, 05 May 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/ndvi-time-series/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/ndvi-time-series/</loc>
     <lastmod>Mon, 20 Apr 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/arcgis-pro-cartography/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/arcgis-pro-cartography/</loc>
     <lastmod>Wed, 08 Apr 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/coordinate-systems/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/notes/coordinate-systems/</loc>
     <lastmod>Mon, 02 Mar 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/research/ecological-network/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/research/ecological-network/</loc>
     <lastmod>Fri, 10 Jul 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/research/ecological-security-pattern/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/research/ecological-security-pattern/</loc>
     <lastmod>Fri, 20 Mar 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/research/land-subsidence-insar/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/research/land-subsidence-insar/</loc>
     <lastmod>Mon, 10 Nov 2025 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/projects/geo-toolbox/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/projects/geo-toolbox/</loc>
     <lastmod>Wed, 10 Jun 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/projects/cesium-3d-campus/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/projects/cesium-3d-campus/</loc>
     <lastmod>Sat, 25 Apr 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/projects/campus-map/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/projects/campus-map/</loc>
     <lastmod>Sat, 14 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/projects/gee-landuse-change/</loc>
+    <loc>https://eznine.github.io/my-blog/my-blog/projects/gee-landuse-change/</loc>
     <lastmod>Sat, 20 Dec 2025 00:00:00 GMT</lastmod>
   </url>
 </urlset>

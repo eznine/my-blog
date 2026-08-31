@@ -94,7 +94,8 @@ public/uploads/      后台上传的图片
 7. **文案系统重构**：site.json 大文件 → content/copy/ 按页面拆分独立可编辑（用户两次纠正才到位：①不要全局页 ②首页大字/简介必须独立于站名，改名字不影响其他页）
 8. **交互升级**：方向卡复用探索卡动效并分缝；三内容卡上移加动效；移动端导航收起逻辑（桌面不收）；回到顶部按钮；移动端目录改为右侧固定滑轨（经历 portal 修复 transform 定位 bug、扇形→等长、文字位置/字号多轮微调）
 9. **commit 582d96a**「第一次双端调试，页面独立修改」
-10. 当前：封面底部经纬度改橙色（进行中）
+10. 封面底部经纬度改橙色
+11. **部署上线**：推送到 github.com/eznine/my-blog（强推覆盖旧版 HTML 小站），GitHub Actions 自动构建发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码（不再用 eznine）；README.md 已写
 
 ## 六、用户的偏好与协作习惯（重要！）
 
@@ -112,9 +113,8 @@ public/uploads/      后台上传的图片
 
 ## 七、已知问题 / 待办
 
-* [ ] push 公开 GitHub 仓库前：改 adminPassword 或将 site.config.json 移出 git
-
+* [x] 部署到 GitHub：已推送 github.com/eznine/my-blog（覆盖旧版），Actions 自动发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码（D469VPnQ7xpWQt，在 site.config.json）
+* [ ] 首次部署需在仓库 Settings → Pages → Source 选 GitHub Actions（网页操作）
 * [ ] 用户提过「右侧有点空」的方案（图幅注记面板/陕西轮廓+西安脉冲点/研究方向速览）尚未选定实施
-
 * [ ] feed.xml 生成脚本若确认不要 RSS 可删
 

@@ -2,113 +2,113 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>EZNINE · 张鹏</title>
-    <link>https://github.com/eznine/</link>
+    <link>https://eznine.github.io/my-blog/my-blog/</link>
     <description>地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Mon, 31 Aug 2026 15:24:23 GMT</lastBuildDate>
-    <atom:link href="https://github.com/eznine/feed.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>Mon, 31 Aug 2026 16:46:23 GMT</lastBuildDate>
+    <atom:link href="https://eznine.github.io/my-blog/my-blog/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>XGBoost + SHAP：地理问题的可解释机器学习工作流</title>
-      <link>https://github.com/eznine/notes/xgboost-shap/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/xgboost-shap/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/notes/xgboost-shap/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/notes/xgboost-shap/</guid>
       <pubDate>Wed, 12 Aug 2026 00:00:00 GMT</pubDate>
       <description>用 XGBoost 建模地理因变量时如何避免精度虚高、如何用 SHAP 把'黑箱'翻译成地理语言，附完整 Python 代码。</description>
     </item>
     <item>
       <title>InSAR 基础与 SBAS：从干涉原理到地表形变监测</title>
-      <link>https://github.com/eznine/notes/insar-basics/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/insar-basics/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/notes/insar-basics/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/notes/insar-basics/</guid>
       <pubDate>Mon, 15 Jun 2026 00:00:00 GMT</pubDate>
       <description>整理 InSAR 的物理原理、D-InSAR 与时序方法（PS/SBAS）的区别、Sentinel-1 数据处理流程与解译要点。</description>
     </item>
     <item>
       <title>MapLibre GL JS 入门：矢量瓦片地图的正确打开方式</title>
-      <link>https://github.com/eznine/notes/maplibre-basics/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/maplibre-basics/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/notes/maplibre-basics/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/notes/maplibre-basics/</guid>
       <pubDate>Tue, 02 Jun 2026 00:00:00 GMT</pubDate>
       <description>从初始化地图到加载自定义矢量瓦片源、图层样式与交互事件，整理 WebGIS 前端开发的起步模板与关键概念。</description>
     </item>
     <item>
       <title>空间自相关与 Moran's I：空间不是独立的</title>
-      <link>https://github.com/eznine/notes/moran-i/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/moran-i/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/notes/moran-i/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/notes/moran-i/</guid>
       <pubDate>Mon, 18 May 2026 00:00:00 GMT</pubDate>
       <description>为什么经典统计在空间数据上会翻车：空间自相关的概念、全局/局部 Moran's I 的计算与解读，附 PySAL 代码。</description>
     </item>
     <item>
       <title>Google Earth Engine 入门：Landsat 影像获取与去云完整流程</title>
-      <link>https://github.com/eznine/notes/gee-landsat-cloud/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/gee-landsat-cloud/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/notes/gee-landsat-cloud/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/notes/gee-landsat-cloud/</guid>
       <pubDate>Tue, 05 May 2026 00:00:00 GMT</pubDate>
       <description>GEE 最常用的操作模板：按时间/区域筛选影像、QA 像元去云、中值合成与导出，附可直接复制的代码。</description>
     </item>
     <item>
       <title>NDVI 不仅仅是 (NIR-Red)/(NIR+Red)：植被指数与时序分析笔记</title>
-      <link>https://github.com/eznine/notes/ndvi-time-series/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/ndvi-time-series/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/notes/ndvi-time-series/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/notes/ndvi-time-series/</guid>
       <pubDate>Mon, 20 Apr 2026 00:00:00 GMT</pubDate>
       <description>从辐射定标讲起，推导 NDVI 公式，比较 EVI、SAVI 等常用植被指数的适用场景，最后给出基于 Landsat 的时序分析思路。</description>
     </item>
     <item>
       <title>ArcGIS Pro 制图符号化：从数据到能出版的好地图</title>
-      <link>https://github.com/eznine/notes/arcgis-pro-cartography/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/arcgis-pro-cartography/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/notes/arcgis-pro-cartography/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/notes/arcgis-pro-cartography/</guid>
       <pubDate>Wed, 08 Apr 2026 00:00:00 GMT</pubDate>
       <description>整理 ArcGIS Pro 日常制图的工作流：分类与分级符号、色彩方案选择、标注避让，以及版面排布的检查清单。</description>
     </item>
     <item>
       <title>地理坐标系与投影：一次说清 CGCS2000、WGS84 与高斯克吕格</title>
-      <link>https://github.com/eznine/notes/coordinate-systems/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/coordinate-systems/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/notes/coordinate-systems/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/notes/coordinate-systems/</guid>
       <pubDate>Mon, 02 Mar 2026 00:00:00 GMT</pubDate>
       <description>从大地基准到投影方式，梳理日常 GIS 工作中最容易混淆的几组坐标系概念，并给出常用 EPSG 代码速查。</description>
     </item>
     <item>
       <title>复杂网络视角下的区域生态网络连通性演化</title>
-      <link>https://github.com/eznine/research/ecological-network/</link>
-      <guid isPermaLink="true">https://github.com/eznine/research/ecological-network/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/research/ecological-network/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/research/ecological-network/</guid>
       <pubDate>Fri, 10 Jul 2026 00:00:00 GMT</pubDate>
       <description>把生态源地抽象为节点、廊道抽象为边，用复杂网络指标刻画 2000—2025 年生态网络拓扑结构的演化及其对采矿扰动的响应。</description>
     </item>
     <item>
       <title>黄土矿区生态安全格局构建：MSPA + MCR + 电路理论</title>
-      <link>https://github.com/eznine/research/ecological-security-pattern/</link>
-      <guid isPermaLink="true">https://github.com/eznine/research/ecological-security-pattern/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/research/ecological-security-pattern/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/research/ecological-security-pattern/</guid>
       <pubDate>Fri, 20 Mar 2026 00:00:00 GMT</pubDate>
       <description>以黄土高原采煤沉陷区为研究区，耦合形态学空间格局分析、最小累积阻力模型与电路理论，识别生态源地、廊道与战略节点。</description>
     </item>
     <item>
       <title>基于 SBAS-InSAR 与机器学习的采空区地表形变驱动因素分析</title>
-      <link>https://github.com/eznine/research/land-subsidence-insar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/research/land-subsidence-insar/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/research/land-subsidence-insar/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/research/land-subsidence-insar/</guid>
       <pubDate>Mon, 10 Nov 2025 00:00:00 GMT</pubDate>
       <description>用 SBAS-InSAR 获取研究区 2018—2024 年地表形变时间序列，以 XGBoost-SHAP 量化地下水开采、煤层埋深、建构密度等因子的非线性贡献。</description>
     </item>
     <item>
       <title>Geo Toolbox：日常地理处理 Python 工具箱</title>
-      <link>https://github.com/eznine/projects/geo-toolbox/</link>
-      <guid isPermaLink="true">https://github.com/eznine/projects/geo-toolbox/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/projects/geo-toolbox/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/projects/geo-toolbox/</guid>
       <pubDate>Wed, 10 Jun 2026 00:00:00 GMT</pubDate>
       <description>把日常重复的地理处理封装成命令行工具：批量裁剪、坐标系转换、按属性拆分、瓦片下载与简单的数据清洗，让 ArcGIS 里点到手酸的操作一条命令搞定。</description>
     </item>
     <item>
       <title>Cesium 三维校园场景：3D Tiles 与地形集成</title>
-      <link>https://github.com/eznine/projects/cesium-3d-campus/</link>
-      <guid isPermaLink="true">https://github.com/eznine/projects/cesium-3d-campus/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/projects/cesium-3d-campus/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/projects/cesium-3d-campus/</guid>
       <pubDate>Sat, 25 Apr 2026 00:00:00 GMT</pubDate>
       <description>用 CesiumJS 搭建可交互三维校园：倾斜摄影转 3D Tiles、建筑白模分层、地下管线展示与飞行漫游。</description>
     </item>
     <item>
       <title>校园交互地图：MapLibre 矢量瓦片方案</title>
-      <link>https://github.com/eznine/projects/campus-map/</link>
-      <guid isPermaLink="true">https://github.com/eznine/projects/campus-map/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/projects/campus-map/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/projects/campus-map/</guid>
       <pubDate>Sat, 14 Feb 2026 00:00:00 GMT</pubDate>
       <description>用 tippecanoe 切片 + MapLibre GL JS 渲染 + 部署到 GitHub Pages 的完整校园地图，支持楼栋检索、路径浏览与移动端适配。</description>
     </item>
     <item>
       <title>GEE 土地利用变化监测：随机森林分类与转移矩阵</title>
-      <link>https://github.com/eznine/projects/gee-landuse-change/</link>
-      <guid isPermaLink="true">https://github.com/eznine/projects/gee-landuse-change/</guid>
+      <link>https://eznine.github.io/my-blog/my-blog/projects/gee-landuse-change/</link>
+      <guid isPermaLink="true">https://eznine.github.io/my-blog/my-blog/projects/gee-landuse-change/</guid>
       <pubDate>Sat, 20 Dec 2025 00:00:00 GMT</pubDate>
       <description>在 Google Earth Engine 上对研究区 2000—2025 年土地利用做随机森林分类，输出转移矩阵与变化热点图，为生态研究提供本底数据。</description>
     </item>
