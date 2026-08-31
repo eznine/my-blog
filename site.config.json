@@ -1,0 +1,51 @@
+﻿{
+  "name": "你的名字",
+  "siteName": "EZNINE",
+  "role": "GIS / 遥感 / WebGIS",
+  "tagline": "用地图理解世界，用代码处理空间",
+  "affiliation": "××大学 · 地理信息科学",
+  "identity": "地理信息科学硕士生",
+  "coords": "34.26°N · 108.94°E",
+  "email": "you@example.com",
+  "github": "https://github.com/yourname",
+  "siteUrl": "https://yourname.github.io",
+  "bio": "地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。",
+  "focusAreas": [
+    {
+      "code": "RS",
+      "title": "GIS 与遥感",
+      "desc": "土地利用解译、植被指数、时序分析，GEE 云端处理与 InSAR 形变监测。"
+    },
+    {
+      "code": "SA",
+      "title": "空间分析",
+      "desc": "生态安全格局、MSPA、电路理论、空间统计与地理加权建模。"
+    },
+    {
+      "code": "WG",
+      "title": "WebGIS 与可视化",
+      "desc": "MapLibre / Cesium / Leaflet，地图应用开发与地理数据前端表达。"
+    },
+    {
+      "code": "DEV",
+      "title": "编程与数据",
+      "desc": "Python / JavaScript 地理数据处理，XGBoost-SHAP 可解释建模。"
+    }
+  ],
+  "skills": [
+    { "group": "GIS 与遥感", "items": ["ArcGIS Pro", "QGIS", "ENVI", "GEE", "SNAP / StaMPS"] },
+    { "group": "空间分析", "items": ["MSPA", "MCR 阻力面", "InVEST", "Circuitscape", "Moran's I / GWR"] },
+    { "group": "WebGIS 与前端", "items": ["MapLibre GL", "Cesium", "Leaflet", "OpenLayers", "React / Next.js", "D3.js"] },
+    { "group": "编程与数据", "items": ["Python", "JavaScript / TypeScript", "R", "PostGIS", "XGBoost / SHAP"] }
+  ],
+  "education": [
+    { "period": "2024 — 至今", "school": "××大学", "detail": "地图学与地理信息系统 · 硕士" },
+    { "period": "2020 — 2024", "school": "××大学", "detail": "地理信息科学 · 学士" }
+  ],
+  "researchInterests": [
+    "生态安全格局与生态网络",
+    "InSAR 地表形变监测（地面塌陷）",
+    "遥感生态参数反演与土地利用变化",
+    "机器学习可解释性在地理问题中的应用"
+  ]
+}

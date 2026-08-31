@@ -1,0 +1,199 @@
+'use client';
+
+import Link from 'next/link';
+import { useLayoutEffect, useRef } from 'react';
+import { site } from '@/lib/site';
+import { topoState } from './topo-shader-field';
+import { MapParticleField } from './map-particle-field';
+import { Crosshair } from './crosshair';
+import { Counter } from './counter';
+
+/**
+ * 滚动驱动的开场舞台：section 高 260vh，内部 sticky 全屏。
+ * 滚动进度 p（0→1，双向可逆）驱动：
+ *   - 全站等高线背景缩放 0.42 → 1.0（写入 topoState，由 layout 的固定画布渲染）
+ *   - 文字分层浮现（data-hs="起始,结束" 窗口，带缓动）
+ *   - SCROLL 提示随 p 淡出
+ */
+
+const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+interface Step {
+  el: HTMLElement;
+  start: number;
+  end: number;
+  fadeOnly: boolean;
+}
+
+export function HeroScroll({
+  notes,
+  research,
+  projects,
+}: {
+  notes: number;
+  research: number;
+  projects: number;
+}) {
+  const stageRef = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const steps: Step[] = [];
+    stage.querySelectorAll<HTMLElement>('[data-hs]').forEach((el) => {
+      const [s, e] = (el.dataset.hs || '0,1').split(',').map(Number);
+      steps.push({ el, start: s, end: e, fadeOnly: el.dataset.hsFade === '1' });
+    });
+    const hint = stage.querySelector<HTMLElement>('[data-hs-hint]');
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const rect = stage.getBoundingClientRect();
+      const total = Math.max(1, stage.offsetHeight - window.innerHeight);
+      const p = clamp01(-rect.top / total);
+
+      const eased = easeOut(p);
+      topoState.zoom = 0.42 + 0.58 * eased;
+      topoState.boost = 0.35 + 0.65 * eased;
+
+      for (const st of steps) {
+        const local = clamp01((p - st.start) / Math.max(0.0001, st.end - st.start));
+        const e = easeOut(local);
+        st.el.style.opacity = String(e);
+        if (!st.fadeOnly) st.el.style.transform = `translateY(${(1 - e) * 28}px)`;
+      }
+      if (hint) hint.style.opacity = String(clamp01(1 - p / 0.12));
+    };
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    update();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+      topoState.zoom = 1;
+      topoState.boost = 0.26;
+    };
+  }, []);
+
+  const [lat, lon] = site.coords.match(/(\d+\.\d+)/g)?.map(Number) ?? [34.26, 108.94];
+
+  return (
+    <section ref={stageRef} className="hero-scroll-section relative -mt-14 h-[calc(260vh+3.5rem)] border-b border-line">
+      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+        {/* 等高线背景由 layout 的全站固定层渲染（滚动驱动 topoState） */}
+
+        {/* 粒子尘埃：随进度淡入 */}
+        <div data-hs="0.30,0.60" data-hs-fade="1" className="absolute inset-0" style={{ opacity: 0 }}>
+          <MapParticleField className="absolute inset-0 h-full w-full" />
+        </div>
+
+        <div className="map-grid map-grid-fade absolute inset-0 opacity-70" aria-hidden="true" />
+        <Crosshair baseLat={lat} baseLon={lon} />
+
+        {/* 文字区暗色纱罩：随文字浮现淡入，把等高线从文字后面压下去 */}
+        <div
+          data-hs="0.06,0.42"
+          data-hs-fade="1"
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            opacity: 0,
+            background:
+              'radial-gradient(ellipse 68% 66% at 34% 52%, var(--bg) 0%, color-mix(in srgb, var(--bg) 88%, transparent) 44%, transparent 76%)',
+          }}
+        />
+
+        <div className="relative mx-auto w-full max-w-6xl px-6">
+          <div data-hs="0.05,0.22" className="mono-label flex flex-wrap items-center gap-4" style={{ opacity: 0 }}>
+            <span className="flex items-center gap-2.5 rounded-full border border-accent/50 px-3.5 py-1.5 !text-accent">
+              <span className="marker-dot is-live !h-[6px] !w-[6px]" />
+              STILL EXPLORING
+            </span>
+            <span className="hidden h-px w-20 bg-line md:block" />
+            <span className="hidden md:inline">未完成的地图 · 第 001 图幅</span>
+          </div>
+
+          <h1
+            data-hs="0.12,0.36"
+            className="hero-shadow mt-10 text-[2.9rem] leading-[1.08] font-black tracking-tight text-ink md:text-[4.6rem]"
+            style={{ opacity: 0 }}
+          >
+            你好，我是
+            <br />
+            <span className="grad-text glow-text">{site.name}</span>
+            <span>，</span>
+            <br />
+            <span className="grad-text glow-text">{site.identity}</span>
+          </h1>
+
+          <p data-hs="0.32,0.52" className="hero-shadow mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft" style={{ opacity: 0 }}>
+            {site.bio}
+          </p>
+
+          <div data-hs="0.48,0.64" className="mt-11 flex flex-wrap items-center gap-5" style={{ opacity: 0 }}>
+            <Link
+              href="/notes"
+              className="group relative overflow-hidden rounded-xl px-8 py-3.5 text-base font-semibold text-white transition-transform duration-300 hover:scale-[1.04] active:scale-95"
+              style={{ background: 'var(--accent)', boxShadow: '0 0 34px var(--accent-glow)' }}
+            >
+              <span className="relative z-10">开始阅读笔记</span>
+              <span className="absolute inset-0 -translate-x-full bg-white/25 transition-transform duration-500 group-hover:translate-x-full" />
+            </Link>
+            <Link
+              href="/projects"
+              className="rounded-xl border border-line-strong px-7 py-3.5 text-base font-medium text-ink transition-all hover:border-accent hover:text-accent"
+            >
+              看看我的项目 →
+            </Link>
+            <a
+              href={site.github}
+              target="_blank"
+              rel="noreferrer"
+              className="text-base text-ink-faint transition-colors hover:text-accent"
+            >
+              GitHub ↗
+            </a>
+          </div>
+
+          <div
+            data-hs="0.64,0.84"
+            className="mt-20 grid max-w-2xl grid-cols-3 divide-x divide-line rounded-2xl border border-line glass"
+            style={{ opacity: 0 }}
+          >
+            {[
+              { n: notes, label: '笔记 NOTES', href: '/notes' },
+              { n: research, label: '研究 RESEARCH', href: '/research' },
+              { n: projects, label: '项目 PROJECTS', href: '/projects' },
+            ].map((s) => (
+              <Link key={s.label} href={s.href} className="group px-6 py-6 transition-colors hover:bg-accent/5">
+                <div className="font-mono text-4xl font-extrabold text-accent md:text-5xl">
+                  <Counter to={s.n} />
+                </div>
+                <div className="mono-label mt-2 !normal-case !tracking-[0.1em] transition-colors group-hover:!text-ink">
+                  {s.label}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div data-hs-hint className="mono-label absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-4">
+          <span className="hidden md:inline">{site.coords}</span>
+          <svg viewBox="0 0 24 24" className="h-4 w-4 animate-bounce text-accent" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M12 4v14m0 0 6-6m-6 6-6-6" />
+          </svg>
+          <span className="hidden md:inline">向下滑动 · SCROLL TO EXPLORE</span>
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,632 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f3efe3;
+  --bg-deep: #ebe6d6;
+  --panel: rgba(255, 253, 246, 0.72);
+  --panel-solid: #faf7ee;
+  --ink: #1c1710;
+  --ink-soft: #57503f;
+  --ink-faint: #8d8471;
+  --line: rgba(28, 23, 16, 0.16);
+  --line-strong: rgba(28, 23, 16, 0.3);
+  --map-line: rgba(28, 23, 16, 0.07);
+  --accent: #d3381c;
+  --accent-strong: #b52c12;
+  --accent-glow: rgba(211, 56, 28, 0.2);
+  --code-bg: #211c13;
+  --code-ink: #e8e0cc;
+  --hl-keyword: #ff8a70;
+  --hl-string: #d8c07a;
+  --hl-comment: #8a8270;
+  --hl-number: #ffb3a0;
+  --hl-func: #b5d0a8;
+  --hl-attr: #d5ccb5;
+  --shadow: 0 10px 36px rgba(28, 23, 16, 0.12);
+}
+
+.dark {
+  --bg: #0a0908;
+  --bg-deep: #060505;
+  --panel: rgba(20, 18, 15, 0.62);
+  --panel-solid: #151310;
+  --ink: #ece5d1;
+  --ink-soft: #a89e87;
+  --ink-faint: #6e6552;
+  --line: rgba(236, 229, 209, 0.15);
+  --line-strong: rgba(236, 229, 209, 0.32);
+  --map-line: rgba(236, 229, 209, 0.08);
+  --accent: #ff4b33;
+  --accent-strong: #ff7057;
+  --accent-glow: rgba(255, 75, 51, 0.26);
+  --code-bg: #16130e;
+  --code-ink: #e8e0cc;
+  --hl-keyword: #ff8a70;
+  --hl-string: #d8c07a;
+  --hl-comment: #7a7260;
+  --hl-number: #ffb3a0;
+  --hl-func: #b5d0a8;
+  --hl-attr: #c9bfa5;
+  --shadow: 0 14px 50px rgba(0, 0, 0, 0.55);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-panel: var(--panel);
+  --color-panel-solid: var(--panel-solid);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --font-sans: "Inter", -apple-system, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas,
+    "SF Mono", Menlo, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 8px;
+  border: 2px solid var(--bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ============ mono 标注（制图注记）============ */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.glow-text {
+  text-shadow: 0 0 32px var(--accent-glow);
+}
+
+/* ============ 玻璃面板 ============ */
+.glass {
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+}
+
+/* ============ 制图网格背景（经纬网）============ */
+.map-grid {
+  background-image: linear-gradient(var(--map-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--map-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.map-grid-fade {
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 30%, black 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 30%, black 30%, transparent 78%);
+}
+
+/* ============ Hero 文字可读性：背景色晕光 ============ */
+.hero-shadow {
+  text-shadow:
+    0 0 22px var(--bg),
+    0 0 46px var(--bg),
+    0 2px 10px var(--bg);
+}
+
+/* ============ 全站文字背景晕光：等高线不再干扰阅读（text-shadow 可继承） ============ */
+header,
+main,
+footer,
+aside {
+  text-shadow:
+    0 0 14px var(--bg),
+    0 0 28px var(--bg),
+    0 1px 5px var(--bg);
+}
+
+/* ============ 全站内容暗纱：文字区域后方压暗等高线（制图注记的"压盖"处理） ============ */
+.veil-layer {
+  background:
+    radial-gradient(ellipse 90% 98% at 50% 44%, var(--bg) 0%, color-mix(in srgb, var(--bg) 90%, transparent) 38%, color-mix(in srgb, var(--bg) 52%, transparent) 64%, transparent 88%),
+    linear-gradient(to bottom, color-mix(in srgb, var(--bg) 60%, transparent), transparent 16%, transparent 84%, color-mix(in srgb, var(--bg) 60%, transparent));
+}
+
+/* ============ 导航项：磁吸动效 + 激活下划线 ============ */
+.nav-item {
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.2s ease;
+  will-change: transform;
+}
+
+.nav-underline {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  height: 2px;
+  width: 58%;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-item.is-active .nav-underline {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* ============ 红色坐标标记 ============ */
+.marker-dot {
+  position: relative;
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: var(--accent);
+  flex: none;
+}
+
+.marker-dot::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 9999px;
+  border: 1.5px solid var(--accent);
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.marker-dot.is-live::after {
+  animation: marker-ping 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes marker-ping {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.4);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* ============ 探索卡片 ============ */
+.explore-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s ease, box-shadow 0.5s ease;
+  will-change: transform;
+}
+
+.explore-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 0 0 1px var(--accent-glow), var(--shadow);
+  transform: translateY(-4px);
+}
+
+/* 卡片右上角红色角标 */
+.explore-card .corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background-image: linear-gradient(225deg, var(--accent-glow), transparent 55%);
+  pointer-events: none;
+}
+
+.explore-card:hover .corner {
+  opacity: 1;
+}
+
+/* 卡片粒子画布 */
+.explore-card .sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.explore-card:hover .sparks {
+  opacity: 1;
+}
+
+/* ============ 幽灵大数字 ============ */
+.ghost-num {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--line-strong);
+  user-select: none;
+}
+
+/* ============ 滚动进场 ============ */
+.rv {
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), filter 0.9s ease;
+  will-change: opacity, transform, filter;
+}
+
+.rv-up { transform: translateY(36px); }
+.rv-down { transform: translateY(-26px); }
+.rv-left { transform: translateX(-44px); }
+.rv-right { transform: translateX(44px); }
+.rv-scale { transform: scale(0.93); }
+.rv-blur { filter: blur(14px); transform: translateY(24px); }
+
+.rv.is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ============ 标题渐变流光（米白→红）============ */
+.grad-text {
+  background: linear-gradient(110deg, var(--ink) 30%, var(--accent) 50%, var(--ink) 72%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: grad-slide 8s linear infinite;
+}
+
+@keyframes grad-slide {
+  to {
+    background-position: -260% 0;
+  }
+}
+
+/* ============ 标题红线自绘 ============ */
+.draw-line {
+  position: relative;
+  display: inline-block;
+}
+
+.draw-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  height: 3px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.is-in .draw-line::after,
+.draw-line.is-in::after {
+  transform: scaleX(1);
+}
+
+/* ============ 页面过渡 ============ */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.page-enter {
+  animation: page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ============ 十字丝 ============ */
+.crosshair-line {
+  position: absolute;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* ============ 正文排版（大字号）============ */
+.md-body {
+  font-size: 1.125rem;
+  line-height: 1.9;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.md-body > *:first-child {
+  margin-top: 0;
+}
+
+.md-body h2 {
+  margin-top: 3rem;
+  margin-bottom: 1.1rem;
+  padding-top: 1.9rem;
+  border-top: 1px solid var(--line);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.md-body h3 {
+  margin-top: 2.2rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.md-body h4 {
+  margin-top: 1.6rem;
+  margin-bottom: 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.md-body h2,
+.md-body h3,
+.md-body h4 {
+  scroll-margin-top: 6rem;
+}
+
+.md-body p {
+  margin-block: 1.1rem;
+}
+
+.md-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.3s;
+}
+
+.md-body a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.md-body ul,
+.md-body ol {
+  margin-block: 1.1rem;
+  padding-left: 1.5em;
+}
+
+.md-body ul {
+  list-style: none;
+}
+
+.md-body ul > li {
+  position: relative;
+}
+
+.md-body ul > li::before {
+  content: "";
+  position: absolute;
+  left: -1.1em;
+  top: 0.78em;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  border: 1.5px solid var(--accent);
+}
+
+.md-body ol {
+  list-style: decimal;
+}
+
+.md-body li {
+  margin-block: 0.4rem;
+}
+
+.md-body li::marker {
+  color: var(--accent);
+}
+
+.md-body blockquote {
+  margin-block: 1.4rem;
+  padding: 0.9rem 1.25rem;
+  border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  border-radius: 0 10px 10px 0;
+  color: var(--ink-soft);
+}
+
+.md-body code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  color: var(--ink);
+}
+
+.md-body pre {
+  margin-block: 1.4rem;
+  padding: 1.2rem 1.3rem;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.md-body pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--code-ink);
+  font-size: inherit;
+}
+
+.md-body table {
+  width: 100%;
+  margin-block: 1.4rem;
+  border-collapse: collapse;
+  font-size: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.md-body th {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+}
+
+.md-body th,
+.md-body td {
+  padding: 0.6rem 0.95rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.md-body tr:last-child td {
+  border-bottom: none;
+}
+
+.md-body img {
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-block: 1.4rem;
+}
+
+.md-body hr {
+  margin-block: 2.2rem;
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);
+}
+
+/* ============ 代码高亮 ============ */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-type {
+  color: var(--hl-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition {
+  color: var(--hl-string);
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion {
+  color: var(--hl-comment);
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-symbol {
+  color: var(--hl-number);
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-section,
+.hljs-name {
+  color: var(--hl-func);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-params {
+  color: var(--hl-attr);
+}
+
+.hljs-meta {
+  color: var(--hl-comment);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}
+
+/* ============ reduced motion ============ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rv,
+  .page-enter,
+  .grad-text,
+  .marker-dot.is-live::after {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .draw-line::after {
+    transform: scaleX(1);
+  }
+}
