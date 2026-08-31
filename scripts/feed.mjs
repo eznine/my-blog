@@ -4,25 +4,61 @@ import matter from 'gray-matter';
 
 const ROOT = process.cwd();
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
-const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf-8'));
+const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'copy', '00-站点信息.json'), 'utf-8'));
 const SITE_URL = (process.env.SITE_URL || cfg.siteUrl).replace(/\/$/, '') + BASE_PATH;
+
+/** 与 lib/content.ts 的 slugify 保持一致：URL 安全的 ASCII slug */
+function slugify(input) {
+  const s = input
+    .replace(/\.mdx?$/, '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 64)
+    .replace(/-+$/g, '');
+  return s || 'post';
+}
+
+const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', '.git', '.next', 'out']);
+
+function collectMd(abs, rel = '') {
+  const out = [];
+  let entries;
+  try {
+    entries = fs.readdirSync(abs, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const e of entries) {
+    if (e.name.startsWith('.')) continue;
+    const relPath = rel ? `${rel}/${e.name}` : e.name;
+    if (e.isDirectory()) {
+      if (SKIP_DIRS.has(e.name)) continue;
+      out.push(...collectMd(path.join(abs, e.name), relPath));
+    } else if (e.name.endsWith('.md') || e.name.endsWith('.mdx')) out.push(relPath);
+  }
+  return out.sort();
+}
 
 function readDir(dir) {
   const abs = path.join(ROOT, 'content', dir);
   if (!fs.existsSync(abs)) return [];
-  return fs
-    .readdirSync(abs)
-    .filter((f) => f.endsWith('.md'))
-    .map((file) => {
-      const raw = fs.readFileSync(path.join(abs, file), 'utf-8');
-      const { data } = matter(raw);
-      const date =
+  return collectMd(abs)
+    .map((relPath) => {
+      const raw = fs.readFileSync(path.join(abs, relPath), 'utf-8');
+      const { data, content } = matter(raw);
+      const stat = fs.statSync(path.join(abs, relPath));
+      const dateStr =
         data.date instanceof Date
-          ? data.date.toISOString()
-          : new Date(data.date || '1970-01-01').toISOString();
+          ? data.date.toISOString().slice(0, 10)
+          : String(data.date || stat.mtime.toISOString().slice(0, 10)).slice(0, 10);
+      const date = new Date(dateStr).toISOString();
+      const titleMatch = content.match(/^#\s+(.+)$/m);
       return {
-        slug: file.replace(/\.md$/, ''),
-        title: data.title ?? file,
+        slug: slugify(relPath),
+        title: data.title ?? titleMatch?.[1]?.trim() ?? relPath,
         summary: data.summary ?? '',
         date,
       };

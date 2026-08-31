@@ -1,0 +1,10 @@
+{
+  "_说明": "404 页文案：从上到下依次是错误码、提示语、英文标注、返回按钮。",
+
+  "notFound": {
+    "code": "404",
+    "message": "该坐标不在本图幅范围内。",
+    "label": "TERRA INCOGNITA · UNKNOWN REGION",
+    "back": "返回首页"
+  }
+}

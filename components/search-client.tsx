@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { searchItems, type SearchItem } from '@/lib/search-core';
+import { site } from '@/lib/site';
 
 const TYPE_ORDER: SearchItem['type'][] = ['note', 'research', 'project'];
 
@@ -46,7 +47,7 @@ export function SearchClient({ items }: { items: SearchItem[] }) {
           value={query}
           autoFocus
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="搜索全部笔记、研究与项目…"
+          placeholder={site.pages.search.placeholder}
           className="w-full rounded-lg border border-line bg-panel py-3.5 pl-12 pr-4 text-[17px] text-ink backdrop-blur placeholder:text-ink-faint transition-all focus:border-accent/60 focus:shadow-[0_0_22px_var(--accent-glow)] focus:outline-none"
         />
       </div>
@@ -64,7 +65,7 @@ export function SearchClient({ items }: { items: SearchItem[] }) {
                   : 'border-line text-ink-soft hover:border-accent/50 hover:text-accent'
               }`}
             >
-              全部 {hits.length}
+              {site.pages.search.all} {hits.length}
             </button>
             {TYPE_ORDER.filter((t) => counts.get(t)).map((t) => {
               const label = items.find((i) => i.type === t)!.typeLabel;
@@ -90,13 +91,13 @@ export function SearchClient({ items }: { items: SearchItem[] }) {
       <div className="mt-6">
         {tokens.length === 0 ? (
           <div className="py-14 text-center">
-            <p className="text-sm text-ink-soft">输入关键词开始搜索，支持标题、标签、分类与正文。</p>
-            <p className="mono-label mt-2">SEARCH INDEX · {items.length} DOCS</p>
+            <p className="text-sm text-ink-soft">{site.pages.search.empty}</p>
+            <p className="mono-label mt-2">{site.pages.search.indexLabel.replace('{n}', String(items.length))}</p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-14 text-center">
-            <p className="text-sm text-ink-soft">没有找到匹配「{query}」的内容。</p>
-            <p className="mono-label mt-2">NO MATCH</p>
+            <p className="text-sm text-ink-soft">{site.pages.search.noMatch.replace('{q}', query)}</p>
+            <p className="mono-label mt-2">{site.pages.search.noMatchLabel}</p>
           </div>
         ) : (
           <ul className="divide-y divide-line border-y border-line">

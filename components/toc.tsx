@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { Heading } from '@/lib/md';
 
-function useActiveId(headings: Heading[]) {
+export function useActiveId(headings: Heading[]) {
   const [activeId, setActiveId] = useState('');
 
   useEffect(() => {
@@ -33,7 +33,7 @@ function useActiveId(headings: Heading[]) {
   return activeId;
 }
 
-function TocList({ headings, activeId, onNavigate }: { headings: Heading[]; activeId: string; onNavigate?: () => void }) {
+export function TocList({ headings, activeId, onNavigate }: { headings: Heading[]; activeId: string; onNavigate?: () => void }) {
   return (
     <ul className="space-y-1 border-l border-line text-[15px]">
       {headings.map((h) => (
@@ -56,52 +56,3 @@ function TocList({ headings, activeId, onNavigate }: { headings: Heading[]; acti
     </ul>
   );
 }
-
-/** 桌面端：左侧固定目录；窄屏：文章顶部下拉目录。 */
-export function ArticleToc({ headings }: { headings: Heading[] }) {
-  const activeId = useActiveId(headings);
-  const [open, setOpen] = useState(false);
-
-  if (headings.length === 0) return null;
-
-  return (
-    <>
-      {/* 窄屏下拉目录 */}
-      <div className="mb-8 xl:hidden">
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          className="flex w-full items-center justify-between rounded-xl border border-line bg-panel px-5 py-3.5 text-left backdrop-blur transition-colors hover:border-accent/50"
-        >
-          <span className="flex items-center gap-2.5 font-mono text-[13px] tracking-[0.18em] text-ink-soft uppercase">
-            <span className="marker-dot is-live !h-[5px] !w-[5px]" />
-            目录 · {headings.length} 节
-          </span>
-          <svg
-            viewBox="0 0 24 24"
-            className={`h-4 w-4 text-ink-faint transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="m6 9 6 6 6-6" />
-          </svg>
-        </button>
-        <div
-          className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ${
-            open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-          }`}
-        >
-          <nav className="min-h-0">
-            <div className="mt-2 rounded-xl border border-line bg-panel px-5 py-4 backdrop-blur">
-              <TocList headings={headings} activeId={activeId} onNavigate={() => setOpen(false)} />
-            </div>
-          </nav>
-        </div>
-      </div>
-    </>
-  );
-}
-
-export { TocList, useActiveId };

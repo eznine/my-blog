@@ -1,0 +1,15 @@
+{
+  "_说明": "归档页文案：顶部标题区、三种内容类型的名称、空状态提示。",
+
+  "page": {
+    "code": "04",
+    "en": "ARCHIVE",
+    "title": "归档",
+    "desc": "站点全部内容的时间线——笔记、研究与项目。",
+    "count": "{total} 条记录 · {notes} 笔记 / {research} 研究 / {projects} 项目",
+    "empty": "还没有内容。在 content/ 目录下添加 Markdown 文件即可。",
+    "typeNote": "笔记",
+    "typeResearch": "研究",
+    "typeProject": "项目"
+  }
+}

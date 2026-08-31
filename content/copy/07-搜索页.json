@@ -1,0 +1,16 @@
+{
+  "_说明": "搜索页文案：顶部标题区、输入框占位符、各类状态提示。",
+
+  "page": {
+    "code": "⌖",
+    "en": "SEARCH",
+    "title": "搜索",
+    "desc": "在全部笔记、研究与项目中检索——标题、标签、分类与正文均可命中。",
+    "placeholder": "搜索全部笔记、研究与项目…",
+    "all": "全部",
+    "empty": "输入关键词开始搜索，支持标题、标签、分类与正文。",
+    "noMatch": "没有找到匹配「{q}」的内容。",
+    "indexLabel": "SEARCH INDEX · {n} DOCS",
+    "noMatchLabel": "NO MATCH"
+  }
+}

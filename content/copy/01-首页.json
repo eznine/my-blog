@@ -1,0 +1,58 @@
+{
+  "_说明": "首页文案：从上到下依次是开场大屏（徽章/大字/按钮/数据条）、『我在做什么』方向卡、三个内容区块（最近的笔记/研究/项目）、页尾结束语。注意：开场大字三行（hero.titleLines）和简介（hero.bio）是首页独立文案，改这里只影响首页，不会动到关于页/页脚（那些在 00-站点信息.json）。",
+
+  "hero": {
+    "badge": "STILL EXPLORING",
+    "mapLabel": "未完成的地图",
+    "titleLines": ["你好", "张鹏，", "地理信息科学"],
+    "bio": "地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。",
+    "ctaNotes": "开始阅读笔记",
+    "ctaProjects": "看看我的项目 →",
+    "github": "GitHub ↗",
+    "stats": [
+      { "label": "笔记 NOTES", "href": "/notes" },
+      { "label": "研究 RESEARCH", "href": "/research" },
+      { "label": "项目 PROJECTS", "href": "/projects" }
+    ],
+    "scrollHint": "向下滑动",
+    "scrollHintEn": "SCROLL TO EXPLORE"
+  },
+
+  "focusAreas": [
+    {
+      "code": "RS",
+      "title": "GIS 与遥感",
+      "desc": "土地利用解译、植被指数、时序分析，GEE 云端处理与 InSAR 形变监测。"
+    },
+    {
+      "code": "SA",
+      "title": "空间分析",
+      "desc": "生态安全格局、MSPA、电路理论、空间统计与地理加权建模。"
+    },
+    {
+      "code": "WG",
+      "title": "WebGIS 与可视化",
+      "desc": "MapLibre / Cesium / Leaflet，地图应用开发与地理数据前端表达。"
+    },
+    {
+      "code": "DEV",
+      "title": "编程与数据",
+      "desc": "Python / JavaScript 地理数据处理，XGBoost-SHAP 可解释建模。"
+    }
+  ],
+
+  "home": {
+    "sections": [
+      { "code": "00", "en": "DIRECTIONS", "title": "我在做什么" },
+      { "code": "01", "en": "LATEST NOTES", "title": "最近的笔记", "href": "/notes", "link": "全部笔记" },
+      { "code": "02", "en": "RESEARCH", "title": "最近的研究", "href": "/research", "link": "全部研究" },
+      { "code": "03", "en": "PROJECTS", "title": "最近的项目", "href": "/projects", "link": "全部项目" }
+    ],
+    "emptyNotes": "还没有笔记，去 content/notes/ 写第一篇吧。",
+    "emptyResearch": "还没有研究记录。",
+    "emptyProjects": "还没有项目。",
+    "endnote": "地图尚未完成 · 探索仍在继续",
+    "endnoteArchive": "归档",
+    "endnoteAbout": "关于我"
+  }
+}

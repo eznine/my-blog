@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Heading } from '@/lib/md';
-import { ArticleToc } from './toc';
 import { DesktopToc } from './desktop-toc';
+import { MobileTocRail } from './mobile-toc-rail';
 import { ReadingProgress } from './reading-progress';
 import { TagChip } from './tag-chip';
 
@@ -48,13 +48,12 @@ export function ArticleShell({
         </Link>
 
         <div className="mt-8 flex gap-12">
-          {/* 左侧固定目录 */}
+          {/* 左侧固定目录（xl+） */}
           <DesktopToc headings={headings} />
+          {/* 移动端右侧章节滑轨（<xl） */}
+          <MobileTocRail headings={headings} />
 
           <article className="min-w-0 max-w-[45rem] flex-1">
-            {/* 窄屏下拉目录 */}
-            <ArticleToc headings={headings} />
-
             <header className="page-enter">
               <div className="mono-label flex items-center gap-2.5 !text-accent">
                 <span className="marker-dot is-live !h-[5px] !w-[5px]" />

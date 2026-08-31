@@ -2,7 +2,11 @@
 
 import { useEffect, useRef } from 'react';
 
-/** 全局光标辉光：一团柔和的青色光晕跟随鼠标，仅精确指针设备启用。 */
+/**
+ * 全局光标辉光：柔和光晕跟随鼠标，仅精确指针设备启用。
+ * 深色主题 screen 混合（提亮），浅色主题普通混合（暖色薄雾）。
+ * 可通过 localStorage 'ez-glow'（'off' 关闭）+ 'ez-glow-change' 事件开关。
+ */
 export function CursorGlow() {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -10,6 +14,12 @@ export function CursorGlow() {
     if (!window.matchMedia('(pointer: fine)').matches) return;
     const el = ref.current;
     if (!el) return;
+
+    const applyEnabled = () => {
+      el.style.display = localStorage.getItem('ez-glow') === 'off' ? 'none' : '';
+    };
+    applyEnabled();
+    window.addEventListener('ez-glow-change', applyEnabled);
 
     let raf = 0;
     let tx = window.innerWidth / 2;
@@ -45,6 +55,7 @@ export function CursorGlow() {
     return () => {
       window.removeEventListener('mousemove', onMove);
       document.documentElement.removeEventListener('mouseleave', onLeave);
+      window.removeEventListener('ez-glow-change', applyEnabled);
       cancelAnimationFrame(raf);
     };
   }, []);
@@ -53,10 +64,9 @@ export function CursorGlow() {
     <div
       ref={ref}
       aria-hidden="true"
-      className="pointer-events-none fixed left-0 top-0 z-[5] h-[520px] w-[520px] opacity-0 mix-blend-screen transition-opacity duration-500 dark:opacity-0"
+      className="cursor-glow pointer-events-none fixed left-0 top-0 z-[5] h-[520px] w-[520px] opacity-0 transition-opacity duration-500"
       style={{
-        background:
-          'radial-gradient(circle, var(--accent-glow) 0%, transparent 60%)',
+        background: 'radial-gradient(circle, var(--accent-glow) 0%, transparent 60%)',
       }}
     />
   );

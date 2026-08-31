@@ -65,7 +65,7 @@ export default async function HomePage() {
       <div className="mx-auto max-w-6xl px-6">
         {/* ================= 方向 ================= */}
         <section className="pt-24 md:pt-28">
-          <SectionHeading code="00" en="DIRECTIONS" title="我在做什么" />
+          <SectionHeading code={site.home.sections[0].code} en={site.home.sections[0].en} title={site.home.sections[0].title} />
           <div className="grid gap-6 sm:grid-cols-2">
             {site.focusAreas.map((f, i) => (
               <Reveal key={f.code} variant="scale" delay={i * 100}>
@@ -100,7 +100,13 @@ export default async function HomePage() {
 
         {/* ================= 最新笔记 ================= */}
         <section className="pt-24 md:pt-28">
-          <SectionHeading code="01" en="LATEST NOTES" title="最近的笔记" href="/notes" linkLabel="全部笔记" />
+          <SectionHeading
+            code={site.home.sections[1].code}
+            en={site.home.sections[1].en}
+            title={site.home.sections[1].title}
+            href={site.home.sections[1].href}
+            linkLabel={site.home.sections[1].link}
+          />
           {notes.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-3">
               {notes.slice(0, 3).map((n, i) => (
@@ -110,13 +116,19 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <p className="py-8 text-ink-faint">还没有笔记，去 content/notes/ 写第一篇吧。</p>
+            <p className="py-8 text-ink-faint">{site.home.emptyNotes}</p>
           )}
         </section>
 
         {/* ================= 最近研究 ================= */}
         <section className="pt-24 md:pt-28">
-          <SectionHeading code="02" en="RESEARCH" title="最近的研究" href="/research" linkLabel="全部研究" />
+          <SectionHeading
+            code={site.home.sections[2].code}
+            en={site.home.sections[2].en}
+            title={site.home.sections[2].title}
+            href={site.home.sections[2].href}
+            linkLabel={site.home.sections[2].link}
+          />
           {research.length > 0 ? (
             <Reveal variant="up">
               <div className="rounded-2xl border border-line glass p-3">
@@ -126,13 +138,19 @@ export default async function HomePage() {
               </div>
             </Reveal>
           ) : (
-            <p className="py-8 text-ink-faint">还没有研究记录。</p>
+            <p className="py-8 text-ink-faint">{site.home.emptyResearch}</p>
           )}
         </section>
 
         {/* ================= 最新项目 ================= */}
         <section className="pt-24 md:pt-28">
-          <SectionHeading code="03" en="PROJECTS" title="最近的项目" href="/projects" linkLabel="全部项目" />
+          <SectionHeading
+            code={site.home.sections[3].code}
+            en={site.home.sections[3].en}
+            title={site.home.sections[3].title}
+            href={site.home.sections[3].href}
+            linkLabel={site.home.sections[3].link}
+          />
           {projects.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2">
               {projects.slice(0, 2).map((p, i) => (
@@ -142,7 +160,7 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <p className="py-8 text-ink-faint">还没有项目。</p>
+            <p className="py-8 text-ink-faint">{site.home.emptyProjects}</p>
           )}
         </section>
 
@@ -153,16 +171,16 @@ export default async function HomePage() {
             <div className="relative">
               <span className="marker-dot is-live mx-auto block !h-3 !w-3" />
               <p className="mt-6 font-mono text-sm tracking-[0.28em] text-ink-faint uppercase">
-                地图尚未完成 · 探索仍在继续
+                {site.home.endnote}
               </p>
               <p className="mt-5 text-2xl font-bold text-ink md:text-3xl">
                 全部内容收录于{' '}
                 <Link href="/archive" className="text-accent transition-colors hover:text-accent-strong">
-                  归档
+                  {site.home.endnoteArchive}
                 </Link>{' '}
                 ·{' '}
                 <Link href="/about" className="text-accent transition-colors hover:text-accent-strong">
-                  关于我
+                  {site.home.endnoteAbout}
                 </Link>
               </p>
             </div>

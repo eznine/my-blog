@@ -1,0 +1,32 @@
+{
+  "_说明": "关于页文案：从上到下依次是页头标题、教育经历、研究兴趣、技能栈、页脚注记。个人信息（姓名/单位/邮箱/坐标）在 00-全局.json 里，因为页脚和首页也要用。",
+
+  "page": {
+    "code": "05",
+    "en": "ABOUT",
+    "title": "关于 · {name}",
+    "education": "EDUCATION · 教育经历",
+    "interests": "INTERESTS · 研究兴趣",
+    "skills": "SKILLS · 技能栈",
+    "footer": "{coords} · DATUM WGS 84 · END OF SHEET"
+  },
+
+  "education": [
+    { "period": "2024 — 至今", "school": "××大学", "detail": "地图学与地理信息系统 · 硕士" },
+    { "period": "2020 — 2024", "school": "××大学", "detail": "地理信息科学 · 学士" }
+  ],
+
+  "researchInterests": [
+    "生态安全格局与生态网络",
+    "InSAR 地表形变监测（地面塌陷）",
+    "遥感生态参数反演与土地利用变化",
+    "机器学习可解释性在地理问题中的应用"
+  ],
+
+  "skills": [
+    { "group": "GIS 与遥感", "items": ["ArcGIS Pro", "QGIS", "ENVI", "GEE", "SNAP / StaMPS"] },
+    { "group": "空间分析", "items": ["MSPA", "MCR 阻力面", "InVEST", "Circuitscape", "Moran's I / GWR"] },
+    { "group": "WebGIS 与前端", "items": ["MapLibre GL", "Cesium", "Leaflet", "OpenLayers", "React / Next.js", "D3.js"] },
+    { "group": "编程与数据", "items": ["Python", "JavaScript / TypeScript", "R", "PostGIS", "XGBoost / SHAP"] }
+  ]
+}

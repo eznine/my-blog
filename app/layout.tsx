@@ -5,15 +5,18 @@ import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { CursorGlow } from '@/components/cursor-glow';
 import { site } from '@/lib/site';
+import { buildAppearanceCss } from '@/lib/appearance';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: `${site.siteName} · ${site.name}的 GIS 空间站`,
-    template: `%s · ${site.siteName}`,
+    default: site.meta.title,
+    template: site.meta.titleTemplate,
   },
-  description: site.bio,
+  description: site.meta.description || site.bio,
 };
+
+const appearanceCss = buildAppearanceCss();
 
 export default function RootLayout({
   children,
@@ -21,6 +24,16 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="transition-colors duration-300">
+        {/* 进入页面时禁用浏览器滚动位置恢复，避免水合前先闪现上次滚动位置的内容 */}
+        <script
+          id="ez-scroll-reset"
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if('scrollRestoration' in history)history.scrollRestoration='manual';if(!window.location.hash)window.scrollTo(0,0);}catch(e){}",
+          }}
+        />
+        {/* 外观配置（content/appearance.json）：覆盖字号与颜色变量 */}
+        <style id="ez-appearance" dangerouslySetInnerHTML={{ __html: appearanceCss }} />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <CursorGlow />
           {/* 全站固定等高线背景：所有页面、任意滚动位置可见，支持鼠标扰动 */}

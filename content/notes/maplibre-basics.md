@@ -1,9 +1,8 @@
 ---
 title: "MapLibre GL JS 入门：矢量瓦片地图的正确打开方式"
-date: 2026-06-02
-category: WebGIS
-tags: [MapLibre, 矢量瓦片, 前端, JavaScript]
+date: "2026-06-02"
 summary: "从初始化地图到加载自定义矢量瓦片源、图层样式与交互事件，整理 WebGIS 前端开发的起步模板与关键概念。"
+category: "WebGIS"
 ---
 
 MapLibre GL JS 是 Mapbox GL JS 的开源分支，渲染矢量瓦片（MVT）流畅且可完全自托管。做校园地图项目时我把它跑通了全流程，记录如下。

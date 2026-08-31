@@ -1,0 +1,26 @@
+{
+  "_说明": "笔记列表页文案：page 是顶部标题区，browser 是搜索框、分类/标签/排序筛选行的文字。",
+
+  "page": {
+    "code": "01",
+    "en": "NOTES",
+    "title": "笔记 · 知识库",
+    "desc": "GIS、遥感、空间分析、WebGIS、编程与相关软件的学习记录——每个方向下的知识点、技术与实践案例，随学习不断扩展。",
+    "count": "共 {n} 篇 · 支持按分类 / 标签 / 关键词筛选"
+  },
+
+  "browser": {
+    "placeholder": "搜索笔记标题、摘要或标签…",
+    "cat": "分类",
+    "tag": "标签",
+    "sort": "排序",
+    "sortNewest": "最新",
+    "sortOldest": "最早",
+    "all": "全部",
+    "collapse": "收起",
+    "count": "{filtered} / {total} 篇",
+    "clear": "× 清除筛选",
+    "empty": "没有匹配的笔记。",
+    "emptyLabel": "NO MATCH · 调整关键词试试"
+  }
+}

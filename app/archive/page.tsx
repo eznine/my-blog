@@ -3,19 +3,20 @@ import Link from 'next/link';
 import { getNotes, getResearch, getProjects } from '@/lib/content';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
+import { site } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: '归档',
-  description: '全部笔记、研究与项目的时间线归档。',
+  title: site.pages.archive.title,
+  description: site.pages.archive.desc,
 };
 
 export default async function ArchivePage() {
   const [notes, research, projects] = await Promise.all([getNotes(), getResearch(), getProjects()]);
 
   const all = [
-    ...notes.map((n) => ({ date: n.date, title: n.title, href: `/notes/${n.slug}`, type: '笔记', category: n.category })),
-    ...research.map((r) => ({ date: r.date, title: r.title, href: `/research/${r.slug}`, type: '研究', category: r.category })),
-    ...projects.map((p) => ({ date: p.date, title: p.title, href: `/projects/${p.slug}`, type: '项目', category: p.category })),
+    ...notes.map((n) => ({ date: n.date, title: n.title, href: `/notes/${n.slug}`, type: site.pages.archive.typeNote, category: n.category })),
+    ...research.map((r) => ({ date: r.date, title: r.title, href: `/research/${r.slug}`, type: site.pages.archive.typeResearch, category: r.category })),
+    ...projects.map((p) => ({ date: p.date, title: p.title, href: `/projects/${p.slug}`, type: site.pages.archive.typeProject, category: p.category })),
   ].sort((a, b) => b.date.localeCompare(a.date));
 
   const years = [...new Set(all.map((i) => i.date.slice(0, 4)))].sort((a, b) => b.localeCompare(a));
@@ -24,19 +25,23 @@ export default async function ArchivePage() {
     <div className="mx-auto max-w-6xl px-6 pb-12 pt-10 md:pt-16">
       <Reveal>
         <PageHeader
-          code="04"
-          en="ARCHIVE"
-          title="归档"
-          desc="站点全部内容的时间线——笔记、研究与项目。"
+          code={site.pages.archive.code}
+          en={site.pages.archive.en}
+          title={site.pages.archive.title}
+          desc={site.pages.archive.desc}
         >
           <p className="mono-label mt-4">
-            {all.length} 条记录 · {notes.length} 笔记 / {research.length} 研究 / {projects.length} 项目
+            {site.pages.archive.count
+              .replace('{total}', String(all.length))
+              .replace('{notes}', String(notes.length))
+              .replace('{research}', String(research.length))
+              .replace('{projects}', String(projects.length))}
           </p>
         </PageHeader>
       </Reveal>
 
       {all.length === 0 ? (
-        <p className="py-12 text-sm text-ink-faint">还没有内容。在 content/ 目录下添加 Markdown 文件即可。</p>
+        <p className="py-12 text-sm text-ink-faint">{site.pages.archive.empty}</p>
       ) : (
         years.map((year, yi) => (
           <Reveal key={year} delay={Math.min(yi, 3) * 80}>

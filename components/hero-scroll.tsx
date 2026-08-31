@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useLayoutEffect, useRef } from 'react';
+import { Fragment, useLayoutEffect, useRef } from 'react';
 import { site } from '@/lib/site';
+import { hasVisitedNonHome } from '@/lib/nav-state';
 import { topoState } from './topo-shader-field';
 import { MapParticleField } from './map-particle-field';
+import { SparkField } from './spark-field';
 import { Crosshair } from './crosshair';
 import { Counter } from './counter';
 
@@ -48,6 +50,16 @@ export function HeroScroll({
     });
     const hint = stage.querySelector<HTMLElement>('[data-hs-hint]');
 
+    // 站内返回首页：直接定位到开场完成处（p=1），不再重播开场（瞬时跳转，避免 smooth 滚动动画）
+    if (hasVisitedNonHome()) {
+      const y = stage.getBoundingClientRect().top + window.scrollY + stage.offsetHeight - window.innerHeight;
+      const el = document.documentElement;
+      const prev = el.style.scrollBehavior;
+      el.style.scrollBehavior = 'auto';
+      window.scrollTo(0, Math.max(0, y));
+      el.style.scrollBehavior = prev;
+    }
+
     let raf = 0;
     const update = () => {
       raf = 0;
@@ -84,11 +96,11 @@ export function HeroScroll({
     };
   }, []);
 
-  const [lat, lon] = site.coords.match(/(\d+\.\d+)/g)?.map(Number) ?? [34.26, 108.94];
+  const [lat, lon] = site.coords.match(/(\d+\.\d+)/g)?.map(Number) ?? [37.74, 112.66];
 
   return (
     <section ref={stageRef} className="hero-scroll-section relative -mt-14 h-[calc(260vh+3.5rem)] border-b border-line">
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+      <div className="sticky top-0 flex h-screen items-center overflow-hidden pt-16">
         {/* 等高线背景由 layout 的全站固定层渲染（滚动驱动 topoState） */}
 
         {/* 粒子尘埃：随进度淡入 */}
@@ -116,10 +128,10 @@ export function HeroScroll({
           <div data-hs="0.05,0.22" className="mono-label flex flex-wrap items-center gap-4" style={{ opacity: 0 }}>
             <span className="flex items-center gap-2.5 rounded-full border border-accent/50 px-3.5 py-1.5 !text-accent">
               <span className="marker-dot is-live !h-[6px] !w-[6px]" />
-              STILL EXPLORING
+              {site.hero.badge}
             </span>
             <span className="hidden h-px w-20 bg-line md:block" />
-            <span className="hidden md:inline">未完成的地图 · 第 001 图幅</span>
+            <span className="hidden md:inline">{site.hero.mapLabel}</span>
           </div>
 
           <h1
@@ -127,32 +139,34 @@ export function HeroScroll({
             className="hero-shadow mt-10 text-[2.9rem] leading-[1.08] font-black tracking-tight text-ink md:text-[4.6rem]"
             style={{ opacity: 0 }}
           >
-            你好，我是
-            <br />
-            <span className="grad-text glow-text">{site.name}</span>
-            <span>，</span>
-            <br />
-            <span className="grad-text glow-text">{site.identity}</span>
+            {site.hero.titleLines.map((line, i) => (
+              <Fragment key={i}>
+                {i > 0 && <br />}
+                <span className="grad-text glow-text">{line}</span>
+              </Fragment>
+            ))}
           </h1>
 
           <p data-hs="0.32,0.52" className="hero-shadow mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft" style={{ opacity: 0 }}>
-            {site.bio}
+            {site.hero.bio}
           </p>
 
           <div data-hs="0.48,0.64" className="mt-11 flex flex-wrap items-center gap-5" style={{ opacity: 0 }}>
             <Link
               href="/notes"
               className="group relative overflow-hidden rounded-xl px-8 py-3.5 text-base font-semibold text-white transition-transform duration-300 hover:scale-[1.04] active:scale-95"
-              style={{ background: 'var(--accent)', boxShadow: '0 0 34px var(--accent-glow)' }}
+              style={{ background: 'var(--accent)' }}
             >
-              <span className="relative z-10">开始阅读笔记</span>
+              <span className="relative z-10" style={{ textShadow: 'none' }}>
+                {site.hero.ctaNotes}
+              </span>
               <span className="absolute inset-0 -translate-x-full bg-white/25 transition-transform duration-500 group-hover:translate-x-full" />
             </Link>
             <Link
               href="/projects"
               className="rounded-xl border border-line-strong px-7 py-3.5 text-base font-medium text-ink transition-all hover:border-accent hover:text-accent"
             >
-              看看我的项目 →
+              {site.hero.ctaProjects}
             </Link>
             <a
               href={site.github}
@@ -160,25 +174,27 @@ export function HeroScroll({
               rel="noreferrer"
               className="text-base text-ink-faint transition-colors hover:text-accent"
             >
-              GitHub ↗
+              {site.hero.github}
             </a>
           </div>
 
           <div
             data-hs="0.64,0.84"
-            className="mt-20 grid max-w-2xl grid-cols-3 divide-x divide-line rounded-2xl border border-line glass"
+            className="mt-10 grid max-w-2xl grid-cols-3 gap-4"
             style={{ opacity: 0 }}
           >
             {[
-              { n: notes, label: '笔记 NOTES', href: '/notes' },
-              { n: research, label: '研究 RESEARCH', href: '/research' },
-              { n: projects, label: '项目 PROJECTS', href: '/projects' },
+              { n: notes, ...site.hero.stats[0] },
+              { n: research, ...site.hero.stats[1] },
+              { n: projects, ...site.hero.stats[2] },
             ].map((s) => (
-              <Link key={s.label} href={s.href} className="group px-6 py-6 transition-colors hover:bg-accent/5">
-                <div className="font-mono text-4xl font-extrabold text-accent md:text-5xl">
+              <Link key={s.label} href={s.href} className="explore-card group rounded-2xl px-6 py-6">
+                <span className="corner" aria-hidden="true" />
+                <SparkField />
+                <div className="relative font-mono text-4xl font-extrabold text-accent md:text-5xl">
                   <Counter to={s.n} />
                 </div>
-                <div className="mono-label mt-2 !normal-case !tracking-[0.1em] transition-colors group-hover:!text-ink">
+                <div className="mono-label relative mt-2 !normal-case !tracking-[0.1em] transition-colors group-hover:!text-ink">
                   {s.label}
                 </div>
               </Link>
@@ -186,12 +202,16 @@ export function HeroScroll({
           </div>
         </div>
 
-        <div data-hs-hint className="mono-label absolute bottom-7 left-1/2 flex -translate-x-1/2 items-center gap-4">
-          <span className="hidden md:inline">{site.coords}</span>
-          <svg viewBox="0 0 24 24" className="h-4 w-4 animate-bounce text-accent" fill="none" stroke="currentColor" strokeWidth="2">
+        <div
+          data-hs-hint
+          className="mono-label absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5"
+        >
+          <svg viewBox="0 0 24 24" className="h-6 w-6 animate-bounce text-accent" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 4v14m0 0 6-6m-6 6-6-6" />
           </svg>
-          <span className="hidden md:inline">向下滑动 · SCROLL TO EXPLORE</span>
+          <span>{site.hero.scrollHint}</span>
+          <span>{site.hero.scrollHintEn}</span>
+          <span className="hidden md:inline">{site.coords}</span>
         </div>
       </div>
     </section>

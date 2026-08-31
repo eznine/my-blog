@@ -5,15 +5,10 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { ThemeToggle } from './theme-toggle';
 import { BrandLogo } from './brand-logo';
+import { markVisitedNonHome } from '@/lib/nav-state';
+import { site } from '@/lib/site';
 
-const NAV = [
-  { href: '/', label: '首页' },
-  { href: '/notes', label: '笔记' },
-  { href: '/research', label: '研究' },
-  { href: '/projects', label: '项目' },
-  { href: '/archive', label: '归档' },
-  { href: '/about', label: '关于' },
-];
+const NAV = site.nav;
 
 function SearchIcon() {
   return (
@@ -24,11 +19,33 @@ function SearchIcon() {
   );
 }
 
+function ArrowUpIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 19V5m0 0-6 6m6-6 6 6" />
+    </svg>
+  );
+}
+
 export function SiteHeader({ siteName }: { siteName: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [progress, setProgress] = useState<number | null>(null);
-  const rafRef = useRef<number>(0);
+  // 水合前隐藏，避免导航栏闪现
+  const [mounted, setMounted] = useState(false);
+  // 首页开场（等高线背景阶段）未完成时隐藏导航栏
+  const [intro, setIntro] = useState(pathname === '/');
+  // 移动端滚动方向：下滑收起 / 上滑显示（仅移动端生效）
+  const [hidden, setHidden] = useState(false);
+  const [showTop, setShowTop] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // 磁吸动效：光标附近的导航项（含搜索/主题按钮）放大上浮（Dock 式高斯衰减）
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
@@ -58,150 +75,230 @@ export function SiteHeader({ siteName }: { siteName: string }) {
     lastX.current = null;
     if (!magRaf.current) magRaf.current = requestAnimationFrame(applyMag);
   };
-  useEffect(() => () => magRaf.current && cancelAnimationFrame(magRaf.current), []);
+  useEffect(
+    () => () => {
+      if (magRaf.current) cancelAnimationFrame(magRaf.current);
+    },
+    []
+  );
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
 
+  // 记录站内已访问过非首页 → 返回首页时跳过开场动画
+  useEffect(() => {
+    if (pathname !== '/') markVisitedNonHome();
+  }, [pathname]);
+
+  useEffect(() => setMounted(true), []);
+
+  // 移动端判断（<768px，对应 Tailwind md 断点）
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // 首页开场进度：p < 0.15（等高线背景阶段）隐藏导航栏，开场完成后显示
   useEffect(() => {
     if (pathname !== '/') {
-      setProgress(null);
+      setIntro(false);
       return;
     }
-
     const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
     const update = () => {
-      const hero = document.querySelector('.hero-scroll-section');
+      const hero = document.querySelector<HTMLElement>('.hero-scroll-section');
       if (!hero) {
-        setProgress(null);
+        setIntro(false);
         return;
       }
       const rect = hero.getBoundingClientRect();
       const total = Math.max(1, hero.offsetHeight - window.innerHeight);
       const p = clamp01(-rect.top / total);
-      setProgress(p);
-      rafRef.current = 0;
+      setIntro(p < 0.15);
     };
-    const onScroll = () => {
-      if (!rafRef.current) rafRef.current = requestAnimationFrame(update);
-    };
+    const onScroll = () => requestAnimationFrame(update);
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', update);
     update();
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', update);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [pathname]);
 
-  // 非首页：直接显示；首页：滚动驱动 p
-  const p = progress ?? 1;
-  const opacity = p;
-  const y = -16 * (1 - p);
+  // 滚动方向控制（仅移动端）：下滑收起，上滑显示；顶部始终显示
+  useEffect(() => {
+    if (!isMobile) {
+      setHidden(false);
+      return;
+    }
+    let lastY = window.scrollY;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastY;
+        if (y < 120) setHidden(false);
+        else if (delta > 6) setHidden(true);
+        else if (delta < -6) setHidden(false);
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isMobile]);
+
+  // 回到顶部按钮显示（所有端）：滚动超过阈值后出现
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setShowTop(window.scrollY > 480);
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // 移动端菜单展开时强制显示导航栏
+  useEffect(() => {
+    if (open) setHidden(false);
+  }, [open]);
+
+  const scrollTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const hide = intro || (isMobile && hidden);
 
   return (
-    <header
-      className="fixed inset-x-0 top-0 z-40 transition-all duration-75"
-      style={{ opacity, transform: `translateY(${y}px)`, pointerEvents: p > 0.15 ? 'auto' : 'none' }}
-    >
-      <div className="glass border-x-0 border-t-0">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Link
-            href="/"
-            className="group flex items-center transition-transform duration-500 hover:scale-[1.03]"
-            onClick={() => setOpen(false)}
-            aria-label={siteName}
-          >
-            <BrandLogo className="h-8 md:h-9" />
-          </Link>
+    <>
+      <header
+        className="fixed inset-x-0 top-0 z-40 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        style={{
+          transform: hide ? 'translateY(-100%)' : 'translateY(0)',
+          opacity: mounted ? 1 : 0,
+          pointerEvents: hide ? 'none' : 'auto',
+        }}
+      >
+        <div className="glass border-x-0 border-t-0">
+          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+            <Link
+              href="/"
+              className="group flex items-center transition-transform duration-500 hover:scale-[1.03]"
+              onClick={() => setOpen(false)}
+              aria-label={siteName}
+            >
+              <BrandLogo className="h-8 md:h-9" />
+            </Link>
 
-          <nav className="hidden items-center gap-1 md:flex" onMouseMove={onNavMove} onMouseLeave={onNavLeave}>
-            {NAV.map((item, i) => (
+            <nav className="hidden items-center gap-1 md:flex" onMouseMove={onNavMove} onMouseLeave={onNavLeave}>
+              {NAV.map((item, i) => (
+                <Link
+                  key={item.href}
+                  ref={(el) => {
+                    itemRefs.current[i] = el;
+                  }}
+                  href={item.href}
+                  className={`nav-item relative rounded-lg px-4 py-2 font-medium ${
+                    isActive(item.href) ? 'is-active text-accent' : 'text-ink-soft hover:text-ink'
+                  }`}
+                  style={{ fontSize: 'var(--fs-nav)' }}
+                >
+                  {item.label}
+                  <span className="nav-underline" />
+                </Link>
+              ))}
+              <span className="mx-2 h-5 w-px bg-line" />
               <Link
-                key={item.href}
+                href="/search"
+                aria-label={site.navSearch}
                 ref={(el) => {
-                  itemRefs.current[i] = el;
+                  itemRefs.current[NAV.length] = el;
                 }}
-                href={item.href}
-                className={`nav-item relative rounded-lg px-4 py-2 text-[15px] font-medium ${
-                  isActive(item.href) ? 'is-active text-accent' : 'text-ink-soft hover:text-ink'
+                className={`nav-item flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-accent ${
+                  isActive('/search') ? 'text-accent' : 'text-ink-soft'
                 }`}
               >
-                {item.label}
-                <span className="nav-underline" />
+                <SearchIcon />
               </Link>
-            ))}
-            <span className="mx-2 h-5 w-px bg-line" />
-            <Link
-              href="/search"
-              aria-label="搜索"
-              ref={(el) => {
-                itemRefs.current[NAV.length] = el;
-              }}
-              className={`nav-item flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-accent ${
-                isActive('/search') ? 'text-accent' : 'text-ink-soft'
-              }`}
-            >
-              <SearchIcon />
-            </Link>
-            <span
-              ref={(el) => {
-                itemRefs.current[NAV.length + 1] = el;
-              }}
-              className="nav-item inline-flex"
-            >
-              <ThemeToggle />
-            </span>
-          </nav>
+              <span
+                ref={(el) => {
+                  itemRefs.current[NAV.length + 1] = el;
+                }}
+                className="nav-item inline-flex"
+              >
+                <ThemeToggle />
+              </span>
+            </nav>
 
-          <div className="flex items-center gap-1 md:hidden">
-            <Link
-              href="/search"
-              aria-label="搜索"
-              className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-soft"
-            >
-              <SearchIcon />
-            </Link>
-            <ThemeToggle />
-            <button
-              type="button"
-              aria-label="打开菜单"
-              aria-expanded={open}
-              onClick={() => setOpen((v) => !v)}
-              className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-soft"
-            >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-                {open ? <path d="m5 5 14 14M19 5 5 19" /> : <path d="M4 7h16M4 12h16M4 17h10" />}
-              </svg>
-            </button>
+            <div className="flex items-center gap-1 md:hidden">
+              <Link
+                href="/search"
+                aria-label={site.navSearch}
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-soft"
+              >
+                <SearchIcon />
+              </Link>
+              <ThemeToggle />
+              <button
+                type="button"
+                aria-label={site.navMenu}
+                aria-expanded={open}
+                onClick={() => setOpen((v) => !v)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-soft"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  {open ? <path d="m5 5 14 14M19 5 5 19" /> : <path d="M4 7h16M4 12h16M4 17h10" />}
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div
+            className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 md:hidden ${
+              open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <nav className="min-h-0">
+              {NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={`relative flex items-center border-t border-line px-6 py-3.5 text-[16px] ${
+                    isActive(item.href) ? 'text-accent' : 'text-ink'
+                  }`}
+                >
+                  {isActive(item.href) && (
+                    <span className="absolute left-0 top-1/2 h-[18px] w-[2.5px] -translate-y-1/2 rounded-full bg-accent" />
+                  )}
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </div>
         </div>
+      </header>
 
-        <div
-          className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 md:hidden ${
-            open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-          }`}
-        >
-          <nav className="min-h-0">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`relative flex items-center border-t border-line px-6 py-3.5 text-[16px] ${
-                  isActive(item.href) ? 'text-accent' : 'text-ink'
-                }`}
-              >
-                {isActive(item.href) && (
-                  <span className="absolute left-0 top-1/2 h-[18px] w-[2.5px] -translate-y-1/2 rounded-full bg-accent" />
-                )}
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </div>
-    </header>
+      {/* 回到顶部：毛玻璃圆钮，滚动超过阈值后出现（所有端） */}
+      <button
+        type="button"
+        onClick={scrollTop}
+        aria-label="回到顶部"
+        className={`glass fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full text-ink-soft shadow-[var(--shadow)] transition-all duration-300 hover:text-accent ${
+          showTop ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
+        }`}
+      >
+        <ArrowUpIcon />
+      </button>
+    </>
   );
 }

@@ -25,6 +25,13 @@
   --hl-func: #b5d0a8;
   --hl-attr: #d5ccb5;
   --shadow: 0 10px 36px rgba(28, 23, 16, 0.12);
+
+  /* ============ 可调字号（content/appearance.json 可覆盖） ============ */
+  --fs-body: 16px;
+  --fs-list-title: 17.5px;
+  --fs-list-summary: 14.5px;
+  --fs-page-title: 44px;
+  --fs-nav: 15px;
 }
 
 .dark {
@@ -160,6 +167,29 @@ aside {
     0 0 14px var(--bg),
     0 0 28px var(--bg),
     0 1px 5px var(--bg);
+}
+
+/* 代码块、图片等"实底"内容置于晕光之上：保持清晰锐利 */
+pre,
+code,
+kbd,
+samp,
+img,
+figure,
+video,
+canvas,
+svg,
+iframe {
+  text-shadow: none;
+}
+
+/* ============ 光标辉光：深色提亮 / 浅色暖雾 ============ */
+.cursor-glow {
+  mix-blend-mode: normal;
+}
+
+.dark .cursor-glow {
+  mix-blend-mode: screen;
 }
 
 /* ============ 全站内容暗纱：文字区域后方压暗等高线（制图注记的"压盖"处理） ============ */
@@ -315,17 +345,20 @@ aside {
 
 /* ============ 标题渐变流光（米白→红）============ */
 .grad-text {
-  background: linear-gradient(110deg, var(--ink) 30%, var(--accent) 50%, var(--ink) 72%);
+  background: linear-gradient(110deg, var(--ink) 30%, var(--accent) 50%, var(--ink) 70%);
   background-size: 260% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: grad-slide 8s linear infinite;
+  animation: grad-slide 12s linear infinite;
 }
 
 @keyframes grad-slide {
+  from {
+    background-position: 100% 0;
+  }
   to {
-    background-position: -260% 0;
+    background-position: -160% 0;
   }
 }
 
@@ -382,7 +415,7 @@ aside {
 
 /* ============ 正文排版（大字号）============ */
 .md-body {
-  font-size: 1.125rem;
+  font-size: var(--fs-body);
   line-height: 1.9;
   color: var(--ink);
   word-break: break-word;

@@ -1,0 +1,45 @@
+{
+  "_说明": "全站共用信息（不属于任何单个页面）：① 个人信息——姓名/身份/坐标/邮箱/GitHub/简介，首页大字、关于页、页脚版权都会引用，改一次全站生效；② 浏览器标题 meta；③ 导航栏菜单；④ 底部信息栏（页脚 + 光标光效开关 + 后台入口）。404 页文案在 08-404页.json。",
+
+  "name": "张鹏",
+  "siteName": "EZNINE",
+  "role": "GIS / 遥感 / WebGIS",
+  "tagline": "用地图理解世界，用代码处理空间",
+  "affiliation": "山西师范大学 · 地理信息科学",
+  "identity": "地理信息科学",
+  "coords": "37.74°N · 112.66°E",
+  "email": "ezninfl@gmail.com",
+  "github": "https://github.com/eznine",
+  "siteUrl": "https://github.com/eznine",
+  "bio": "地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。",
+
+  "meta": {
+    "title": "EZNINE的GIS空间站",
+    "titleTemplate": "%s · EZNINE的GIS空间站",
+    "description": "张鹏的 GIS 空间站：生态安全格局、InSAR 形变监测与 WebGIS 可视化。"
+  },
+
+  "nav": [
+    { "href": "/", "label": "首页" },
+    { "href": "/notes", "label": "笔记" },
+    { "href": "/research", "label": "研究" },
+    { "href": "/projects", "label": "项目" },
+    { "href": "/archive", "label": "归档" },
+    { "href": "/about", "label": "关于" }
+  ],
+  "navSearch": "搜索",
+  "navMenu": "打开菜单",
+
+  "footer": {
+    "github": "GitHub ↗",
+    "copyright": "© {year} {name} · 仍在探索 STILL EXPLORING",
+    "sheet": "UNFINISHED MAP"
+  },
+
+  "utilities": {
+    "glow": "光标光效",
+    "on": "ON",
+    "off": "OFF",
+    "admin": "后台管理 · Admin"
+  }
+}

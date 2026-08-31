@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { site, asset } from '@/lib/site';
+import { site } from '@/lib/site';
 import { BrandLogo } from './brand-logo';
+import { SiteUtilities } from './site-utilities';
 
 export function SiteFooter() {
   return (
@@ -22,36 +23,32 @@ export function SiteFooter() {
           </div>
 
           <nav className="grid grid-cols-2 gap-x-14 gap-y-3 text-[15px]">
-            {[
-              { href: '/notes', label: '笔记' },
-              { href: '/research', label: '研究' },
-              { href: '/projects', label: '项目' },
-              { href: '/archive', label: '归档' },
-              { href: '/about', label: '关于' },
-              { href: '/search', label: '搜索' },
-            ].map((l) => (
-              <Link key={l.href} href={l.href} className="text-ink-soft transition-colors hover:text-accent">
-                {l.label}
-              </Link>
-            ))}
+            {site.nav
+              .filter((l) => l.href !== '/')
+              .map((l) => (
+                <Link key={l.href} href={l.href} className="text-ink-soft transition-colors hover:text-accent">
+                  {l.label}
+                </Link>
+              ))}
           </nav>
 
           <div className="flex flex-col gap-3 text-[15px]">
             <a href={site.github} target="_blank" rel="noreferrer" className="text-ink-soft transition-colors hover:text-accent">
-              GitHub ↗
+              {site.footer.github}
             </a>
             <a href={`mailto:${site.email}`} className="text-ink-soft transition-colors hover:text-accent">
               {site.email}
             </a>
-            <a href={asset('/feed.xml')} className="text-ink-soft transition-colors hover:text-accent">
-              RSS 订阅
-            </a>
           </div>
         </div>
 
+        <SiteUtilities />
+
         <div className="mt-12 flex flex-col gap-2 border-t border-line pt-6 text-[13px] text-ink-faint md:flex-row md:items-center md:justify-between">
-          <span>© {new Date().getFullYear()} {site.name} · 仍在探索 STILL EXPLORING</span>
-          <span className="font-mono tracking-[0.14em]">UNFINISHED MAP · SHEET NO. 001</span>
+          <span>
+            {site.footer.copyright.replace('{year}', String(new Date().getFullYear())).replace('{name}', site.name)}
+          </span>
+          <span className="font-mono tracking-[0.14em]">{site.footer.sheet}</span>
         </div>
       </div>
     </footer>

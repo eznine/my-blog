@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "predev": "node scripts/feed.mjs",
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
     "prebuild": "node scripts/feed.mjs",
     "build": "next build",
-    "feed": "node scripts/feed.mjs"
+    "feed": "node scripts/feed.mjs",
+    "admin": "node scripts/admin-server.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

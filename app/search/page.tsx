@@ -2,10 +2,11 @@ import type { Metadata } from 'next';
 import { buildSearchIndex } from '@/lib/search';
 import { SearchClient } from '@/components/search-client';
 import { PageHeader } from '@/components/page-header';
+import { site } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: '搜索',
-  description: '全文搜索所有笔记、研究与项目。',
+  title: site.pages.search.title,
+  description: site.pages.search.desc,
 };
 
 export default async function SearchPage() {
@@ -14,10 +15,10 @@ export default async function SearchPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 pb-10 pt-10 md:pt-14">
       <PageHeader
-        code="⌖"
-        en="SEARCH"
-        title="搜索"
-        desc="在全部笔记、研究与项目中检索——标题、标签、分类与正文均可命中。"
+        code={site.pages.search.code}
+        en={site.pages.search.en}
+        title={site.pages.search.title}
+        desc={site.pages.search.desc}
       />
       <div className="mt-8">
         <SearchClient items={items} />

@@ -19,7 +19,9 @@ export function PageHeader({
           <span className="marker-dot is-live" />
           {code} · {en}
         </div>
-        <h1 className="mt-4 text-4xl font-black tracking-tight text-ink md:text-5xl">{title}</h1>
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-ink md:text-5xl" style={{ fontSize: 'var(--fs-page-title)' }}>
+          {title}
+        </h1>
         {desc && <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink-soft">{desc}</p>}
         {children}
       </div>

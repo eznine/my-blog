@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
 
 export const metadata: Metadata = {
-  title: '关于',
+  title: site.pages.about.title.replace('{name}', site.name),
   description: `${site.name} · ${site.identity} · ${site.affiliation}`,
 };
 
@@ -15,7 +15,7 @@ export default async function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 pb-10 pt-10 md:pt-14">
       <Reveal>
-        <PageHeader code="05" en="ABOUT" title={`关于 · ${site.name}`}>
+        <PageHeader code={site.pages.about.code} en={site.pages.about.en} title={site.pages.about.title.replace('{name}', site.name)}>
           <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-soft">
             <span>{site.identity}</span>
             <span className="text-ink-faint">/</span>
@@ -42,7 +42,7 @@ export default async function AboutPage() {
 
       <Reveal>
         <section className="mt-14 border-t border-line pt-8">
-          <div className="mono-label">EDUCATION · 教育经历</div>
+          <div className="mono-label">{site.pages.about.education}</div>
           <ul className="mt-4 space-y-4">
             {site.education.map((e) => (
               <li key={e.period} className="flex flex-col gap-0.5 sm:flex-row sm:gap-6">
@@ -59,7 +59,7 @@ export default async function AboutPage() {
 
       <Reveal>
         <section className="mt-12 border-t border-line pt-8">
-          <div className="mono-label">INTERESTS · 研究兴趣</div>
+          <div className="mono-label">{site.pages.about.interests}</div>
           <ul className="mt-4 space-y-2">
             {site.researchInterests.map((r) => (
               <li key={r} className="flex items-baseline gap-3 text-[17px] text-ink">
@@ -73,7 +73,7 @@ export default async function AboutPage() {
 
       <Reveal>
         <section className="mt-12 border-t border-line pt-8">
-          <div className="mono-label">SKILLS · 技能栈</div>
+          <div className="mono-label">{site.pages.about.skills}</div>
           <div className="mt-5 space-y-5">
             {site.skills.map((g) => (
               <div key={g.group} className="flex flex-col gap-2 sm:flex-row sm:gap-6">
@@ -94,7 +94,7 @@ export default async function AboutPage() {
       <Reveal>
         <footer className="mt-14 border-t border-line pt-6 text-center">
           <p className="font-mono text-[11px] tracking-[0.18em] text-ink-faint uppercase">
-            {site.coords} · DATUM WGS 84 · END OF SHEET
+            {site.pages.about.footer.replace('{coords}', site.coords)}
           </p>
         </footer>
       </Reveal>
