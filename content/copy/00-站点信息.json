@@ -14,9 +14,9 @@
   "bio": "地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。",
 
   "meta": {
-    "title": "EZNINE的GIS空间站",
-    "titleTemplate": "%s · EZNINE的GIS空间站",
-    "description": "张鹏的 GIS 空间站：生态安全格局、InSAR 形变监测与 WebGIS 可视化。"
+    "title": "未完成的地图",
+    "titleTemplate": "%s · 未完成的地图",
+    "description": "生态安全格局、InSAR 形变监测与 WebGIS 可视化。"
   },
 
   "nav": [

@@ -211,7 +211,7 @@ export function HeroScroll({
           </svg>
           <span>{site.hero.scrollHint}</span>
           <span>{site.hero.scrollHintEn}</span>
-          <span className="hidden md:inline">{site.coords}</span>
+          <span className="hidden !text-accent md:inline">{site.coords}</span>
         </div>
       </div>
     </section>

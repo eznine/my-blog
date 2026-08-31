@@ -1,92 +1,86 @@
-# GEO · NOTES — GIS 个人平台
+# EZNINE 的 GIS 空间站
 
-以 GIS、遥感、WebGIS、空间分析与编程为核心的个人网站。
+> 一处坐标，一段旅程，一张未完成的地图。
 
-- **HOME** 认识我：身份、方向、核心能力与最新内容
-- **NOTES** 看我的学习：GIS / 遥感 / 空间分析 / WebGIS / 编程学习笔记
-- **RESEARCH** 看我的科研：生态安全格局、InSAR、生态网络等真实研究
-- **PROJECT** 看我的作品：WebGIS、3D GIS、GIS 工具、遥感应用
-- **ABOUT** 了解我的背景
+地理信息科学方向研究生的个人博客。关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。
 
-技术栈：Next.js 15（App Router · 静态导出）+ Tailwind CSS v4 + 构建期 Markdown 编译。
-暗色模式、全文搜索、标签分类、目录导航、RSS 订阅、GitHub Pages 自动部署，全部开箱即用。
+**在线地址**：<https://eznine.github.io/my-blog>
 
-## 本地使用
+## 技术栈
+
+- **框架**：Next.js 15（App Router，静态导出 `output: 'export'`）
+- **样式**：Tailwind CSS v4 + CSS 变量（主题色 / 字号可调）
+- **背景**：WebGL2 shader 等高线全站固定层，支持鼠标扰动
+- **部署**：GitHub Pages（GitHub Actions 自动构建发布）
+- **后台**：本地 Node API 服务（文章管理 / 批量导入 / 外观设置）
+
+## 本地开发
 
 ```bash
-npm install     # 安装依赖
-npm run dev     # 开发模式 http://localhost:3000
-npm run build   # 构建到 out/（纯静态，可部署到任何静态托管）
+npm install
+npm run dev
 ```
 
-## 写内容
+`npm run dev` 会同时启动 Next.js 开发服务器和本地后台服务（端口 3001），打开 <http://localhost:3000> 即可访问。
 
-所有内容都是 Markdown 文件，放在 `content/` 对应目录，文件名即 URL（`content/notes/foo.md` → `/notes/foo`）。
+## 内容管理
 
-**笔记**（`content/notes/`）：
+所有页面文案按页面拆分，存放在 `content/copy/`，文件按编号排序，字段顺序即页面从上到下的顺序：
 
-```yaml
----
-title: 文章标题
-date: 2026-08-01
-category: 遥感          # 分类，自动汇总为筛选器
-tags: [GEE, Landsat]    # 标签，自动汇总
-summary: 一句话摘要，显示在列表与搜索结果中。
----
-正文，支持 GFM、代码高亮、表格。
+```
+content/copy/
+├── 00-站点信息.json   全站共用数据（姓名/坐标/邮箱/浏览器标题/导航栏/底部信息栏）
+├── 01-首页.json       首页：开场大屏、方向卡、三个内容区块、结束语
+├── 02-笔记页.json     笔记页
+├── 03-研究页.json     研究页
+├── 04-项目页.json     项目页
+├── 05-归档页.json     归档页
+├── 06-关于页.json     关于页
+├── 07-搜索页.json     搜索页
+└── 08-404页.json      404 页
 ```
 
-**研究**（`content/research/`）额外支持：
+文章内容（Markdown）在 `content/notes`、`content/research`、`content/projects`，中文文件名会自动转换为 URL 安全的英文 slug。
 
-```yaml
-status: 在研            # 在研 / 已发表 / 已完成
-links:
-  - label: 论文 DOI
-    url: https://doi.org/...
+## 后台管理
+
+后台是**本地服务**，用于日常写作与管理，入口在首页底部信息区。
+
+```bash
+npm run admin        # 仅启动后台服务（127.0.0.1:3001）
+npm run dev          # 同时启动站点 + 后台
 ```
 
-**项目**（`content/projects/`）额外支持：
+后台功能：
 
-```yaml
-tech: [MapLibre, TypeScript]   # 技术栈徽章
-demo: https://...              # 在线演示链接
-github: https://github.com/...
+- 文章管理：笔记 / 研究 / 项目的新增、编辑、删除（Markdown 编辑器，支持图片上传）
+- 批量导入：多文件导入 Markdown，可统一分类、追加标签
+- 外观设置：调整正文 / 列表 / 标题 / 导航的字号与颜色（写入 `content/appearance.json`）
+- 分类与标签候选管理
+
+> 注意：后台密码在 `site.config.json` 的 `adminPassword` 字段。该文件已被 git 跟踪，请勿在公开仓库中暴露真实密码。
+
+## 部署
+
+推送到 `main` 分支即自动触发 GitHub Actions 构建并发布到 GitHub Pages：
+
+```bash
+git push origin main
 ```
 
-## 修改个人信息
-
-- `site.config.json` — 姓名、身份、学校、邮箱、GitHub、坐标、方向、技能、教育经历（全站共用）
-- `content/pages/about.md` — 关于页长文介绍
-- `app/globals.css` 顶部 `:root` / `.dark` — 改强调色等设计变量
-
-## 部署到 GitHub Pages
-
-1. 在 GitHub 新建仓库并推送代码：
-
-   ```bash
-   git init && git add -A && git commit -m "init"
-   git branch -M main
-   git remote add origin https://github.com/<你的用户名>/<仓库名>.git
-   git push -u origin main
-   ```
-
-2. 仓库 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**。
-3. 推送到 `main` 会自动触发 `.github/workflows/deploy.yml`：安装依赖 → 静态构建 → 发布。
-   - 仓库名为 `<用户名>.github.io` 时，站点在根路径；
-   - 其他仓库名时自动使用 `/<仓库名>` 作为 basePath，无需手动配置。
-4. 记得把 `site.config.json` 里的 `siteUrl` 改成你的实际地址（影响 RSS / Sitemap 里的链接）。
-
-也可以部署到 Vercel / Netlify / Cloudflare Pages：直接导入仓库，构建命令 `npm run build`，输出目录 `out`。
+部署流程（`.github/workflows/deploy.yml`）会自动计算 basePath（项目页为 `/my-blog`），无需手动配置。
 
 ## 目录结构
 
-```text
-app/                页面（App Router）
-  notes/ research/ projects/ archive/ about/ search/
-components/         组件（导航、卡片、动效、搜索等）
-content/            所有 Markdown 内容
-  notes/ research/ projects/ pages/
-lib/                内容加载、搜索、Markdown 管线
-scripts/feed.mjs    RSS 与 Sitemap 生成（build 前自动执行）
-site.config.json    个人信息唯一配置入口
 ```
+app/                 页面（首页 / notes / research / projects / archive / about / search / admin）
+components/          组件（含 admin/ 后台组件）
+content/             文案（copy/）、文章（notes/research/projects）、外观配置、分类标签
+lib/                 数据读取与配置生成
+scripts/             开发 / 后台 / RSS 生成脚本
+public/              静态资源与上传图片
+```
+
+## License
+
+个人项目，保留所有权利。

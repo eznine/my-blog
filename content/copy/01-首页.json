@@ -4,8 +4,8 @@
   "hero": {
     "badge": "STILL EXPLORING",
     "mapLabel": "未完成的地图",
-    "titleLines": ["你好", "张鹏，", "地理信息科学"],
-    "bio": "地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。",
+    "titleLines": ["一处坐标", "一段旅程", "一张未完成的地图"],
+    "bio": "我从一处坐标出发，沿着兴趣与好奇，慢慢绘制自己的世界；一笔一划，描摹所见，也描摹尚未成为答案的自己。",
     "ctaNotes": "开始阅读笔记",
     "ctaProjects": "看看我的项目 →",
     "github": "GitHub ↗",
@@ -51,7 +51,7 @@
     "emptyNotes": "还没有笔记，去 content/notes/ 写第一篇吧。",
     "emptyResearch": "还没有研究记录。",
     "emptyProjects": "还没有项目。",
-    "endnote": "地图尚未完成 · 探索仍在继续",
+    "endnote": "有些地方尚未抵达 · 有些线条仍在延伸",
     "endnoteArchive": "归档",
     "endnoteAbout": "关于我"
   }
