@@ -19,7 +19,10 @@ const CONTENT = path.join(ROOT, 'content');
 const UPLOADS = path.join(ROOT, 'public', 'uploads');
 const SALT = '::eznine-admin';
 
-const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf-8'));
+let cfg = {};
+try {
+  cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'site.config.json'), 'utf-8'));
+} catch {}
 const PASSWORD = process.env.ADMIN_PASSWORD || cfg.adminPassword || 'eznine';
 const TOKEN = crypto.createHash('sha256').update(PASSWORD + SALT).digest('hex');
 

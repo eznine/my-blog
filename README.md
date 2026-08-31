@@ -1,8 +1,8 @@
-# EZNINE 的 GIS 空间站
+# 未完成的地图
 
 > 一处坐标，一段旅程，一张未完成的地图。
 
-地理信息科学方向研究生的个人博客。关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。
+地理信息科学方向研究生的个人博客（曾用名：EZNINE 的 GIS 空间站）。关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。
 
 **在线地址**：<https://eznine.github.io/my-blog>
 
@@ -58,7 +58,7 @@ npm run dev          # 同时启动站点 + 后台
 - 外观设置：调整正文 / 列表 / 标题 / 导航的字号与颜色（写入 `content/appearance.json`）
 - 分类与标签候选管理
 
-> 注意：后台密码在 `site.config.json` 的 `adminPassword` 字段。该文件已被 git 跟踪，请勿在公开仓库中暴露真实密码。
+> 后台密码在本地 `site.config.json` 的 `adminPassword` 字段（该文件已加入 `.gitignore`，不会提交到仓库）。参考模板见 `site.config.example.json`。也可以用环境变量 `ADMIN_PASSWORD` 覆盖。
 
 ## 部署
 

@@ -1,11 +1,11 @@
-# AGENTS.md — EZNINE GIS 空间站 项目档案
+# AGENTS.md — 未完成的地图（EZNINE GIS 空间站）项目档案
 
 > 本文件是给 AI 助手（及未来的自己）看的项目说明书：项目是什么、有什么功能、
 > 我们一起做了什么、用户（张鹏）的习惯偏好。每次大改动后应更新。
 
 ## 一、项目是什么
 
-**EZNINE 的 GIS 空间站**——一个地理信息科学（GIS）方向研究生的个人博客。
+**未完成的地图**（曾用名：EZNINE 的 GIS 空间站）——一个地理信息科学（GIS）方向研究生的个人博客。
 
 * 站长：张鹏，地理信息科学方向硕士生
 
@@ -109,11 +109,11 @@ public/uploads/      后台上传的图片
 
 * **双端思维**：手机和电脑分别验证，移动端体验优先级高（目录滑轨、导航收起都是移动端专属）
 
-* **安全提醒**：site.config.json 含 adminPassword，push 公开仓库前需处理
+* **安全提醒**：site.config.json 含 adminPassword，已加入 .gitignore 不入库；密码绝不写进文档/README/提交信息
 
 ## 七、已知问题 / 待办
 
-* [x] 部署到 GitHub：已推送 github.com/eznine/my-blog（覆盖旧版），Actions 自动发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码（D469VPnQ7xpWQt，在 site.config.json）
+* [x] 部署到 GitHub：已推送 github.com/eznine/my-blog（覆盖旧版），Actions 自动发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码，且 site.config.json 已加入 .gitignore 不入库（密码只在本地文件，勿写进任何文档）
 * [ ] 首次部署需在仓库 Settings → Pages → Source 选 GitHub Actions（网页操作）
 * [ ] 用户提过「右侧有点空」的方案（图幅注记面板/陕西轮廓+西安脉冲点/研究方向速览）尚未选定实施
 * [ ] feed.xml 生成脚本若确认不要 RSS 可删
