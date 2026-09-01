@@ -38,7 +38,6 @@ export function HeroScroll({
   projects: number;
 }) {
   const stageRef = useRef<HTMLElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -64,26 +63,10 @@ export function HeroScroll({
     }
 
     let raf = 0;
-
-    /* 缩放适配：内容高于可用区域时整体等比缩小，保证任何视口下第一屏完整可见 */
-    const fit = () => {
-      const zone = stage.querySelector<HTMLElement>('.hero-content-zone');
-      const content = contentRef.current;
-      if (!zone || !content) return;
-      content.style.transform = '';
-      content.style.transformOrigin = '';
-      const avail = zone.clientHeight;
-      const nat = content.offsetHeight;
-      if (avail <= 0 || nat <= avail) return;
-      const k = avail / nat;
-      // 布局盒仍为自然高度（flex 居中会溢出两端），用 translateY 补偿让缩放后的视觉盒回到正中
-      content.style.transformOrigin = 'top center';
-      content.style.transform = `translateY(${((nat - nat * k) / 2).toFixed(1)}px) scale(${k.toFixed(4)})`;
-    };
-
     const update = () => {
       raf = 0;
       const rect = stage.getBoundingClientRect();
+      // 分母用 sticky 容器实际高度（内容超高时容器会生长），保证动画跑完才开始上滑
       const vh = viewportEl?.offsetHeight || window.innerHeight;
       const total = Math.max(1, stage.offsetHeight - vh);
       const p = clamp01(-rect.top / total);
@@ -104,20 +87,13 @@ export function HeroScroll({
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
     };
-    const onResize = () => {
-      fit();
-      onScroll();
-    };
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize);
+    window.addEventListener('resize', onScroll);
     update();
-    fit();
-    // 字体加载完成后高度会变，再校准一次
-    document.fonts?.ready.then(() => fit()).catch(() => {});
 
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', onScroll);
       if (raf) cancelAnimationFrame(raf);
       topoState.zoom = 1;
       topoState.boost = 0.26;
@@ -128,7 +104,7 @@ export function HeroScroll({
 
   return (
     <section ref={stageRef} className="hero-scroll-section relative -mt-14 border-b border-line">
-      <div className="hero-sticky-viewport sticky top-0">
+      <div className="hero-sticky-viewport sticky top-0 flex items-center pt-16 pb-24 md:pb-16">
         {/* 等高线背景由 layout 的全站固定层渲染（滚动驱动 topoState） */}
 
         {/* 粒子尘埃：随进度淡入 */}
@@ -152,9 +128,7 @@ export function HeroScroll({
           }}
         />
 
-        {/* 内容区：上下边界避开导航栏与底部提示，超高时整体缩放适配（不裁切、不撑高舞台） */}
-        <div className="hero-content-zone">
-          <div ref={contentRef} className="relative mx-auto w-full max-w-6xl px-6">
+        <div className="relative mx-auto w-full max-w-6xl px-6">
           <div data-hs="0.05,0.22" className="mono-label flex flex-wrap items-center gap-4" style={{ opacity: 0 }}>
             <span className="flex items-center gap-2.5 rounded-full border border-accent/50 px-3.5 py-1.5 !text-accent">
               <span className="marker-dot is-live !h-[6px] !w-[6px]" />
@@ -229,7 +203,6 @@ export function HeroScroll({
                 </div>
               </Link>
             ))}
-          </div>
           </div>
         </div>
 

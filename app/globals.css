@@ -79,9 +79,10 @@
 
 html {
   scroll-behavior: smooth;
-  /* 与 body 一致：任何页面都不允许横向滚动（含 html 层，覆盖部分国产浏览器行为） */
-  overflow-x: hidden;
-  /* 禁掉横向过滚手势（部分安卓浏览器横向拖动会出现滚动指示条） */
+  /* 禁掉横向过滚手势（部分安卓浏览器横向拖动会出现滚动指示条）。
+     注意：绝对不要在 html 上加 overflow-x:hidden！html 和 body 同时设置时，
+     body 会变成真实滚动容器，position:sticky 全部失效（封面舞台跟着滚走）。
+     横向裁切只由 body 的 overflow-x:hidden 承担（会传播到视口，不产生滚动容器）。 */
   overscroll-behavior-x: none;
 }
 
@@ -167,10 +168,9 @@ body {
   height: calc(260vh + 3.5rem);
 }
 
-/* 封面舞台：定高一屏，内容超高时由 JS 整体缩放适配（hero-scroll.tsx fit()） */
+/* 封面舞台：min-height 一屏，内容超高时容器生长（不裁切、滚动可见）；横向溢出用 clip 裁掉（clip 不产生滚动容器，不破坏 sticky） */
 .hero-sticky-viewport {
-  height: 100vh;
-  /* 只裁横向溢出（clip 不产生滚动容器，不影响 sticky） */
+  min-height: 100vh;
   overflow-x: clip;
 }
 
@@ -180,30 +180,15 @@ body {
   }
 
   .hero-sticky-viewport {
-    height: 100svh;
+    min-height: 100svh;
   }
 }
 
-/* 封面内容可用区：上避开导航栏（4rem），下避开底部提示（移动端 8rem 含浏览器底栏余量） */
-.hero-content-zone {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 4rem;
-  bottom: calc(8rem + env(safe-area-inset-bottom, 0px));
-  display: flex;
-  align-items: center;
-}
-
-@media (min-width: 768px) {
-  .hero-content-zone {
-    bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
-  }
-}
-
-/* 封面底部提示：锚定可视视口底部；留空需 ≥ 提示自身高度 + 浏览器底栏，否则末行（经纬度）被底栏盖住 */
+/* 封面底部提示：锚定可视视口底部。
+   留空必须 ≥ 提示自身高度(~108px) + 浏览器底栏(~56px) —— 移动端 11rem 起步，
+   否则末行（经纬度）会被夸克等浏览器的悬浮底栏盖住 */
 .hero-hint {
-  top: calc(100vh - 8rem - env(safe-area-inset-bottom, 0px));
+  top: calc(100vh - 11rem - env(safe-area-inset-bottom, 0px));
 }
 
 @media (min-width: 768px) {
@@ -214,7 +199,7 @@ body {
 
 @supports (height: 100svh) {
   .hero-hint {
-    top: calc(100svh - 8rem - env(safe-area-inset-bottom, 0px));
+    top: calc(100svh - 11rem - env(safe-area-inset-bottom, 0px));
   }
 
   @media (min-width: 768px) {

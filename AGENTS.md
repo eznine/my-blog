@@ -96,7 +96,7 @@ public/uploads/      后台上传的图片
 9. **commit 582d96a**「第一次双端调试，页面独立修改」
 10. 封面底部经纬度改橙色
 11. **部署上线**：推送到 github.com/eznine/my-blog（强推覆盖旧版 HTML 小站），GitHub Actions 自动构建发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码（不再用 eznine）；README.md 已写
-12. **移动端/低窗口视口适配**：vh→svh 全站替换 + 安全区抬升（封面提示/回到顶部/页脚）；后用户再报「内容被裁掉、滚动也不显示」——根因是封面 sticky 容器**定高+overflow-hidden**，内容高于视口时被永久裁切。曾试「容器 min-height 生长」方案（失败：sticky 高于视口时开场模型被破坏——p=1 时只显示上半截、卡片永远看不到、舞台尾部出现空隙）。**最终方案：sticky 恢复定高 100svh + 内容区 `.hero-content-zone`（上避导航 4rem、下避提示 8rem）+ JS 整体缩放适配（fit()：超高时 translateY 补偿 + scale，任何视口第一屏完整可见）**；底部提示留空必须 ≥ 提示自身高度(~108px)+浏览器底栏，否则末行经纬度被底栏盖住（8rem 起步）；禁 `overscroll-behavior-x` 消除安卓横向过滚指示条
+12. **移动端/低窗口视口适配 + 一次重大排障教训**：vh→svh 全站替换 + 安全区抬升；封面 sticky 容器从「定高+overflow-hidden 裁切」改为「min-height:100svh + overflow-x:clip，内容超高时容器生长」（此结构用户验证 OK）。**教训（浪费了两轮修复）：commit ed75c50 在 html 上加了 `overflow-x:hidden` 与 body 的叠加，导致 body 变成真实滚动容器，全站 `position:sticky` 失效**——封面跟着滚走，症状是「第一页显示不全/有缝隙/往下滑内容消失」，与封面结构无关。062bce9→ed75c50 的 diff 定位到根因。**铁律：横向裁切只放 body（overflow-x:hidden 会传播到视口、不产生滚动容器），html 绝不设 overflow-x**；`overscroll-behavior-x:none`（html）禁安卓横向过滚指示条；`.hero-hint` 移动端锚点留空 11rem（≥提示高 108px+夸克悬浮底栏 56px），否则末行经纬度被底栏盖住。修复后用浏览器实测：sticky 钉顶、内容完整、下一区块间隙 1px、无横向滚动 ✓
 
 ## 六、用户的偏好与协作习惯（重要！）
 
