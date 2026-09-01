@@ -209,8 +209,32 @@ body {
   }
 }
 
-.safe-bottom-btn {
-  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+/* 回到顶部锚定容器：以「大视口高度」(lvh，工具栏收起时的恒定高度)为基准。
+   直接 fixed+bottom 的按钮会随浏览器工具栏显隐（视口高度变化）上下跳动，
+   不同浏览器行为不同（时有时无）；挂在恒定高度容器底部则完全稳定。
+   移动端 padding 抬高，躲开浏览器悬浮工具栏(~56px)。 */
+.back-top-anchor {
+  position: fixed;
+  top: 0;
+  right: 1.5rem;
+  height: 100vh;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 4.75rem;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .back-top-anchor {
+    padding-bottom: 1.5rem;
+  }
+}
+
+@supports (height: 100lvh) {
+  .back-top-anchor {
+    height: 100lvh;
+  }
 }
 
 /* 页面底部给悬浮浏览器栏留出呼吸空间（仅移动端） */

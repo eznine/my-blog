@@ -291,17 +291,20 @@ export function SiteHeader({ siteName }: { siteName: string }) {
         </div>
       </header>
 
-      {/* 回到顶部：毛玻璃圆钮，滚动超过阈值后出现（所有端） */}
-      <button
-        type="button"
-        onClick={scrollTop}
-        aria-label="回到顶部"
-        className={`glass safe-bottom-btn fixed right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full text-ink-soft shadow-[var(--shadow)] transition-opacity duration-300 hover:text-accent ${
-          showTop ? 'opacity-100' : 'pointer-events-none opacity-0'
-        }`}
-      >
-        <ArrowUpIcon />
-      </button>
+      {/* 回到顶部：毛玻璃圆钮，滚动超过阈值后出现（所有端）。
+          挂在 lvh 恒定高度锚容器底部，浏览器工具栏显隐不再引起跳动 */}
+      <div className="back-top-anchor">
+        <button
+          type="button"
+          onClick={scrollTop}
+          aria-label="回到顶部"
+          className={`glass pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full text-ink-soft shadow-[var(--shadow)] transition-opacity duration-300 hover:text-accent ${
+            showTop ? 'opacity-100' : 'pointer-events-none opacity-0'
+          }`}
+        >
+          <ArrowUpIcon />
+        </button>
+      </div>
     </>
   );
 }

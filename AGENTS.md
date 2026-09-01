@@ -97,6 +97,7 @@ public/uploads/      后台上传的图片
 10. 封面底部经纬度改橙色
 11. **部署上线**：推送到 github.com/eznine/my-blog（强推覆盖旧版 HTML 小站），GitHub Actions 自动构建发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码（不再用 eznine）；README.md 已写
 12. **移动端/低窗口视口适配 + 一次重大排障教训**：vh→svh 全站替换 + 安全区抬升；封面 sticky 容器从「定高+overflow-hidden 裁切」改为「min-height:100svh + overflow-x:clip，内容超高时容器生长」（此结构用户验证 OK）。**教训（浪费了两轮修复）：commit ed75c50 在 html 上加了 `overflow-x:hidden` 与 body 的叠加，导致 body 变成真实滚动容器，全站 `position:sticky` 失效**——封面跟着滚走，症状是「第一页显示不全/有缝隙/往下滑内容消失」，与封面结构无关。062bce9→ed75c50 的 diff 定位到根因。**铁律：横向裁切只放 body（overflow-x:hidden 会传播到视口、不产生滚动容器），html 绝不设 overflow-x**；`overscroll-behavior-x:none`（html）禁安卓横向过滚指示条；`.hero-hint` 移动端锚点留空 11rem（≥提示高 108px+夸克悬浮底栏 56px），否则末行经纬度被底栏盖住。修复后用浏览器实测：sticky 钉顶、内容完整、下一区块间隙 1px、无横向滚动 ✓
+13. **横滑「时有时无」+ 回顶按钮跳动 + 经纬度换行（三连修）**：① 横滑真凶 = Reveal 入场动画 `.rv-right/.rv-left` 初始位移 ±44px 把未入场的元素推出视口（动画完成后位移消失 → 时有时无）；scrollWidth(410)>clientWidth(390) 实锤。修复：布局容器（layout.tsx 的 `div.relative.flex.min-h-svh.flex-col`）加 `overflow-x-clip`——clip 真正裁掉溢出（scrollWidth==clientWidth）且**不产生滚动容器、不破坏 sticky**（已实测钉顶正常），注意 clip 与 hidden 的区别：body 的 hidden 只是传播到视口，溢出区域仍存在，安卓浏览器照样显示横滑指示条。② 回顶按钮跳动 = fixed+bottom 元件随浏览器工具栏显隐（视口高度变化）移动，浏览器各异 → 修复：按钮挂进 `.back-top-anchor`（fixed 容器，高 100lvh 恒定 + 底部 padding 抬高躲悬浮工具栏，桌面 1.5rem/移动 4.75rem），位置永久稳定。③ 经纬度换行 = mono-label 0.18em 字距下该行 ~165-185px，提示容器 left-1/2 的可用宽只有 50vw，窄屏+字体差异下偶尔换行 → 容器加 `whitespace-nowrap`（居中 translate 下不会溢出视口）。
 
 ## 六、用户的偏好与协作习惯（重要！）
 

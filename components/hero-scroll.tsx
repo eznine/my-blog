@@ -208,7 +208,7 @@ export function HeroScroll({
 
         <div
           data-hs-hint
-          className="mono-label hero-hint absolute left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5"
+          className="mono-label hero-hint absolute left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5 whitespace-nowrap"
         >
           <svg viewBox="0 0 24 24" className="h-6 w-6 animate-bounce text-accent" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 4v14m0 0 6-6m-6 6-6-6" />

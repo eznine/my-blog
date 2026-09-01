@@ -42,7 +42,10 @@ export default function RootLayout({
           </div>
           {/* 全站文字暗纱：内容列后方压暗等高线，所有页面与首页一致的可读性 */}
           <div className="veil-layer pointer-events-none fixed inset-0 -z-10" aria-hidden="true" />
-          <div className="relative flex min-h-svh flex-col">
+          {/* overflow-x-clip：裁掉入场动画(rv ±44px 位移)等造成的横向溢出，
+              scrollWidth 不再超出视口 → 安卓浏览器不再出现横向滚动指示条/横滑。
+              clip 不产生滚动容器，不影响内部 position:sticky */}
+          <div className="relative flex min-h-svh flex-col overflow-x-clip">
             <SiteHeader siteName={site.siteName} />
             <main className="flex-1 pt-14">{children}</main>
             <SiteFooter />
