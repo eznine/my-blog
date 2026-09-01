@@ -106,6 +106,8 @@ export interface SiteConfig {
     placeholder: string;
     cat: string;
     tag: string;
+    chap: string;
+    allChapters: string;
     sort: string;
     sortNewest: string;
     sortOldest: string;

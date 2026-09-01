@@ -1,10 +1,10 @@
 ---
 title: "NDVI 不仅仅是 (NIR-Red)/(NIR+Red)：植被指数与时序分析笔记"
-date: 2026-04-20
-category: 遥感
-tags: [NDVI, 植被指数, Landsat, 时序分析]
+date: "2026-04-20"
 summary: "从辐射定标讲起，推导 NDVI 公式，比较 EVI、SAVI 等常用植被指数的适用场景，最后给出基于 Landsat 的时序分析思路。"
+tags: ["NDVI","植被指数","Landsat","时序分析"]
 ---
+
 
 植被指数是遥感里最古老也最常用的定量产品。但直接拿 DN 值算 NDVI 是新手最常见的错误——先把物理链条理清楚。
 

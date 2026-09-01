@@ -1,23 +1,39 @@
 {
   "categories": {
     "notes": [
-      "GIS 基础",
-      "遥感与影像",
-      "空间分析",
-      "WebGIS 开发",
-      "Python",
-      "ArcGIS"
+      "遥感",
+      "WebGIS 开发"
     ],
     "research": [
       "生态安全格局",
       "InSAR 形变监测",
       "土地利用变化",
-      "机器学习"
+      "机器学习",
+      "生态网络",
+      "地面塌陷"
     ],
     "projects": [
       "WebGIS 应用",
       "数据处理工具",
-      "可视化"
+      "可视化",
+      "WebGIS",
+      "3D GIS",
+      "遥感应用",
+      "GIS 工具"
+    ]
+  },
+  "chapters": {
+    "WebGIS 开发": [
+      "GIS基础",
+      "Leaflet",
+      "OpenLayers",
+      "React-Next",
+      "Web基础"
+    ],
+    "遥感": [
+      "SAR",
+      "大气",
+      "土地利用"
     ]
   },
   "tags": [

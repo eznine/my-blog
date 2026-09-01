@@ -4,6 +4,7 @@ import { TopoShaderField } from '@/components/topo-shader-field';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { CursorGlow } from '@/components/cursor-glow';
+import { ScrollProgressDot } from '@/components/scroll-progress-dot';
 import { site } from '@/lib/site';
 import { buildAppearanceCss } from '@/lib/appearance';
 import './globals.css';
@@ -36,6 +37,8 @@ export default function RootLayout({
         <style id="ez-appearance" dangerouslySetInnerHTML={{ __html: appearanceCss }} />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <CursorGlow />
+          {/* 桌面端右侧滚动进度（细轨 + 橙色圆圈），仅 xl+ 显示 */}
+          <ScrollProgressDot />
           {/* 全站固定等高线背景：所有页面、任意滚动位置可见，支持鼠标扰动 */}
           <div className="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
             <TopoShaderField className="h-full w-full" />

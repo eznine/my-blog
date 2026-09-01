@@ -25,12 +25,12 @@ export default async function ResearchPage() {
           <p className="mono-label mt-4">{site.pages.research.count.replace('{n}', String(research.length))}</p>
         </PageHeader>
       </Reveal>
-      <div className="pt-4">
+      <div className="grid gap-4 pt-8 md:grid-cols-2">
         {research.length === 0 ? (
           <p className="py-12 text-sm text-ink-faint">{site.pages.research.empty}</p>
         ) : (
           research.map((r, i) => (
-            <Reveal key={r.slug} delay={Math.min(i, 4) * 70}>
+            <Reveal key={r.slug} delay={Math.min(i, 4) * 70} className="h-full">
               <ResearchItem research={r} />
             </Reveal>
           ))

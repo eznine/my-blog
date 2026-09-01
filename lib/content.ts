@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { cache } from 'react';
 import matter from 'gray-matter';
 import { renderMarkdown } from './md';
@@ -10,6 +11,7 @@ export interface BasePost {
   date: string;
   summary: string;
   category: string;
+  chapter?: string;
   tags: string[];
   html: string;
 }
@@ -32,6 +34,7 @@ interface RawFrontmatter {
   date?: string | Date;
   summary?: string;
   category?: string;
+  chapter?: string;
   tags?: string[];
   status?: string;
   links?: { label: string; url: string }[];
@@ -73,15 +76,23 @@ function uniqueSlug(base: string, taken: Set<string>): string {
   }
 }
 
-/** 子目录名推断分类：'02-web-basics' → 'Web Basics' */
+/** 一级子目录名推断大类：含中文原样保留（'WebGIS 开发'），纯 ASCII 做 Title Case（'02-web-basics' → 'Web Basics'） */
 function folderCategory(dir: string): string | undefined {
-  const label = dir
-    .replace(/^\d+[-_\s]*/, '')
+  const name = dir.replace(/^\d+[-_\s]*/, '');
+  if (!name) return undefined;
+  if (/[^\x00-\x7F]/.test(name)) return name;
+  const label = name
     .split(/[-_]+/)
     .filter(Boolean)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
   return label || undefined;
+}
+
+/** 二级子目录名推断章节：去前导编号后原样（'01-环境配置' → '环境配置'，'02web基础' → 'web基础'） */
+function folderChapter(dir: string): string | undefined {
+  const name = dir.replace(/^\d+[-_\s]*/, '');
+  return name || undefined;
 }
 
 /** 递归收集目录下所有 .md/.mdx 文件，返回相对路径（正斜杠分隔）。跳过 node_modules 等非内容目录。 */
@@ -115,6 +126,45 @@ function inferTitle(content: string, fallback: string): string {
   return fallback;
 }
 
+/* ---------------- 相对图片路径重写 ---------------- */
+// md 里的相对路径图片（如 ../images/foo.png）在网页上会断链；
+// 渲染前把图片复制到 public/content-images/，并把路径改写为绝对 URL。
+
+const IMG_DIR_NAME = 'content-images';
+const base = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
+function copyImageAndRewrite(url: string, mdFileDir: string): string | null {
+  // 跳过绝对 URL、data URI、根路径
+  if (/^(https?:|data:|\/)/.test(url)) return null;
+  // URL 解码 + 剥离 ?query / #hash（Notion 导出常带 ?width=）
+  const decoded = decodeURIComponent(url).split(/[?#]/)[0].trim();
+  if (!decoded) return null;
+  const srcPath = path.resolve(mdFileDir, decoded);
+  if (!fs.existsSync(srcPath)) return null;
+  const hash = crypto.createHash('md5').update(srcPath).digest('hex').slice(0, 12);
+  const ext = path.extname(srcPath) || '.png';
+  const name = `${hash}${ext}`;
+  const destDir = path.join(process.cwd(), 'public', IMG_DIR_NAME);
+  const destPath = path.join(destDir, name);
+  fs.mkdirSync(destDir, { recursive: true });
+  if (!fs.existsSync(destPath)) fs.copyFileSync(srcPath, destPath);
+  return `${base}/${IMG_DIR_NAME}/${name}`;
+}
+
+function rewriteImagePaths(md: string, mdFileDir: string): string {
+  // Markdown 图片：![alt](url)
+  md = md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+    const newUrl = copyImageAndRewrite(url, mdFileDir);
+    return newUrl ? `![${alt}](${newUrl})` : match;
+  });
+  // HTML <img src="url">
+  md = md.replace(/<img\s+([^>]*?)src=["']([^"']+)["']([^>]*?)>/g, (match, pre, url, post) => {
+    const newUrl = copyImageAndRewrite(url, mdFileDir);
+    return newUrl ? `<img ${pre}src="${newUrl}"${post}>` : match;
+  });
+  return md;
+}
+
 /** 无 frontmatter 日期时用文件修改时间 */
 function fileDate(absFile: string): string {
   try {
@@ -145,10 +195,13 @@ async function loadDir<T extends BasePost>(
       const raw = fs.readFileSync(absFile, 'utf-8');
       const { data, content } = matter(raw);
       const fm = data as RawFrontmatter;
-      const html = await renderMarkdown(content);
+      const md = rewriteImagePaths(content, path.dirname(absFile));
+      const html = await renderMarkdown(md);
 
       const segments = relPath.split('/');
-      const folder = segments.length > 1 ? segments[0] : undefined;
+      const depth = segments.length - 1; // 目录层级：0=根，1=大类目录，2=大类/章节目录
+      const folder = depth >= 1 ? segments[0] : undefined;
+      const subFolder = depth >= 2 ? segments[1] : undefined;
       const fileName = segments[segments.length - 1];
       const date = normalizeDate(fm.date) || fileDate(absFile);
       const title = fm.title ?? inferTitle(content, fileName.replace(/\.mdx?$/, ''));
@@ -159,6 +212,7 @@ async function loadDir<T extends BasePost>(
         date,
         summary: fm.summary ?? '',
         category: fm.category ?? (folder ? folderCategory(folder) ?? '未分类' : '未分类'),
+        chapter: fm.chapter ?? (subFolder ? folderChapter(subFolder) : undefined),
         tags: fm.tags ?? [],
         html,
         ...decorate(fm),

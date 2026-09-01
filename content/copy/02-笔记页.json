@@ -13,6 +13,8 @@
     "placeholder": "搜索笔记标题、摘要或标签…",
     "cat": "分类",
     "tag": "标签",
+    "chap": "章节",
+    "allChapters": "全部章节",
     "sort": "排序",
     "sortNewest": "最新",
     "sortOldest": "最早",

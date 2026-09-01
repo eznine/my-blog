@@ -1,10 +1,10 @@
 ---
 title: "Google Earth Engine 入门：Landsat 影像获取与去云完整流程"
-date: 2026-05-05
-category: 遥感
-tags: [GEE, Landsat, 去云, JavaScript]
+date: "2026-05-05"
 summary: "GEE 最常用的操作模板：按时间/区域筛选影像、QA 像元去云、中值合成与导出，附可直接复制的代码。"
+tags: ["GEE","Landsat","去云","JavaScript"]
 ---
+
 
 GEE 把 PB 级影像库和算力搬到云端，本地只写逻辑不存数据。下面是我最常用的 Landsat 8 处理模板。
 

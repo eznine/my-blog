@@ -74,6 +74,46 @@ function listFiles(type) {
   }));
 }
 
+/* ---------------- 与 lib/content.ts 一致的目录推断 ---------------- */
+
+/** 一级子目录名推断大类：中文原样保留，纯 ASCII 做 Title Case */
+function folderCategory(dir) {
+  const name = dir.replace(/^\d+[-_\s]*/, '');
+  if (!name) return undefined;
+  if (/[^\x00-\x7F]/.test(name)) return name;
+  const label = name
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  return label || undefined;
+}
+
+/** 二级子目录名推断章节：去前导编号后原样 */
+function folderChapter(dir) {
+  const name = dir.replace(/^\d+[-_\s]*/, '');
+  return name || undefined;
+}
+
+/** relPath → { category, chapter }（目录推断；frontmatter 优先在外层做） */
+function inferFromPath(relPath) {
+  const segments = relPath.split('/');
+  const depth = segments.length - 1;
+  return {
+    category: depth >= 1 ? folderCategory(segments[0]) : undefined,
+    chapter: depth >= 2 ? folderChapter(segments[1]) : undefined,
+  };
+}
+
+/** 文章的生效分类/章节：frontmatter 优先，缺省回退目录推断 */
+function effectiveTaxonomy(relPath, fm) {
+  const inferred = inferFromPath(relPath);
+  return {
+    category: fm.category ?? inferred.category,
+    chapter: fm.chapter ?? inferred.chapter,
+  };
+}
+
 /* ---------------- frontmatter 解析 / 序列化 ---------------- */
 
 function parseFrontmatter(raw) {
@@ -86,7 +126,27 @@ function parseFrontmatter(raw) {
     const [, key, valRaw] = kv;
     const val = valRaw.trim();
     if (!val) continue;
-    if (val.startsWith('[') || val.startsWith('{')) {
+    if (val.startsWith('[') && val.endsWith(']')) {
+      const inner = val.slice(1, -1).trim();
+      if (!inner) {
+        data[key] = [];
+      } else {
+        try {
+          data[key] = JSON.parse(val);
+        } catch {
+          // YAML 流式数组（值可能无引号，如 [GIS, 遥感]）：JSON.parse 失败时按逗号拆
+          data[key] = inner
+            .split(',')
+            .map((s) => {
+              const t = s.trim();
+              if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'")))
+                return t.slice(1, -1);
+              return t;
+            })
+            .filter(Boolean);
+        }
+      }
+    } else if (val.startsWith('{') && val.endsWith('}')) {
       try {
         data[key] = JSON.parse(val);
       } catch {
@@ -109,6 +169,7 @@ function buildFrontmatter(meta) {
   lines.push(`date: ${yamlStr(meta.date || new Date().toISOString().slice(0, 10))}`);
   if (meta.summary) lines.push(`summary: ${yamlStr(meta.summary)}`);
   if (meta.category) lines.push(`category: ${yamlStr(meta.category)}`);
+  if (meta.chapter) lines.push(`chapter: ${yamlStr(meta.chapter)}`);
   if (Array.isArray(meta.tags) && meta.tags.length) lines.push(`tags: ${JSON.stringify(meta.tags)}`);
   if (meta.status) lines.push(`status: ${yamlStr(meta.status)}`);
   if (Array.isArray(meta.tech) && meta.tech.length) lines.push(`tech: ${JSON.stringify(meta.tech)}`);
@@ -142,15 +203,62 @@ function readBody(req) {
 
 const isAuthed = (req) => req.headers['x-admin-token'] === TOKEN;
 
-function uniqueSlugFor(type, base) {
-  const files = listFiles(type);
-  let slug = base;
-  if (slug === 'post' || !slug) slug = 'post-' + crypto.randomBytes(3).toString('hex');
-  const taken = new Set(files.map((f) => f.slug));
-  if (!taken.has(slug)) return slug;
-  for (let i = 2; ; i++) {
-    const s = `${slug}-${i}`;
-    if (!taken.has(s)) return s;
+/** 文章 meta（category/chapter）→ 子目录层级；章节依附大类，无大类则根目录 */
+function taxonomyDirs(type, meta) {
+  const cat = String(meta?.category || '').trim();
+  const chap = cat && String(meta?.chapter || '').trim();
+  if (!cat) return [];
+  const typeRoot = path.join(CONTENT, type);
+  // 优先复用已存在的分类文件夹（'02-web-basics' ←→ 'Web Basics'），没有才按大类名新建
+  let catDir = cat;
+  try {
+    for (const e of fs.readdirSync(typeRoot, { withFileTypes: true })) {
+      if (e.isDirectory() && folderCategory(e.name) === cat) {
+        catDir = e.name;
+        break;
+      }
+    }
+  } catch {}
+  if (!chap) return [catDir];
+  // 章节同理：复用该大类下已有的章节文件夹（'01-环境配置' ←→ '环境配置'）
+  let chapDir = chap;
+  try {
+    for (const e of fs.readdirSync(path.join(typeRoot, catDir), { withFileTypes: true })) {
+      if (e.isDirectory() && folderChapter(e.name) === chap) {
+        chapDir = e.name;
+        break;
+      }
+    }
+  } catch {}
+  return [catDir, chapDir];
+}
+
+/**
+ * 在大类/章节目录下放置文章文件：返回 { file, slug }。
+ * slug 与前台一致——由完整 relPath 派生（目录名参与 slug）。
+ * 文件名沿用清洗后的原名（中文文件名原样保留，与直接拖入一致）；
+ * excludeFile 用于更新场景排除文章自身，避免原地保存时 slug 漂移。
+ */
+function placeFile(type, dirs, rawName, excludeFile) {
+  const baseName =
+    String(rawName || '')
+      .trim()
+      .replace(/\.mdx?$/, '')
+      .replace(/[\\/:*?"<>|#%&{}$!'@+`=]/g, '-')
+      .slice(0, 64)
+      .trim() || 'post-' + crypto.randomBytes(3).toString('hex');
+  const taken = new Set(
+    listFiles(type)
+      .filter((f) => f.file !== excludeFile)
+      .map((f) => f.slug),
+  );
+  for (let i = 0; ; i++) {
+    const name = i === 0 ? baseName : `${baseName}-${i + 1}`;
+    const rel = [...dirs, `${name}.md`].join('/');
+    const slug = slugify(rel);
+    const file = path.join(CONTENT, type, rel);
+    if (file === excludeFile) return { file, slug };
+    if (!taken.has(slug) && !fs.existsSync(file)) return { file, slug };
   }
 }
 
@@ -184,15 +292,17 @@ async function handle(req, res) {
   if (p === '/api/posts' && req.method === 'GET') {
     if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
     const items = listFiles(type)
-      .map(({ slug, file }) => {
+      .map(({ slug, relPath, file }) => {
         const { data, content } = parseFrontmatter(fs.readFileSync(file, 'utf-8'));
         const stat = fs.statSync(file);
         const titleMatch = content.match(/^#\s+(.+)$/m);
+        const eff = effectiveTaxonomy(relPath, data);
         return {
           slug,
           title: data.title ?? titleMatch?.[1]?.trim() ?? slug,
           date: data.date ?? stat.mtime.toISOString().slice(0, 10),
-          category: data.category ?? '',
+          category: eff.category ?? '未分类',
+          chapter: eff.chapter ?? '',
           tags: Array.isArray(data.tags) ? data.tags : [],
           summary: data.summary ?? '',
           status: data.status ?? '',
@@ -213,30 +323,29 @@ async function handle(req, res) {
     return json(res, 200, { slug, relPath: found.relPath, meta: data, content });
   }
 
-  /* ---- 新建 ---- */
+  /* ---- 新建：按大类/章节放入对应文件夹 ---- */
   if (p === '/api/posts' && req.method === 'POST') {
     if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
     const meta = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
-    const slug = uniqueSlugFor(type, slugify(meta.slug || meta.title || ''));
-    const file = path.join(CONTENT, type, `${slug}.md`);
-    if (fs.existsSync(file)) return json(res, 409, { error: `slug "${slug}" 已存在` });
+    const dirs = taxonomyDirs(type, meta);
+    const { file, slug } = placeFile(type, dirs, meta.slug || meta.title || '');
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, buildFrontmatter(meta) + '\n' + (meta.content || ''), 'utf-8');
     return json(res, 200, { ok: true, slug });
   }
 
-  /* ---- 更新（可改 slug：改后移到该类型根目录） ---- */
+  /* ---- 更新：目录跟随大类/章节变化（slug 由最终路径派生） ---- */
   if (p === '/api/posts' && req.method === 'PUT') {
     if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
     const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
     const old = listFiles(type).find((f) => f.slug === body.slug);
     if (!old) return json(res, 404, { error: '文章不存在' });
 
-    const newSlug = body.newSlug && body.newSlug !== body.slug ? uniqueSlugFor(type, slugify(body.newSlug)) : body.slug;
-    const target =
-      newSlug === body.slug
-        ? old.file
-        : path.join(CONTENT, type, `${newSlug}.md`);
+    const dirs = taxonomyDirs(type, body);
+    const oldName = path.basename(old.relPath).replace(/\.mdx?$/, '');
+    const rawName =
+      body.newSlug && body.newSlug !== body.slug ? body.newSlug : oldName;
+    const { file: target, slug: newSlug } = placeFile(type, dirs, rawName, old.file);
 
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, buildFrontmatter(body) + '\n' + (body.content || ''), 'utf-8');
@@ -244,22 +353,30 @@ async function handle(req, res) {
     return json(res, 200, { ok: true, slug: newSlug });
   }
 
-  /* ---- 删除 ---- */
+  /* ---- 删除（并清理变空的章节/大类目录） ---- */
   if (p === '/api/posts' && req.method === 'DELETE') {
     const slug = url.searchParams.get('slug');
     if (!TYPES.includes(type) || !slug) return json(res, 400, { error: '参数不完整' });
     const found = listFiles(type).find((f) => f.slug === slug);
     if (!found) return json(res, 404, { error: '文章不存在' });
     fs.unlinkSync(found.file);
+    try {
+      const typeRoot = path.join(CONTENT, type);
+      const parent = path.dirname(found.file);
+      if (parent !== typeRoot && !fs.readdirSync(parent).length) fs.rmdirSync(parent);
+      const grand = path.dirname(parent);
+      if (path.dirname(grand) === typeRoot && !fs.readdirSync(grand).length) fs.rmdirSync(grand);
+    } catch {}
     return json(res, 200, { ok: true });
   }
 
-  /* ---- 批量导入 MD：统一分类 + 追加标签 ---- */
+  /* ---- 批量导入 MD：统一大类 + 章节 + 追加标签 ---- */
   if (p === '/api/posts/bulk' && req.method === 'POST') {
     if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
     const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
     const files = Array.isArray(body.files) ? body.files : [];
     const category = String(body.category || '').trim();
+    const chapter = String(body.chapter || '').trim();
     const addTags = (Array.isArray(body.tags) ? body.tags : [])
       .map((t) => String(t).trim())
       .filter(Boolean);
@@ -281,16 +398,107 @@ async function handle(req, res) {
       }
       if (!meta.date) meta.date = new Date().toISOString().slice(0, 10);
       if (category) meta.category = category;
+      if (chapter) meta.chapter = chapter;
       const baseTags = Array.isArray(meta.tags) ? meta.tags.map(String) : [];
       meta.tags = [...new Set([...baseTags, ...addTags])];
 
-      const slug = uniqueSlugFor(type, slugify(meta.slug || meta.title || name));
-      const file = path.join(CONTENT, type, `${slug}.md`);
+      // 沿用导入的原文件名，放进大类/章节文件夹（复用已有目录，与直接拖入一致）
+      const dirs = taxonomyDirs(type, { category, chapter });
+      const { file, slug } = placeFile(type, dirs, meta.slug || name);
       fs.mkdirSync(path.dirname(file), { recursive: true });
       fs.writeFileSync(file, buildFrontmatter(meta) + '\n' + content, 'utf-8');
       items.push({ slug, title: meta.title });
     }
     return json(res, 200, { ok: true, imported: items.length, items, skipped });
+  }
+
+  /* ---- 批量操作：删除 / 修改（大类、章节、加标签、移除标签） ---- */
+  if (p === '/api/posts/batch' && req.method === 'POST') {
+    if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
+    const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+    const slugs = Array.isArray(body.slugs) ? body.slugs.map(String).filter(Boolean) : [];
+    if (!slugs.length) return json(res, 400, { error: '未选择文章' });
+    const files = listFiles(type).filter((f) => slugs.includes(f.slug));
+    if (!files.length) return json(res, 404, { error: '文章不存在' });
+
+    // 删除文件后清理变空的章节/大类目录
+    const cleanupEmpty = (file) => {
+      try {
+        const typeRoot = path.join(CONTENT, type);
+        const parent = path.dirname(file);
+        if (parent !== typeRoot && !fs.readdirSync(parent).length) fs.rmdirSync(parent);
+        const grand = path.dirname(parent);
+        if (path.dirname(grand) === typeRoot && !fs.readdirSync(grand).length) fs.rmdirSync(grand);
+      } catch {}
+    };
+
+    if (body.action === 'delete') {
+      for (const f of files) {
+        fs.unlinkSync(f.file);
+        cleanupEmpty(f.file);
+      }
+      return json(res, 200, { ok: true, deleted: files.length });
+    }
+
+    if (body.action === 'update') {
+      const setCategory = !!body.setCategory;
+      const category = String(body.category || '').trim();
+      const setChapter = !!body.setChapter;
+      const chapter = String(body.chapter || '').trim();
+      const addTags = (Array.isArray(body.addTags) ? body.addTags : [])
+        .map((t) => String(t).trim())
+        .filter(Boolean);
+      const removeTags = (Array.isArray(body.removeTags) ? body.removeTags : [])
+        .map((t) => String(t).trim())
+        .filter(Boolean);
+      if (!setCategory && !setChapter && !addTags.length && !removeTags.length)
+        return json(res, 400, { error: '没有可应用的修改' });
+
+      let updated = 0;
+      const moved = [];
+      for (const f of files) {
+        const raw = fs.readFileSync(f.file, 'utf-8');
+        const { data, content } = parseFrontmatter(raw);
+        const eff = effectiveTaxonomy(f.relPath, data);
+        const meta = { ...data };
+
+        // 生效值物化：改分类/章节时目录推断值写进 frontmatter，保证落盘位置与显示一致
+        if (setCategory) meta.category = category;
+        if (setChapter) {
+          const finalCat = setCategory ? category : String(meta.category ?? eff.category ?? '');
+          meta.chapter = finalCat ? chapter : '';
+        }
+
+        let tags = Array.isArray(meta.tags) ? meta.tags.map(String) : [];
+        if (addTags.length) tags = [...new Set([...tags, ...addTags])];
+        if (removeTags.length) tags = tags.filter((t) => !removeTags.includes(t));
+        meta.tags = tags;
+
+        if (!setCategory && !setChapter) {
+          // 仅改标签：原地重写，不动文件位置与 slug
+          fs.writeFileSync(f.file, buildFrontmatter(meta) + '\n' + content, 'utf-8');
+        } else {
+          const finalCat = String(meta.category ?? eff.category ?? '');
+          const finalChap = String(meta.chapter ?? eff.chapter ?? '');
+          meta.category = finalCat;
+          meta.chapter = finalChap;
+          const dirs = taxonomyDirs(type, { category: finalCat, chapter: finalChap });
+          const oldName = path.basename(f.relPath).replace(/\.mdx?$/, '');
+          const { file: target, slug: newSlug } = placeFile(type, dirs, oldName, f.file);
+          fs.mkdirSync(path.dirname(target), { recursive: true });
+          fs.writeFileSync(target, buildFrontmatter(meta) + '\n' + content, 'utf-8');
+          if (target !== f.file) {
+            fs.unlinkSync(f.file);
+            cleanupEmpty(f.file);
+            moved.push({ slug: newSlug, from: f.relPath });
+          }
+        }
+        updated += 1;
+      }
+      return json(res, 200, { ok: true, updated, moved });
+    }
+
+    return json(res, 400, { error: '未知操作' });
   }
 
   /* ---- 外观设置（字号/颜色） ---- */
@@ -312,18 +520,92 @@ async function handle(req, res) {
     return json(res, 200, { ok: true });
   }
 
-  /* ---- 分类 / 标签管理 ---- */
+  /* ---- 分类 / 标签 / 章节管理 ---- */
   if (p === '/api/taxonomy' && (req.method === 'GET' || req.method === 'PUT')) {
     const file = path.join(CONTENT, 'taxonomy.json');
+    const empty = { categories: { notes: [], research: [], projects: [] }, chapters: {}, tags: [] };
     if (req.method === 'GET') {
-      if (!fs.existsSync(file)) {
-        return json(res, 200, { categories: { notes: [], research: [], projects: [] }, tags: [] });
+      let base = {};
+      try {
+        base = JSON.parse(fs.readFileSync(file, 'utf-8'));
+      } catch {}
+      const data = { ...empty, ...base, chapters: { ...(base.chapters || {}) } };
+      // 聚合文章实际使用的大类/章节（frontmatter 优先、目录推断兜底），补充为候选
+      for (const t of TYPES) {
+        data.categories[t] = [...(data.categories[t] || [])];
+        for (const { relPath, file: f } of listFiles(t)) {
+          const { data: fm } = parseFrontmatter(fs.readFileSync(f, 'utf-8'));
+          const eff = effectiveTaxonomy(relPath, fm);
+          if (eff.category && !data.categories[t].includes(eff.category)) data.categories[t].push(eff.category);
+          if (eff.category && eff.chapter) {
+            const list = (data.chapters[eff.category] = data.chapters[eff.category] || []);
+            if (!list.includes(eff.chapter)) list.push(eff.chapter);
+          }
+        }
       }
-      return json(res, 200, JSON.parse(fs.readFileSync(file, 'utf-8')));
+      // 章节顺序以 taxonomy.json 为准（后台可拖拽排序）；文章聚合只追加缺失项，不重新排序
+      for (const key of Object.keys(data.chapters)) {
+        data.chapters[key] = [...new Set(data.chapters[key])];
+      }
+      return json(res, 200, data);
     }
     const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
     fs.writeFileSync(file, JSON.stringify(body, null, 2) + '\n', 'utf-8');
     return json(res, 200, { ok: true });
+  }
+
+  /* ---- 重命名大类 / 章节：级联更新该类型所有文章的 frontmatter 与 taxonomy ---- */
+  if (p === '/api/taxonomy/rename' && req.method === 'POST') {
+    const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+    if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
+    const kind = body.kind === 'chapter' ? 'chapter' : 'category';
+    const from = String(body.from || '').trim();
+    const to = String(body.to || '').trim();
+    const owner = String(body.category || '').trim(); // 章节重命名时所属大类
+    if (!from || !to || from === to) return json(res, 400, { error: '参数不完整' });
+    if (kind === 'chapter' && !owner) return json(res, 400, { error: '缺少所属分类' });
+
+    let updated = 0;
+    for (const { relPath, file } of listFiles(type)) {
+      const raw = fs.readFileSync(file, 'utf-8');
+      const { data, content } = parseFrontmatter(raw);
+      // 按生效值（frontmatter 优先、目录推断兜底）匹配；命中则显式写入
+      // frontmatter 覆盖目录推断——目录与 slug 不动，前台/后台显示一致
+      const eff = effectiveTaxonomy(relPath, data);
+      let changed = false;
+      if (kind === 'category' && eff.category === from) {
+        data.category = to;
+        changed = true;
+      }
+      if (kind === 'chapter' && eff.chapter === from && (!owner || eff.category === owner)) {
+        data.chapter = to;
+        changed = true;
+      }
+      if (changed) {
+        fs.writeFileSync(file, buildFrontmatter(data) + '\n' + content, 'utf-8');
+        updated += 1;
+      }
+    }
+
+    const taxFile = path.join(CONTENT, 'taxonomy.json');
+    let tax = { categories: { notes: [], research: [], projects: [] }, chapters: {}, tags: [] };
+    try {
+      tax = { ...tax, ...JSON.parse(fs.readFileSync(taxFile, 'utf-8')) };
+    } catch {}
+    tax.chapters = tax.chapters || {};
+    if (kind === 'category') {
+      for (const key of Object.keys(tax.categories || {})) {
+        tax.categories[key] = (tax.categories[key] || []).map((c) => (c === from ? to : c));
+      }
+      if (tax.chapters[from]) {
+        tax.chapters[to] = tax.chapters[from];
+        delete tax.chapters[from];
+      }
+    } else if (Array.isArray(tax.chapters[owner])) {
+      tax.chapters[owner] = tax.chapters[owner].map((c) => (c === from ? to : c));
+    }
+    fs.writeFileSync(taxFile, JSON.stringify(tax, null, 2) + '\n', 'utf-8');
+    return json(res, 200, { ok: true, updated });
   }
 
   /* ---- 图片上传（原始二进制 body，?name= 文件名） ---- */

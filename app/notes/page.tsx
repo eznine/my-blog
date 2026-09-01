@@ -4,6 +4,7 @@ import { NotesBrowser } from '@/components/notes-browser';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
 import { site } from '@/lib/site';
+import taxonomy from '@/content/taxonomy.json';
 
 export const metadata: Metadata = {
   title: site.pages.notes.title,
@@ -18,6 +19,7 @@ export default async function NotesPage() {
     date: n.date,
     summary: n.summary,
     category: n.category,
+    chapter: n.chapter,
     tags: n.tags,
   }));
 
@@ -34,7 +36,11 @@ export default async function NotesPage() {
         </PageHeader>
       </Reveal>
       <div className="pt-8">
-        <NotesBrowser notes={items} />
+        <NotesBrowser
+        notes={items}
+        categoryOrder={taxonomy.categories.notes}
+        chapterOrder={taxonomy.chapters}
+      />
       </div>
     </div>
   );

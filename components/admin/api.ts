@@ -76,6 +76,7 @@ export interface PostMeta {
   date: string;
   summary?: string;
   category?: string;
+  chapter?: string;
   tags?: string[];
   status?: string;
   tech?: string[];
@@ -90,6 +91,7 @@ export interface PostListItem extends PostMeta {
 
 export interface Taxonomy {
   categories: Record<PostType, string[]>;
+  chapters?: Record<string, string[]>;
   tags: string[];
 }
 
@@ -104,7 +106,26 @@ export function parseFrontmatter(raw: string): { data: Record<string, unknown>; 
     const [, key, valRaw] = kv;
     const val = valRaw.trim();
     if (!val) continue;
-    if (val.startsWith('[') || val.startsWith('{')) {
+    if (val.startsWith('[') && val.endsWith(']')) {
+      const inner = val.slice(1, -1).trim();
+      if (!inner) {
+        data[key] = [];
+      } else {
+        try {
+          data[key] = JSON.parse(val);
+        } catch {
+          data[key] = inner
+            .split(',')
+            .map((s) => {
+              const t = s.trim();
+              if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'")))
+                return t.slice(1, -1);
+              return t;
+            })
+            .filter(Boolean);
+        }
+      }
+    } else if (val.startsWith('{') && val.endsWith('}')) {
       try {
         data[key] = JSON.parse(val);
       } catch {

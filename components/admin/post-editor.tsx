@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { renderMarkdown } from '@/lib/md';
+import { TaxonomySelect } from './taxonomy-select';
 import {
   api,
   uploadImage,
@@ -22,6 +23,7 @@ interface FormState {
   date: string;
   summary: string;
   category: string;
+  chapter: string;
   tags: string[];
   status: string;
   tech: string[];
@@ -36,6 +38,7 @@ const EMPTY: FormState = {
   date: new Date().toISOString().slice(0, 10),
   summary: '',
   category: '',
+  chapter: '',
   tags: [],
   status: '',
   tech: [],
@@ -77,6 +80,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           date: str(m.date) || EMPTY.date,
           summary: str(m.summary),
           category: str(m.category),
+          chapter: str(m.chapter),
           tags: arr(m.tags),
           status: str(m.status),
           tech: arr(m.tech),
@@ -98,6 +102,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           date: str(meta.date) || EMPTY.date,
           summary: str(meta.summary),
           category: str(meta.category),
+          chapter: str(meta.chapter),
           tags: arr(meta.tags),
           status: str(meta.status),
           tech: arr(meta.tech),
@@ -165,16 +170,17 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
     });
   };
 
-  /* ---- 图片上传 ---- */
-  const onImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
+  /* ---- 图片上传（按钮 / 拖拽 / 粘贴共用） ---- */
+  const uploadAndInsert = async (files: File[]) => {
+    const imgs = files.filter((f) => /^image\//.test(f.type));
+    if (!imgs.length || uploading) return;
     setUploading(true);
     setError('');
     try {
-      const url = await uploadImage(file);
-      insert(`\n![${form.title || file.name}](${url})\n`);
+      for (const file of imgs) {
+        const url = await uploadImage(file);
+        insert(`\n![${form.title || file.name}](${url})\n`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '上传失败');
     } finally {
@@ -182,21 +188,42 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
     }
   };
 
-  /* ---- 保存 ---- */
-  const save = async () => {
-    if (!form.title.trim()) {
-      setError('标题不能为空');
-      return;
+  const onImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    await uploadAndInsert(files);
+  };
+
+  const onPaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const files = Array.from(e.clipboardData.files || []);
+    if (files.length) {
+      e.preventDefault();
+      await uploadAndInsert(files);
     }
+  };
+
+  const onDrop = async (e: React.DragEvent<HTMLTextAreaElement>) => {
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length) {
+      e.preventDefault();
+      await uploadAndInsert(files);
+    }
+  };
+
+  /* ---- 保存：标题可留空（自动取正文一级标题，再无则「未命名」） ---- */
+  const save = async () => {
     setSaving(true);
     setError('');
     setSaved('');
+    const autoTitle =
+      form.title.trim() || form.content.match(/^#\s+(.+)$/m)?.[1]?.trim() || '';
     try {
       const payload = {
-        title: form.title.trim(),
+        title: autoTitle,
         date: form.date,
         summary: form.summary,
-        category: form.category,
+        category: form.category.trim(),
+        chapter: form.category.trim() ? form.chapter.trim() : '',
         tags: form.tags,
         status: form.status,
         tech: form.tech,
@@ -211,7 +238,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           })
         : await api<{ slug: string }>(`/api/posts?type=${type}`, {
             method: 'POST',
-            body: JSON.stringify({ ...payload, slug: form.slug || form.title }),
+            body: JSON.stringify({ ...payload, slug: form.slug || autoTitle }),
           });
       setSaved(`已保存 · /${type === 'notes' ? 'notes' : type}/${r.slug}`);
       if (!isEdit) window.history.replaceState(null, '', `/admin`);
@@ -227,6 +254,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
   const labelCls = 'mb-1.5 block font-mono text-[11px] tracking-[0.16em] text-ink-faint uppercase';
 
   const categoryOptions = taxonomy?.categories?.[type] || [];
+  const chapterOptions = (form.category.trim() && taxonomy?.chapters?.[form.category.trim()]) || [];
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 md:pt-14">
@@ -274,43 +302,53 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           <div className="mt-8 grid gap-5 rounded-2xl border border-line p-6 md:grid-cols-2 lg:grid-cols-4">
             <div className="md:col-span-2">
               <label className={labelCls}>标题 Title</label>
-              <input className={inputCls} value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="文章标题" />
+              <input
+                className={inputCls}
+                value={form.title}
+                onChange={(e) => set('title', e.target.value)}
+                placeholder="可留空：自动取正文一级标题 / 文件名"
+              />
             </div>
             <div>
               <label className={labelCls}>日期 Date</label>
               <input type="date" className={inputCls} value={form.date} onChange={(e) => set('date', e.target.value)} />
             </div>
             <div>
-              <label className={labelCls}>分类 Category</label>
-              <input
-                className={inputCls}
+              <label className={labelCls}>大类 Category</label>
+              <TaxonomySelect
+                variant="dropdown"
                 value={form.category}
-                onChange={(e) => set('category', e.target.value)}
-                placeholder="选择或输入分类"
-                list="admin-categories"
+                onChange={(v) => {
+                  set('category', v);
+                  if (v.trim() !== form.category.trim()) set('chapter', '');
+                }}
+                onPick={() => set('chapter', '')}
+                options={categoryOptions}
+                placeholder="选择或输入大类"
               />
-              <datalist id="admin-categories">
-                {categoryOptions.map((c) => (
-                  <option key={c} value={c} />
-                ))}
-              </datalist>
+            </div>
+            <div>
+              <label className={labelCls}>章节 Chapter</label>
+              <TaxonomySelect
+                variant="dropdown"
+                value={form.chapter}
+                onChange={(v) => set('chapter', v)}
+                options={chapterOptions}
+                placeholder={form.category.trim() ? '如：01 环境配置（可留空）' : '先选大类，再选章节'}
+                disabled={!form.category.trim()}
+              />
             </div>
 
             {type === 'research' && (
               <div>
                 <label className={labelCls}>状态 Status</label>
-                <input
-                  className={inputCls}
+                <TaxonomySelect
+                  variant="dropdown"
                   value={form.status}
-                  onChange={(e) => set('status', e.target.value)}
+                  onChange={(v) => set('status', v)}
+                  options={['进行中', '已完成', '已发表']}
                   placeholder="进行中 / 已完成 / 已发表"
-                  list="admin-status"
                 />
-                <datalist id="admin-status">
-                  <option value="进行中" />
-                  <option value="已完成" />
-                  <option value="已发表" />
-                </datalist>
               </div>
             )}
 
@@ -455,8 +493,10 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
                 ref={textareaRef}
                 value={form.content}
                 onChange={(e) => set('content', e.target.value)}
+                onPaste={onPaste}
+                onDrop={onDrop}
                 spellCheck={false}
-                placeholder="# 在这里用 Markdown 写正文…&#10;&#10;支持代码块、表格、图片（工具栏上传）等。"
+                placeholder="# 在这里用 Markdown 写正文…&#10;&#10;支持代码块、表格、图片（工具栏上传 / 直接拖入 / 粘贴截图）等。"
                 className="min-h-[60vh] w-full resize-y bg-transparent px-6 py-5 font-mono text-[14px] leading-[1.75] text-ink focus:outline-none"
               />
               {showPreview && (

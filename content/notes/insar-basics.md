@@ -1,10 +1,10 @@
 ---
 title: "InSAR 基础与 SBAS：从干涉原理到地表形变监测"
-date: 2026-06-15
-category: 遥感
-tags: [InSAR, SBAS, 形变监测, Sentinel-1]
+date: "2026-06-15"
 summary: "整理 InSAR 的物理原理、D-InSAR 与时序方法（PS/SBAS）的区别、Sentinel-1 数据处理流程与解译要点。"
+tags: ["InSAR","SBAS","形变监测","Sentinel-1"]
 ---
+
 
 InSAR 用两幅 SAR 影像的相位差测量地表毫米级形变，是地面沉降、滑坡、矿区塌陷监测的主力技术。
 

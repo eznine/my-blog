@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { site } from '@/lib/site';
+import { NoteCard } from '@/components/note-card';
+import { Reveal } from '@/components/reveal';
 
 export interface NoteMeta {
   slug: string;
@@ -10,6 +11,7 @@ export interface NoteMeta {
   date: string;
   summary: string;
   category: string;
+  chapter?: string;
   tags: string[];
 }
 
@@ -19,9 +21,23 @@ function countBy(items: string[]): [string, number][] {
   return [...map.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
 }
 
-export function NotesBrowser({ notes }: { notes: NoteMeta[] }) {
+/** 章节按名称排序：'01 环境配置' 排在 '02 Web 基础' 前 */
+const chapterCollator = new Intl.Collator('zh', { numeric: true });
+
+export function NotesBrowser({
+  notes,
+  categoryOrder,
+  chapterOrder,
+}: {
+  notes: NoteMeta[];
+  /** 分类展示顺序（来自后台 taxonomy.json，可拖拽排序）；未收录的分类排在后面 */
+  categoryOrder?: string[];
+  /** 各分类下章节的展示顺序；未收录的章节排在后面 */
+  chapterOrder?: Record<string, string[]>;
+}) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string | null>(null);
+  const [chapter, setChapter] = useState<string | null>(null);
   const [tag, setTag] = useState<string | null>(null);
   const [sortAsc, setSortAsc] = useState(false);
   const [allTagsOpen, setAllTagsOpen] = useState(false);
@@ -31,21 +47,68 @@ export function NotesBrowser({ notes }: { notes: NoteMeta[] }) {
     const t = sp.get('tag');
     const c = sp.get('category');
     const q = sp.get('q');
+    const ch = sp.get('chapter');
     if (t) setTag(t);
-    if (c) setCategory(c);
+    if (c) {
+      setCategory(c);
+      if (ch) setChapter(ch);
+    }
     if (q) setQuery(q);
   }, []);
 
-  const categories = useMemo(() => countBy(notes.map((n) => n.category)), [notes]);
+  const categories = useMemo(() => {
+    const list = countBy(notes.map((n) => n.category));
+    if (!categoryOrder?.length) return list;
+    const idx = new Map(categoryOrder.map((c, i) => [c, i]));
+    return list.sort(
+      (a, b) =>
+        (idx.has(a[0]) ? (idx.get(a[0]) as number) : 1e9) -
+          (idx.has(b[0]) ? (idx.get(b[0]) as number) : 1e9) ||
+        b[1] - a[1] ||
+        a[0].localeCompare(b[0], 'zh'),
+    );
+  }, [notes, categoryOrder]);
   const tags = useMemo(() => countBy(notes.flatMap((n) => n.tags)), [notes]);
+
+  /** 选中分类下的章节——优先按后台保存的顺序（可拖拽排序），未收录的按名称排序垫后 */
+  const chapters = useMemo(() => {
+    if (!category) return [] as [string, number][];
+    const list = countBy(
+      notes.filter((n) => n.category === category && n.chapter).map((n) => n.chapter as string),
+    );
+    const order = chapterOrder?.[category];
+    if (order?.length) {
+      const idx = new Map(order.map((c, i) => [c, i]));
+      list.sort(
+        (a, b) =>
+          (idx.has(a[0]) ? (idx.get(a[0]) as number) : 1e9) -
+            (idx.has(b[0]) ? (idx.get(b[0]) as number) : 1e9) ||
+          chapterCollator.compare(a[0], b[0]),
+      );
+    } else {
+      list.sort((a, b) => chapterCollator.compare(a[0], b[0]));
+    }
+    return list;
+  }, [notes, category, chapterOrder]);
+
+  const categoryCount = useMemo(
+    () => (category ? notes.filter((n) => n.category === category).length : 0),
+    [notes, category],
+  );
+
+  const pickCategory = (c: string | null) => {
+    setCategory(c);
+    setChapter(null);
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const hit = notes.filter((n) => {
       if (category && n.category !== category) return false;
+      if (category && chapter && n.chapter !== chapter) return false;
       if (tag && !n.tags.includes(tag)) return false;
       if (q) {
-        const hay = `${n.title} ${n.summary} ${n.category} ${n.tags.join(' ')}`.toLowerCase();
+        const hay = `${n.title} ${n.summary} ${n.category} ${n.chapter ?? ''} ${n.tags.join(' ')}`.toLowerCase();
         if (!q.split(/\s+/).every((token) => hay.includes(token))) return false;
       }
       return true;
@@ -53,7 +116,7 @@ export function NotesBrowser({ notes }: { notes: NoteMeta[] }) {
     return hit.sort((a, b) =>
       sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date),
     );
-  }, [notes, query, category, tag, sortAsc]);
+  }, [notes, query, category, chapter, tag, sortAsc]);
 
   const byYear = useMemo(() => {
     const groups: { year: string; items: NoteMeta[] }[] = [];
@@ -68,7 +131,7 @@ export function NotesBrowser({ notes }: { notes: NoteMeta[] }) {
 
   const active = category !== null || tag !== null || query.trim() !== '';
   const shownTags = allTagsOpen ? tags : tags.slice(0, 18);
-  const labelCls = 'mr-1 font-mono text-[12px] tracking-[0.1em] text-ink-soft';
+  const labelCls = 'mr-1 font-mono tracking-[0.1em] text-ink-soft';
 
   return (
     <div>
@@ -95,21 +158,31 @@ export function NotesBrowser({ notes }: { notes: NoteMeta[] }) {
 
       {/* 分类 */}
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <span className={labelCls}>{site.notesBrowser.cat}</span>
-        <FilterButton active={category === null} onClick={() => setCategory(null)}>
+        <span className={labelCls} style={{ fontSize: 'var(--fs-filter)' }}>{site.notesBrowser.cat}</span>
+        <FilterButton active={category === null} onClick={() => pickCategory(null)}>
           {site.notesBrowser.all} {notes.length}
         </FilterButton>
         {categories.map(([c, n]) => (
-          <FilterButton key={c} active={category === c} onClick={() => setCategory(category === c ? null : c)}>
+          <FilterButton key={c} active={category === c} onClick={() => pickCategory(category === c ? null : c)}>
             {c} {n}
           </FilterButton>
         ))}
       </div>
 
+      {/* 章节面板：选中分类后展开，真实占位挤开下方内容 */}
+      <ChapterPanel
+        open={category !== null && chapters.length > 0}
+        category={category}
+        chapters={chapters}
+        categoryCount={categoryCount}
+        activeChapter={chapter}
+        onSelect={(ch) => setChapter(ch)}
+      />
+
       {/* 标签 */}
       {tags.length > 0 && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className={labelCls}>{site.notesBrowser.tag}</span>
+          <span className={labelCls} style={{ fontSize: 'var(--fs-filter)' }}>{site.notesBrowser.tag}</span>
           {shownTags.map(([t, n]) => (
             <FilterButton key={t} small active={tag === t} onClick={() => setTag(tag === t ? null : t)}>
               {t} {n}
@@ -129,7 +202,7 @@ export function NotesBrowser({ notes }: { notes: NoteMeta[] }) {
 
       {/* 排序 */}
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className={labelCls}>{site.notesBrowser.sort}</span>
+        <span className={labelCls} style={{ fontSize: 'var(--fs-filter)' }}>{site.notesBrowser.sort}</span>
         <FilterButton active={!sortAsc} onClick={() => setSortAsc(false)}>
           {site.notesBrowser.sortNewest}
         </FilterButton>
@@ -148,7 +221,7 @@ export function NotesBrowser({ notes }: { notes: NoteMeta[] }) {
             type="button"
             onClick={() => {
               setQuery('');
-              setCategory(null);
+              pickCategory(null);
               setTag(null);
             }}
             className="font-mono text-[11px] tracking-wider text-accent hover:text-accent-strong"
@@ -158,50 +231,87 @@ export function NotesBrowser({ notes }: { notes: NoteMeta[] }) {
         )}
       </div>
 
-      {/* 列表（按年分组） */}
+      {/* 列表（按年分组，卡片一行一个竖排） */}
       {byYear.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-sm text-ink-soft">{site.notesBrowser.empty}</p>
           <p className="mono-label mt-2">{site.notesBrowser.emptyLabel}</p>
         </div>
       ) : (
-        byYear.map((g) => (
+        byYear.map((g, gi) => (
           <section key={g.year} className="mt-8">
-            <h2 className="font-mono text-[13px] font-semibold tracking-[0.2em] text-accent">{g.year}</h2>
-            <ul>
-              {g.items.map((n) => (
-                <li key={n.slug} className="group border-b border-line">
-                  <Link
-                    href={`/notes/${n.slug}`}
-                    className="flex flex-col gap-1 py-4 transition-colors sm:flex-row sm:items-baseline sm:gap-6"
-                  >
-                    <span className="w-24 shrink-0 font-mono text-[13.5px] text-ink-soft">{n.date.slice(5)}</span>
-                    <span className="min-w-0 flex-1">
-                      <span
-                        className="font-semibold text-ink transition-colors group-hover:text-accent"
-                        style={{ fontSize: 'var(--fs-list-title)' }}
-                      >
-                        {n.title}
-                      </span>
-                      {n.summary && (
-                        <span
-                          className="mt-1 block truncate text-ink-soft"
-                          style={{ fontSize: 'var(--fs-list-summary)' }}
-                        >
-                          {n.summary}
-                        </span>
-                      )}
-                    </span>
-                    <span className="shrink-0 rounded-md border border-line px-2 py-0.5 font-mono text-[12.5px] text-ink-soft transition-colors group-hover:border-accent/50 group-hover:text-accent">
-                      {n.category}
-                    </span>
-                  </Link>
-                </li>
+            <h2 className="font-mono text-base font-semibold tracking-[0.2em] text-accent">{g.year}</h2>
+            <div className="mt-3 flex flex-col gap-4">
+              {g.items.map((n, i) => (
+                <Reveal key={n.slug} delay={Math.min(gi * 3 + i, 5) * 55} className="h-full">
+                  <NoteCard note={n} />
+                </Reveal>
               ))}
-            </ul>
+            </div>
           </section>
         ))
       )}
+    </div>
+  );
+}
+
+/**
+ * 章节面板：点选分类后展开（grid-rows 0fr→1fr 过渡），真实占位把
+ * 标签/排序/列表往下挤开，不悬浮不重叠；章节行横向滑动选择。
+ */
+function ChapterPanel({
+  open,
+  category,
+  chapters,
+  categoryCount,
+  activeChapter,
+  onSelect,
+}: {
+  open: boolean;
+  category: string | null;
+  chapters: [string, number][];
+  categoryCount: number;
+  activeChapter: string | null;
+  onSelect: (ch: string | null) => void;
+}) {
+  return (
+    <div
+      className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
+        open ? 'mt-3 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+      }`}
+      inert={!open}
+    >
+      <div className="overflow-hidden">
+        <div className="rounded-xl border border-line bg-panel/70 p-3.5 backdrop-blur">
+          <div className="mb-2.5 flex items-baseline justify-between gap-3">
+            <span className="mono-label truncate" style={{ fontSize: 'var(--fs-filter)' }}>
+              {category} · {site.notesBrowser.chap}
+            </span>
+            <span className="mono-label shrink-0 text-accent">
+              {activeChapter ?? site.notesBrowser.allChapters}
+            </span>
+          </div>
+          <div
+            className={`flex gap-2 overflow-x-auto pb-1 overscroll-x-contain [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-line-strong/70 [&::-webkit-scrollbar-track]:bg-transparent ${
+              open ? '' : 'pointer-events-none'
+            }`}
+          >
+            <FilterButton small active={activeChapter === null} onClick={() => onSelect(null)}>
+              {site.notesBrowser.allChapters} {categoryCount}
+            </FilterButton>
+            {chapters.map(([ch, n]) => (
+              <FilterButton
+                key={ch}
+                small
+                active={activeChapter === ch}
+                onClick={() => onSelect(activeChapter === ch ? null : ch)}
+              >
+                {ch} {n}
+              </FilterButton>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -221,13 +331,14 @@ function FilterButton({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-md border font-mono transition-colors ${
-        small ? 'px-2 py-[3px] text-[12.5px]' : 'px-3 py-1.5 text-[13.5px]'
+      className={`rounded-md border font-mono transition-all duration-200 will-change-transform active:translate-y-0 ${
+        small ? 'px-2 py-[3px]' : 'px-3 py-1.5'
       } ${
         active
-          ? 'border-accent/60 bg-accent/10 text-accent'
-          : 'border-line text-ink-soft hover:border-accent/50 hover:text-accent'
+          ? 'border-accent/60 bg-accent/10 text-accent shadow-[0_0_10px_rgba(255,75,51,0.08)]'
+          : 'border-line text-ink-soft hover:-translate-y-0.5 hover:border-accent/60 hover:text-accent hover:shadow-[0_0_14px_rgba(255,75,51,0.10)]'
       }`}
+      style={{ fontSize: 'var(--fs-filter)' }}
     >
       {children}
     </button>

@@ -18,6 +18,7 @@ const SIZE_FIELDS: { key: keyof AppearanceConfig['sizes']; label: string; hint: 
   { key: 'listSummary', label: '列表摘要', hint: '列表条目摘要行', min: 12, max: 18, step: 0.5 },
   { key: 'pageTitle', label: '页面大标题', hint: '各列表页顶部大标题', min: 30, max: 60, step: 1 },
   { key: 'nav', label: '导航栏', hint: '顶部导航菜单文字', min: 13, max: 18, step: 0.5 },
+  { key: 'filter', label: '筛选按钮', hint: '笔记页分类/标签/排序按钮文字', min: 10, max: 18, step: 0.5 },
 ];
 
 const COLOR_FIELDS: { key: keyof ThemeColors; label: string; hint: string }[] = [
@@ -58,14 +59,16 @@ export function AppearanceManager({ onBack }: { onBack: () => void }) {
       .finally(() => setLoading(false));
   }, []);
 
-  // 实时预览：把当前编辑态注入页面（与 layout 注入的样式同源同优先级，后加载者生效）
+  // 实时预览：把当前编辑态注入 body 末尾。
+  // 注意 layout 注入的 #ez-appearance 渲染在 body 开头（React 19 无 precedence 的 style 原地渲染），
+  // 同特异性下 DOM 靠后的赢，因此预览必须挂在 body 末尾才能覆盖已保存值。
   useEffect(() => {
     const id = 'ez-appearance-preview';
     let el = document.getElementById(id) as HTMLStyleElement | null;
     if (!el) {
       el = document.createElement('style');
       el.id = id;
-      document.head.appendChild(el);
+      document.body.appendChild(el);
     }
     el.textContent = appearanceCssFrom(cfg);
     return () => {
@@ -201,6 +204,11 @@ export function AppearanceManager({ onBack }: { onBack: () => void }) {
                   <span className="text-ink-soft">导航菜单</span>
                   <span className="ml-3 text-accent">当前页面</span>
                   <span className="ml-3 text-ink-faint">其他</span>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1" style={{ fontSize: 'var(--fs-filter)' }}>
+                  <span className="rounded-md border border-line px-2.5 py-1 font-mono text-ink-soft">全部 12</span>
+                  <span className="rounded-md border border-accent/60 bg-accent/10 px-2.5 py-1 font-mono text-accent">GIS 5</span>
+                  <span className="rounded-md border border-line px-2.5 py-1 font-mono text-ink-soft">遥感 3</span>
                 </div>
               </div>
             </div>

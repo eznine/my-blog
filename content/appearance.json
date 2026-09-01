@@ -4,7 +4,8 @@
     "listTitle": 17.5,
     "listSummary": 14.5,
     "pageTitle": 44,
-    "nav": 15
+    "nav": 15,
+    "filter": 15.5
   },
   "colors": {
     "dark": {
@@ -16,7 +17,7 @@
     "light": {
       "ink": "",
       "inkSoft": "",
-      "inkFaint": "",
+      "inkFaint": "#696254",
       "accent": ""
     }
   }

@@ -20,12 +20,13 @@ export interface AppearanceConfig {
     listSummary: number;
     pageTitle: number;
     nav: number;
+    filter: number;
   };
   colors: { dark: ThemeColors; light: ThemeColors };
 }
 
 export const DEFAULT_APPEARANCE: AppearanceConfig = {
-  sizes: { body: 16, listTitle: 17.5, listSummary: 14.5, pageTitle: 44, nav: 15 },
+  sizes: { body: 16, listTitle: 17.5, listSummary: 14.5, pageTitle: 44, nav: 15, filter: 13.5 },
   colors: {
     dark: { ink: '', inkSoft: '', inkFaint: '', accent: '' },
     light: { ink: '', inkSoft: '', inkFaint: '', accent: '' },
@@ -73,7 +74,8 @@ export function appearanceCssFrom(c: Partial<AppearanceConfig> | null | undefine
 --fs-list-title:${px(sizes.listTitle, '17.5px')};
 --fs-list-summary:${px(sizes.listSummary, '14.5px')};
 --fs-page-title:${px(sizes.pageTitle, '44px')};
---fs-nav:${px(sizes.nav, '15px')}`;
+--fs-nav:${px(sizes.nav, '15px')};
+--fs-filter:${px(sizes.filter, '13.5px')};}`;
   return [sizeCss, themeCss(':root', c?.colors?.light), themeCss('.dark', c?.colors?.dark)]
     .filter(Boolean)
     .join('\n');
