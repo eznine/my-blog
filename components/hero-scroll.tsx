@@ -51,8 +51,10 @@ export function HeroScroll({
     const hint = stage.querySelector<HTMLElement>('[data-hs-hint]');
 
     // 站内返回首页：直接定位到开场完成处（p=1），不再重播开场（瞬时跳转，避免 smooth 滚动动画）
+    const viewportEl = stage.querySelector<HTMLElement>('.hero-sticky-viewport');
     if (hasVisitedNonHome()) {
-      const y = stage.getBoundingClientRect().top + window.scrollY + stage.offsetHeight - window.innerHeight;
+      const vh = viewportEl?.offsetHeight || window.innerHeight;
+      const y = stage.getBoundingClientRect().top + window.scrollY + stage.offsetHeight - vh;
       const el = document.documentElement;
       const prev = el.style.scrollBehavior;
       el.style.scrollBehavior = 'auto';
@@ -64,7 +66,9 @@ export function HeroScroll({
     const update = () => {
       raf = 0;
       const rect = stage.getBoundingClientRect();
-      const total = Math.max(1, stage.offsetHeight - window.innerHeight);
+      // 分母用 sticky 容器实际高度（内容超高时容器会生长），保证动画跑完才开始上滑
+      const vh = viewportEl?.offsetHeight || window.innerHeight;
+      const total = Math.max(1, stage.offsetHeight - vh);
       const p = clamp01(-rect.top / total);
 
       const eased = easeOut(p);
@@ -100,7 +104,7 @@ export function HeroScroll({
 
   return (
     <section ref={stageRef} className="hero-scroll-section relative -mt-14 border-b border-line">
-      <div className="hero-sticky-viewport sticky top-0 flex items-center overflow-hidden pt-16">
+      <div className="hero-sticky-viewport sticky top-0 flex items-center pt-16 pb-24 md:pb-16">
         {/* 等高线背景由 layout 的全站固定层渲染（滚动驱动 topoState） */}
 
         {/* 粒子尘埃：随进度淡入 */}

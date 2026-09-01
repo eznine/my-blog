@@ -164,7 +164,7 @@ body {
 }
 
 .hero-sticky-viewport {
-  height: 100vh;
+  min-height: 100vh;
 }
 
 @supports (height: 100svh) {
@@ -173,7 +173,7 @@ body {
   }
 
   .hero-sticky-viewport {
-    height: 100svh;
+    min-height: 100svh;
   }
 }
 

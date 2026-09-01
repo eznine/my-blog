@@ -96,6 +96,7 @@ public/uploads/      后台上传的图片
 9. **commit 582d96a**「第一次双端调试，页面独立修改」
 10. 封面底部经纬度改橙色
 11. **部署上线**：推送到 github.com/eznine/my-blog（强推覆盖旧版 HTML 小站），GitHub Actions 自动构建发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码（不再用 eznine）；README.md 已写
+12. **移动端/低窗口视口适配**：vh→svh 全站替换 + 安全区抬升（封面提示/回到顶部/页脚）；后用户再报「内容被裁掉、滚动也不显示」——根因是封面 sticky 容器**定高+overflow-hidden**，内容高于视口时被永久裁切。最终方案：容器改 `min-height:100svh` + 去掉 overflow-hidden（随内容生长），滚动进度分母改用容器实际高度，动画跑完才上滑释放
 
 ## 六、用户的偏好与协作习惯（重要！）
 
