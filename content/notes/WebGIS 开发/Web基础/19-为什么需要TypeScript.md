@@ -3,8 +3,12 @@ title: "第 19 节 · 为什么需要 TypeScript"
 date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "Web基础"
+order: 55
 tags: ["web"]
 ---
+
+
+
 
 # 第 19 节 · 为什么需要 TypeScript
 

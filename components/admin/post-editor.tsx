@@ -26,6 +26,7 @@ interface FormState {
   chapter: string;
   tags: string[];
   status: string;
+  hidden: boolean;
   tech: string[];
   demo: string;
   github: string;
@@ -41,6 +42,7 @@ const EMPTY: FormState = {
   chapter: '',
   tags: [],
   status: '',
+  hidden: false,
   tech: [],
   demo: '',
   github: '',
@@ -83,6 +85,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           chapter: str(m.chapter),
           tags: arr(m.tags),
           status: str(m.status),
+          hidden: m.hidden === true || String(m.hidden).toLowerCase() === 'true',
           tech: arr(m.tech),
           demo: str(m.demo),
           github: str(m.github),
@@ -105,6 +108,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           chapter: str(meta.chapter),
           tags: arr(meta.tags),
           status: str(meta.status),
+          hidden: meta.hidden === true || String(meta.hidden).toLowerCase() === 'true',
           tech: arr(meta.tech),
           demo: str(meta.demo),
           github: str(meta.github),
@@ -226,6 +230,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
         chapter: form.category.trim() ? form.chapter.trim() : '',
         tags: form.tags,
         status: form.status,
+        hidden: form.hidden,
         tech: form.tech,
         demo: form.demo,
         github: form.github,
@@ -351,6 +356,30 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
                 />
               </div>
             )}
+
+            <div className="flex items-center gap-3 rounded-xl border border-line px-4 py-3">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={form.hidden}
+                onClick={() => set('hidden', !form.hidden)}
+                className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+                  form.hidden ? 'bg-accent' : 'bg-ink-faint/25'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                    form.hidden ? 'left-[22px]' : 'left-0.5'
+                  }`}
+                />
+              </button>
+              <div>
+                <div className="text-[14px] font-medium text-ink">隐藏文章</div>
+                <div className="font-mono text-[11px] text-ink-faint">
+                  开启后前台列表与直链都不显示，后台仍可管理
+                </div>
+              </div>
+            </div>
 
             {type === 'projects' && (
               <>

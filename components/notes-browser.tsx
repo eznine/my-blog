@@ -13,6 +13,7 @@ export interface NoteMeta {
   category: string;
   chapter?: string;
   tags: string[];
+  order?: number;
 }
 
 function countBy(items: string[]): [string, number][] {
@@ -113,9 +114,15 @@ export function NotesBrowser({
       }
       return true;
     });
-    return hit.sort((a, b) =>
-      sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date),
-    );
+    return hit.sort((a, b) => {
+      const d = sortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
+      if (d !== 0) return d;
+      // 同一天：先按后台预览里拖拽设定的 order，再按标题（与后台预览一致）
+      const ao = Number(a.order) || 0;
+      const bo = Number(b.order) || 0;
+      if (ao !== bo) return ao - bo;
+      return a.title.localeCompare(b.title, 'zh');
+    });
   }, [notes, query, category, chapter, tag, sortAsc]);
 
   const byYear = useMemo(() => {

@@ -16,8 +16,8 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 interface TaxonomySelectProps {
   value: string;
   onChange: (v: string) => void;
-  /** 点选候选后的附加回调（如大类改变时清空章节） */
-  onPick?: () => void;
+  /** 点选候选（或清除）后的回调，带选中值；供「点选即保存」类行内编辑使用 */
+  onPick?: (v: string) => void;
   options: string[];
   placeholder?: string;
   hint?: ReactNode;
@@ -40,7 +40,7 @@ function Chips({
 }: {
   value: string;
   onChange: (v: string) => void;
-  onPick?: () => void;
+  onPick?: (v: string) => void;
   options: string[];
   placeholder?: string;
   hint?: ReactNode;
@@ -62,7 +62,7 @@ function Chips({
             type="button"
             onClick={() => {
               onChange('');
-              onPick?.();
+              onPick?.('');
             }}
             title="清除"
             className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md px-1.5 py-0.5 text-[15px] leading-none text-ink-faint transition-colors hover:text-accent"
@@ -80,7 +80,7 @@ function Chips({
               type="button"
               onClick={() => {
                 onChange(opt);
-                onPick?.();
+                onPick?.(opt);
               }}
               className={`rounded-lg border px-3 py-1 text-[13.5px] transition-all ${
                 active
@@ -110,7 +110,7 @@ function Dropdown({
 }: {
   value: string;
   onChange: (v: string) => void;
-  onPick?: () => void;
+  onPick?: (v: string) => void;
   options: string[];
   placeholder?: string;
   disabled?: boolean;
@@ -138,7 +138,7 @@ function Dropdown({
 
   const pick = (opt: string) => {
     onChange(opt);
-    onPick?.();
+    onPick?.(opt);
     setTyped(null);
     setOpen(false);
   };

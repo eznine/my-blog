@@ -3,8 +3,12 @@ title: "第 21 节 · interface 与 type"
 date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "Web基础"
+order: 60
 tags: ["web"]
 ---
+
+
+
 
 # 第 21 节 · interface 与 type
 

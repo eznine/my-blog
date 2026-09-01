@@ -108,7 +108,7 @@ export default async function HomePage() {
             linkLabel={site.home.sections[1].link}
           />
           {notes.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="flex flex-col gap-4 md:gap-5">
               {notes.slice(0, 3).map((n, i) => (
                 <Reveal key={n.slug} variant="up" delay={i * 110}>
                   <NoteCard note={n} />

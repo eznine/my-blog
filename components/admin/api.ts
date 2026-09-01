@@ -87,6 +87,10 @@ export interface PostMeta {
 
 export interface PostListItem extends PostMeta {
   slug: string;
+  /** 同一天内手动排序序号（前端预览拖拽生成） */
+  order?: number;
+  /** 已隐藏（前台不显示） */
+  hidden?: boolean;
 }
 
 export interface Taxonomy {

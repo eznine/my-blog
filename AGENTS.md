@@ -104,18 +104,30 @@ public/uploads/      后台上传的图片
 ## 五、已完成的演进历程（与用户协作记录）
 
 1. **初始 Demo**（commit 9f48dec）：基础站点 + 8 笔记/4 项目/3 研究 + GitHub Pages 工作流
+
 2. **视觉大改**：去导航栏编号、卡片粒子动效（参考豆包风格）、目录左移、配色调整、字号加大
+
 3. **品牌与可读性**：EZNINE logo 替换 GEO·NOTES、全站文字光晕、导航磁吸 hover、移动端目录下拉
+
 4. **Git 初始化 + 后台系统**：首个 commit；本地 admin server（编辑/上传/分类标签）；「首页」导航直达内容区；浅色主题光效 + 开关
+
 5. **第二批功能**：笔记页中文标签 + 时间排序、列表文字加深加大、外观设置系统（appearance.json + CSS 变量注入）、批量导入、favicon 换地球 logo、去 CTA 发光、（粒子大字动效后因卡顿回退为静态渐变）
+
 6. **细节打磨**：进页闪现修复（禁滚动恢复 + 导航初始隐藏）、流光循环无缝化、页脚删 RSS/SHEET NO. 001、坐标统一 37.74,112.66（十字丝以此为基准）、底部提示纵排
+
 7. **文案系统重构**：site.json 大文件 → content/copy/ 按页面拆分独立可编辑（用户两次纠正才到位：①不要全局页 ②首页大字/简介必须独立于站名，改名字不影响其他页）
+
 8. **交互升级**：方向卡复用探索卡动效并分缝；三内容卡上移加动效；移动端导航收起逻辑（桌面不收）；回到顶部按钮；移动端目录改为右侧固定滑轨（经历 portal 修复 transform 定位 bug、扇形→等长、文字位置/字号多轮微调）
+
 9. **commit 582d96a**「第一次双端调试，页面独立修改」
+
 10. 封面底部经纬度改橙色
-11. **部署上线**：推送到 github.com/eznine/my-blog（强推覆盖旧版 HTML 小站），GitHub Actions 自动构建发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码（不再用 eznine）；README.md 已写
-12. **移动端/低窗口视口适配 + 一次重大排障教训**：vh→svh 全站替换 + 安全区抬升；封面 sticky 容器从「定高+overflow-hidden 裁切」改为「min-height:100svh + overflow-x:clip，内容超高时容器生长」（此结构用户验证 OK）。**教训（浪费了两轮修复）：commit ed75c50 在 html 上加了 `overflow-x:hidden` 与 body 的叠加，导致 body 变成真实滚动容器，全站 `position:sticky` 失效**——封面跟着滚走，症状是「第一页显示不全/有缝隙/往下滑内容消失」，与封面结构无关。062bce9→ed75c50 的 diff 定位到根因。**铁律：横向裁切只放 body（overflow-x:hidden 会传播到视口、不产生滚动容器），html 绝不设 overflow-x**；`overscroll-behavior-x:none`（html）禁安卓横向过滚指示条；`.hero-hint` 移动端锚点留空 11rem（≥提示高 108px+夸克悬浮底栏 56px），否则末行经纬度被底栏盖住。修复后用浏览器实测：sticky 钉顶、内容完整、下一区块间隙 1px、无横向滚动 ✓
-13. **横滑「时有时无」+ 回顶按钮跳动 + 经纬度换行（三连修）**：① 横滑真凶 = Reveal 入场动画 `.rv-right/.rv-left` 初始位移 ±44px 把未入场的元素推出视口（动画完成后位移消失 → 时有时无）；scrollWidth(410)>clientWidth(390) 实锤。修复：布局容器（layout.tsx 的 `div.relative.flex.min-h-svh.flex-col`）加 `overflow-x-clip`——clip 真正裁掉溢出（scrollWidth==clientWidth）且**不产生滚动容器、不破坏 sticky**（已实测钉顶正常），注意 clip 与 hidden 的区别：body 的 hidden 只是传播到视口，溢出区域仍存在，安卓浏览器照样显示横滑指示条。② 回顶按钮跳动 = fixed+bottom 元件随浏览器工具栏显隐（视口高度变化）移动，浏览器各异 → 修复：按钮挂进 `.back-top-anchor`（fixed 容器，高 100lvh 恒定 + 底部 padding 抬高躲悬浮工具栏，桌面 1.5rem/移动 4.75rem），位置永久稳定。③ 经纬度换行 = mono-label 0.18em 字距下该行 ~165-185px，提示容器 left-1/2 的可用宽只有 50vw，窄屏+字体差异下偶尔换行 → 容器加 `whitespace-nowrap`（居中 translate 下不会溢出视口）。
+
+11. **部署上线**：推送到 github.com/eznine/my-blog（强推覆盖旧版 HTML 小站），GitHub Actions 自动构建发布到 <https://eznine.github.io/my-blog；后台密码已更换为随机强密码（不再用> eznine）；README.md 已写
+
+12. **移动端/低窗口视口适配 + 一次重大排障教训**：vh→svh 全站替换 + 安全区抬升；封面 sticky 容器从「定高+overflow-hidden 裁切」改为「min-height:100svh + overflow-x:clip，内容超高时容器生长」（此结构用户验证 OK）。**教训（浪费了两轮修复）：commit ed75c50 在 html 上加了** **`overflow-x:hidden`** **与 body 的叠加，导致 body 变成真实滚动容器，全站** **`position:sticky`** **失效**——封面跟着滚走，症状是「第一页显示不全/有缝隙/往下滑内容消失」，与封面结构无关。062bce9→ed75c50 的 diff 定位到根因。**铁律：横向裁切只放 body（overflow-x:hidden 会传播到视口、不产生滚动容器），html 绝不设 overflow-x**；`overscroll-behavior-x:none`（html）禁安卓横向过滚指示条；`.hero-hint` 移动端锚点留空 11rem（≥提示高 108px+夸克悬浮底栏 56px），否则末行经纬度被底栏盖住。修复后用浏览器实测：sticky 钉顶、内容完整、下一区块间隙 1px、无横向滚动 ✓
+
+13. **横滑「时有时无」+ 回顶按钮跳动 + 经纬度换行（三连修）**：① 横滑真凶 = Reveal 入场动画 `.rv-right/.rv-left` 初始位移 ±44px 把未入场的元素推出视口（动画完成后位移消失 → 时有时无）；scrollWidth(410)>clientWidth(390) 实锤。修复：布局容器（layout.tsx 的 `div.relative.flex.min-h-svh.flex-col`）加 `overflow-x-clip`——clip 真正裁掉溢出（scrollWidth==clientWidth）且**不产生滚动容器、不破坏 sticky**（已实测钉顶正常），注意 clip 与 hidden 的区别：body 的 hidden 只是传播到视口，溢出区域仍存在，安卓浏览器照样显示横滑指示条。② 回顶按钮跳动 = fixed+bottom 元件随浏览器工具栏显隐（视口高度变化）移动，浏览器各异 → 修复：按钮挂进 `.back-top-anchor`（fixed 容器，高 100lvh 恒定 + 底部 padding 抬高躲悬浮工具栏，桌面 1.5rem/移动 4.75rem），位置永久稳定。③ 经纬度换行 = mono-label 0.18em 字距下该行 \~165-185px，提示容器 left-1/2 的可用宽只有 50vw，窄屏+字体差异下偶尔换行 → 容器加 `whitespace-nowrap`（居中 translate 下不会溢出视口）。
 
 14. **笔记「大类/章节」二级内容体系**：① 内容结构——`content/notes/` 支持 `大类/章节/文章.md` 嵌套，目录名推断分类层级（frontmatter 优先）；② 前台——笔记页点分类展开章节面板（挤开不重叠、横滑选择、可再叠加标签/排序）；③ 后台——批量导入弹窗 portal 修虚影 bug + 大类/章节/标签三选联动、编辑器标题可空（H1 兜底）、taxonomy 页章节增删改 + 重命名级联、新建/导入落盘按大类/章节进文件夹且复用已有分类文件夹（'Web Basics'→`02-web-basics/`）、删除清理空目录。**教训**：a) `Array.sort(collator)` 不能直接传 Collator 对象（需 `(a,b)=>collator.compare(a,b)`），报「comparison function must be a function」且经 500 冒泡到页面；b) placeFile 的 taken 去重必须排除文章自身，否则原地重复保存 slug 会漂移加后缀；c) 后台读 category 只看 frontmatter 会与前台目录推断不一致——统一用 effectiveTaxonomy（frontmatter ?? 目录推断）。
 
@@ -123,7 +135,7 @@ public/uploads/      后台上传的图片
 
 16. **三 bug 连修（批量操作报「无效的内容类型」+ 颜色设置全失效 + 预览不动）**：① admin-server 所有接口的 type 都从 URL query 读，前端调用 `/api/posts/batch` 漏带 `?type=` → 服务端 type=undefined 报 400「无效的内容类型」，**API 测试通过但 UI 失败**（测试脚本带了 query）——教训：前后端联调 bug 测试要与 UI 走完全相同的数据流；② `appearanceCssFrom` 模板字符串漏闭合 `}`：颜色全空时靠 EOF 自动闭合侥幸正常，一旦设置颜色，后续 `:root{--ink:...}` 被当坏声明吞掉 → **所有颜色静默失效**（字号碰巧在坏声明之前所以幸存）——教训：拼接 CSS 必须单元验证括号配对；③ 实时预览失效：layout 注入的 `<style>`（React 19 无 precedence 原地渲染）在 **body 开头**，预览 style 挂 head 末尾——同特异性 CSS 后出现者赢，body 里的保存值永远覆盖 head 里的预览值 → 拖滑块没反应——修复：预览 style `document.body.appendChild` 挂 body 末尾。另：rg 的 `-rn` 不是「递归+行号」而是 `-r n`（替换为字母 n），会污染搜索结果显示 `var(--n)` 假象，排查 CSS 变量时差点被带偏。④ 后续排查「深色主题文字层级全乱」：修好颜色功能后，**测试期间写进 appearance.json 的脏颜色值开始真实生效**（inkSoft/inkFaint 被残留成近白色，弱化文字比标题还亮）——教训：功能修复上线后必须清查测试期写进配置文件的脏数据，appearance.json 颜色全空 = 用 globals.css 原始默认色。
 
-17. **选择器 + 排序 + 后台筛选（用户第 5 轮「后台选大类只剩那一个、选择框丑、要拖拽排序」+ 追加「后台加筛选、Shift 连选」）**：① 弃用全部原生 datalist（`<input list>` 有值会被过滤只剩匹配项、想换必须删光、样式不可控）→ 新建 `components/admin/taxonomy-select.tsx`：`chips` 形态候选常驻全部可见点选即替换（批量弹窗 4 处）；`dropdown` 形态点开全列、键盘输入才过滤、点外关闭（编辑器分类/章节/状态 3 处）；② 「分类与标签」页加**拖拽排序**（HTML5 draggable：分类卡片整卡拖、章节改竖排列表拖，⠿ 手柄、目标位橙框+上移反馈），顺序写回 taxonomy.json；③ admin-server GET /api/taxonomy **删掉原先的章节 zhNumeric 强制排序**（会覆盖后台调好的顺序），聚合仅追加缺失项；④ 前台 `notes-browser.tsx` 分类/章节顺序改为**优先遵循 taxonomy 数组顺序**（未收录项按文章数/名称垫后），notes/page.tsx JSON import taxonomy.json 传入。**教训**：a) TS 对 const 函数表达式内前向引用块级变量（filteredPosts）报错——把派生 memo 移到引用它的函数前即可；b) `posts.map(...).filter(Boolean)` 传给 string[] 要写类型守卫 `filter((c): c is string => Boolean(c))`，否则 TS2322；c) dev 残留进程占 3000 会让 Next.js 自动挪到 3001 与后台服务打架——重启 dev 前先清 3000/3001 端口监听；d) 常规登录流程的 checkbox 勾选加 Shift 连选用 `onClick`（带 native shiftKey）而非 onChange。
+17. **选择器 + 排序 + 后台筛选（用户第 5 轮「后台选大类只剩那一个、选择框丑、要拖拽排序」+ 追加「后台加筛选、Shift 连选」）**：① 弃用全部原生 datalist（`<input list>` 有值会被过滤只剩匹配项、想换必须删光、样式不可控）→ 新建 `components/admin/taxonomy-select.tsx`：`chips` 形态候选常驻全部可见点选即替换（批量弹窗 4 处）；`dropdown` 形态点开全列、键盘输入才过滤、点外关闭（编辑器分类/章节/状态 3 处）；② 「分类与标签」页加**拖拽排序**（HTML5 draggable：分类卡片整卡拖、章节改竖排列表拖，⠿ 手柄、目标位橙框+上移反馈），顺序写回 taxonomy.json；③ admin-server GET /api/taxonomy **删掉原先的章节 zhNumeric 强制排序**（会覆盖后台调好的顺序），聚合仅追加缺失项；④ 前台 `notes-browser.tsx` 分类/章节顺序改为**优先遵循 taxonomy 数组顺序**（未收录项按文章数/名称垫后），notes/page.tsx JSON import taxonomy.json 传入。**教训**：a) TS 对 const 函数表达式内前向引用块级变量（filteredPosts）报错——把派生 memo 移到引用它的函数前即可；b) `posts.map(...).filter(Boolean)` 传给 string\[] 要写类型守卫 `filter((c): c is string => Boolean(c))`，否则 TS2322；c) dev 残留进程占 3000 会让 Next.js 自动挪到 3001 与后台服务打架——重启 dev 前先清 3000/3001 端口监听；d) 常规登录流程的 checkbox 勾选加 Shift 连选用 `onClick`（带 native shiftKey）而非 onChange。
 
 18. **卡片化 + hover 动效（「后台选分类后把章节放出来」「筛选按钮鼠标移上去会变化」「笔记/研究每条都加首页那种卡片」）**：① 后台列表筛选加 `listChapter`——选中分类后联动显示该分类的章节 chips（仿前端章节面板，切分类/切类型/清除筛选均重置）；② 前台 FilterButton（分类/标签/章节/排序共用）hover 动效：上移 2px + 橙色光晕（shadow）+ 边框/文字变橙，active 按压回弹（`transition-all duration-200`）；③ 笔记页列表从「按年分组的横条 li」改为「按年分组 → 网格（sm:2 列 / lg:3 列）+ NoteCard」——`note-card.tsx` props 改瘦类型 `Pick<Note,'slug'|'title'|'date'|'summary'|'category'>` 以兼容前台 NoteMeta（原只服务首页全量 Note）并删掉 notes-browser 里不再用的 Link import；④ 研究页 `research-item.tsx` 从 hover 变底色横条改为 explore-card 卡片（corner 角标 + SparkField 火花 + READ/DETAIL 箭头 + 状态/分类/标签），research/page.tsx 列表改 `grid md:grid-cols-2` + Reveal h-full 等高。项目页早已是 ProjectCard 卡片，三列表页风格至此统一。**教训**：卡片网格中 Reveal（client 组件）作为 grid item 要传 `className="h-full"` 让内部 `h-full` 卡片等高对齐。
 
@@ -147,8 +159,11 @@ public/uploads/      后台上传的图片
 
 ## 七、已知问题 / 待办
 
-* [x] 部署到 GitHub：已推送 github.com/eznine/my-blog（覆盖旧版），Actions 自动发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码，且 site.config.json 已加入 .gitignore 不入库（密码只在本地文件，勿写进任何文档）
+* [x] 部署到 GitHub：已推送 github.com/eznine/my-blog（覆盖旧版），Actions 自动发布到 <https://eznine.github.io/my-blog；后台密码已更换为随机强密码，且> site.config.json 已加入 .gitignore 不入库（密码只在本地文件，勿写进任何文档）
+
 * [ ] 首次部署需在仓库 Settings → Pages → Source 选 GitHub Actions（网页操作）
+
 * [ ] 用户提过「右侧有点空」的方案（图幅注记面板/陕西轮廓+西安脉冲点/研究方向速览）尚未选定实施
+
 * [ ] feed.xml 生成脚本若确认不要 RSS 可删
 

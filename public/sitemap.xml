@@ -2,62 +2,162 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://github.com/eznine</loc>
-    <lastmod>Tue, 01 Sep 2026 12:13:00 GMT</lastmod>
+    <lastmod>Tue, 01 Sep 2026 15:47:59 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/notes/</loc>
-    <lastmod>Tue, 01 Sep 2026 12:13:00 GMT</lastmod>
+    <lastmod>Tue, 01 Sep 2026 15:47:59 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/research/</loc>
-    <lastmod>Tue, 01 Sep 2026 12:13:00 GMT</lastmod>
+    <lastmod>Tue, 01 Sep 2026 15:47:59 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/projects/</loc>
-    <lastmod>Tue, 01 Sep 2026 12:13:00 GMT</lastmod>
+    <lastmod>Tue, 01 Sep 2026 15:47:59 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/archive/</loc>
-    <lastmod>Tue, 01 Sep 2026 12:13:00 GMT</lastmod>
+    <lastmod>Tue, 01 Sep 2026 15:47:59 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/about/</loc>
-    <lastmod>Tue, 01 Sep 2026 12:13:00 GMT</lastmod>
+    <lastmod>Tue, 01 Sep 2026 15:47:59 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/search/</loc>
-    <lastmod>Tue, 01 Sep 2026 12:13:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/fvc/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/5-2/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/abm/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/ca-markov/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/ca/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/clue/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <lastmod>Tue, 01 Sep 2026 15:47:59 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/notes/css/</loc>
     <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/dinsar/</loc>
+    <loc>https://github.com/eznine/notes/gis-abm/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-ca-markov/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-ca/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-clue/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-plus/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-13/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-14/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-ca-2/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-15/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-16/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-17/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-18/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-19/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-20/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-21/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-22/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-23/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-24/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-25/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-26/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-27/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-28/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-29/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-30/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-31/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-mcr/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-mspa-mcr/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-10/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-11/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-12/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-8/</loc>
+    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/gis-9/</loc>
     <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
@@ -65,55 +165,7 @@
     <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/insar-dem/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/js-python/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
     <loc>https://github.com/eznine/notes/javascript/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/mcr/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/mspa-mcr/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/numpy/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/p2/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/p3/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/plus/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/readme/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/sar/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/sar-2/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/sbas-insar/</loc>
     <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
@@ -425,224 +477,140 @@
     <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/geopandas/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/rasterio/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/modis/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/2/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/13/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/14/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/ca-2/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/15/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/34/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/3/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
     <loc>https://github.com/eznine/notes/post/</loc>
     <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/16/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/17/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/8/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/4/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/32/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/18/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/10/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/11/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/19/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/20/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/9/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/5/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/21/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/35/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/12/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/notes/rsei/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/42/</loc>
+    <lastmod>Fri, 12 Jun 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/notes/36/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <lastmod>Tue, 19 May 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/22/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/python-numpy/</loc>
+    <lastmod>Wed, 29 Apr 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/23/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/python-geopandas/</loc>
+    <lastmod>Tue, 28 Apr 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/24/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/python-rasterio/</loc>
+    <lastmod>Tue, 28 Apr 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/25/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/sar-sar/</loc>
+    <lastmod>Tue, 28 Apr 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/26/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/envi-41/</loc>
+    <lastmod>Wed, 11 Mar 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/37/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/sar-sbas-insar/</loc>
+    <lastmod>Tue, 03 Mar 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/27/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/sar-dinsar/</loc>
+    <lastmod>Wed, 25 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/38/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/sar-insar-dem/</loc>
+    <lastmod>Tue, 24 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/39/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/sar-sar-2/</loc>
+    <lastmod>Tue, 24 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/28/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/fvc/</loc>
+    <lastmod>Sat, 21 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/40/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/geemap-5-2/</loc>
+    <lastmod>Mon, 09 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/33/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/geemap-js-python/</loc>
+    <lastmod>Fri, 06 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/6/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/geemap-32/</loc>
+    <lastmod>Fri, 06 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/29/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/geemap-p3/</loc>
+    <lastmod>Mon, 02 Feb 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/7/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/geemap-p2/</loc>
+    <lastmod>Sat, 31 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/30/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/envi-34/</loc>
+    <lastmod>Fri, 30 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/31/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/35/</loc>
+    <lastmod>Fri, 30 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/41/</loc>
-    <lastmod>Tue, 01 Sep 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/geemap-33/</loc>
+    <lastmod>Thu, 29 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/xgboost-shap/</loc>
-    <lastmod>Wed, 12 Aug 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/python-5/</loc>
+    <lastmod>Sat, 24 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/insar-basics/</loc>
-    <lastmod>Mon, 15 Jun 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/python-6/</loc>
+    <lastmod>Tue, 20 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/maplibre-basics/</loc>
-    <lastmod>Tue, 02 Jun 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/python-7/</loc>
+    <lastmod>Sun, 18 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/moran-i/</loc>
-    <lastmod>Mon, 18 May 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/envi-modis/</loc>
+    <lastmod>Sat, 17 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/gee-landsat-cloud/</loc>
-    <lastmod>Tue, 05 May 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/envi-40/</loc>
+    <lastmod>Sat, 17 Jan 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
-    <loc>https://github.com/eznine/notes/ndvi-time-series/</loc>
-    <lastmod>Mon, 20 Apr 2026 00:00:00 GMT</lastmod>
+    <loc>https://github.com/eznine/notes/python-4/</loc>
+    <lastmod>Thu, 15 Jan 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/envi-38/</loc>
+    <lastmod>Thu, 15 Jan 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/envi-39/</loc>
+    <lastmod>Thu, 15 Jan 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/python-2/</loc>
+    <lastmod>Wed, 14 Jan 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/notes/python-3/</loc>
+    <lastmod>Sun, 11 Jan 2026 00:00:00 GMT</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/eznine/research/land-subsidence-insar/</loc>
+    <lastmod>Mon, 17 Aug 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/research/ecological-network/</loc>
-    <lastmod>Fri, 10 Jul 2026 00:00:00 GMT</lastmod>
+    <lastmod>Mon, 10 Aug 2026 00:00:00 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/research/ecological-security-pattern/</loc>
     <lastmod>Fri, 20 Mar 2026 00:00:00 GMT</lastmod>
-  </url>
-  <url>
-    <loc>https://github.com/eznine/research/land-subsidence-insar/</loc>
-    <lastmod>Mon, 10 Nov 2025 00:00:00 GMT</lastmod>
   </url>
   <url>
     <loc>https://github.com/eznine/projects/geo-toolbox/</loc>

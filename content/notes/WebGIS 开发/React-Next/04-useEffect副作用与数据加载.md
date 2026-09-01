@@ -3,8 +3,12 @@ title: "第 04 节 · useEffect：副作用与数据加载"
 date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "React-Next"
+order: 18
 tags: ["web"]
 ---
+
+
+
 
 # 第 04 节 · useEffect：副作用与数据加载
 

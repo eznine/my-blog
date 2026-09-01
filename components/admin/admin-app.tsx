@@ -20,6 +20,7 @@ import { PostEditor } from './post-editor';
 import { TaxonomyManager } from './taxonomy-manager';
 import { AppearanceManager } from './appearance-manager';
 import { TaxonomySelect } from './taxonomy-select';
+import { ListPreview } from './list-preview';
 
 type View = 'login' | 'list' | 'editor' | 'taxonomy' | 'appearance';
 
@@ -112,6 +113,27 @@ interface EditorTarget {
 
 export function AdminApp() {
   const [view, setView] = useState<View>('login');
+
+  /* ---- 视图与浏览器历史联动：进入编辑/分类/外观可 pushState，浏览器后退/「返回」可直接回列表 ---- */
+  const navView = (v: View) => {
+    setView(v);
+    if (v !== 'list') window.history.pushState({ v }, '', `#${v}`);
+  };
+  const navList = () => {
+    setEditorTarget(null);
+    setRowEdit(null);
+    if (window.history.state?.v) window.history.back();
+    else setView('list');
+  };
+  useEffect(() => {
+    const onPop = () => {
+      const st = window.history.state as { v?: View } | null;
+      const v = st?.v;
+      setView(v && v !== 'login' ? v : 'list');
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
@@ -149,6 +171,7 @@ export function AdminApp() {
   const [beCat, setBeCat] = useState('');
   const [beChapOn, setBeChapOn] = useState(false);
   const [beChap, setBeChap] = useState('');
+  const [beHidden, setBeHidden] = useState(''); // '' | 'hide' | 'show'
   const [beAddTags, setBeAddTags] = useState('');
   const [beRmTags, setBeRmTags] = useState('');
 
@@ -157,6 +180,90 @@ export function AdminApp() {
   const [listCat, setListCat] = useState<string | null>(null);
   const [listChapter, setListChapter] = useState<string | null>(null);
   const [listTag, setListTag] = useState<string | null>(null);
+
+  /* ---- 列表视图：编辑表格 / 前端排列预览 ---- */
+  const [listMode, setListMode] = useState<'table' | 'preview'>('table');
+
+  /* ---- 行内快速修改（日期 / 分类，PATCH /api/posts/meta 只改 frontmatter、不搬文件） ---- */
+  const [rowEdit, setRowEdit] = useState<{ slug: string; field: 'date' | 'category'; draft: string } | null>(null);
+  const [rowMsg, setRowMsg] = useState<string | null>(null);
+  const rowMsgTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const flashRowMsg = (m: string) => {
+    setRowMsg(m);
+    if (rowMsgTimer.current) clearTimeout(rowMsgTimer.current);
+    rowMsgTimer.current = setTimeout(() => setRowMsg(null), 2600);
+  };
+
+  /** 解析日期输入：支持 2026/09/01 与 2026-09-01，非法返回 null */
+  const normalizeDateInput = (raw: string): string | null => {
+    const m = raw.trim().match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (!m) return null;
+    const y = +m[1];
+    const mo = +m[2];
+    const d = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+    const dt = new Date(Date.UTC(y, mo - 1, d));
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
+    return `${String(y).padStart(4, '0')}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  };
+
+  const patchMeta = async (slug: string, patch: { date?: string; category?: string }) => {
+    try {
+      const r = await api<{ ok: boolean; date?: string; category?: string }>(`/api/posts/meta?type=${type}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ slug, ...patch }),
+      });
+      setPosts((prev) =>
+        prev.map((x) =>
+          x.slug === slug
+            ? { ...x, date: r.date ?? x.date, category: r.category !== undefined ? r.category : x.category }
+            : x,
+        ),
+      );
+      flashRowMsg('已保存');
+    } catch (e) {
+      flashRowMsg(e instanceof Error ? e.message : '保存失败');
+    }
+    setRowEdit(null);
+  };
+
+  const saveRowDate = (slug: string, raw: string) => {
+    const norm = normalizeDateInput(raw);
+    if (norm) void patchMeta(slug, { date: norm });
+    else {
+      flashRowMsg('日期格式无效，支持 2026/09/01 或 2026-09-01');
+      setRowEdit(null);
+    }
+  };
+
+  const saveRowCategory = (slug: string, draft: string) => void patchMeta(slug, { category: draft.trim() });
+
+  /** 行内分类候选（taxonomy 聚合 + 文章实际使用） */
+  const catCandidates = useMemo(
+    () => [
+      ...new Set([...bulkCats, ...posts.map((p) => p.category).filter((c): c is string => Boolean(c))]),
+    ],
+    [bulkCats, posts],
+  );
+
+  /** 预览视图：同日拖拽排序 → 批量写入 order（前台笔记页同规则生效） */
+  const reorderPosts = async (list: { slug: string; order: number }[]) => {
+    try {
+      const r = await api<{ ok: boolean; updated: number }>(`/api/posts/reorder?type=${type}`, {
+        method: 'POST',
+        body: JSON.stringify({ list }),
+      });
+      setPosts((prev) =>
+        prev.map((p) => {
+          const it = list.find((l) => l.slug === p.slug);
+          return it ? { ...p, order: it.order } : p;
+        }),
+      );
+      flashRowMsg(`排序已保存（${r.updated} 篇）`);
+    } catch (e) {
+      flashRowMsg(e instanceof Error ? e.message : '排序保存失败');
+    }
+  };
 
   useEffect(() => {
     setSelected(new Set());
@@ -456,11 +563,32 @@ export function AdminApp() {
     }
   };
 
+  /** 批量隐藏：直接在操作条隐藏所选文章（前台不再显示，后台仍可管理/恢复） */
+  const batchHide = async () => {
+    if (!selected.size || batchBusy) return;
+    setBatchBusy(true);
+    setBatchError('');
+    try {
+      const r = await api<{ updated: number }>(`/api/posts/batch?type=${type}`, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'update', slugs: [...selected], hiddenAction: 'hide' }),
+      });
+      const n = r?.updated ?? selected.size;
+      setSelected(new Set());
+      flashRowMsg(`已隐藏 ${n} 篇 · 前台不再显示`);
+      await loadPosts(type);
+    } catch (err) {
+      setBatchError(err instanceof Error ? err.message : '批量隐藏失败');
+    } finally {
+      setBatchBusy(false);
+    }
+  };
+
   const submitBatch = async () => {
     if (!selected.size || batchBusy) return;
     const addTags = beAddTags.split(/[,，、\s]+/).map((s) => s.trim()).filter(Boolean);
     const removeTags = beRmTags.split(/[,，、\s]+/).map((s) => s.trim()).filter(Boolean);
-    if (!beCatOn && !beChapOn && !addTags.length && !removeTags.length) {
+    if (!beCatOn && !beChapOn && !addTags.length && !removeTags.length && !beHidden) {
       setBatchError('请至少勾选一项修改内容');
       return;
     }
@@ -478,6 +606,7 @@ export function AdminApp() {
           chapter: beChap.trim(),
           addTags,
           removeTags,
+          hiddenAction: beHidden,
         }),
       });
       setBatchDone(
@@ -490,6 +619,7 @@ export function AdminApp() {
       setBeChap('');
       setBeAddTags('');
       setBeRmTags('');
+      setBeHidden('');
       await loadPosts(type);
       setTimeout(() => setBatchOpen(false), 1200);
     } catch (err) {
@@ -556,8 +686,7 @@ export function AdminApp() {
         slug={editorTarget.slug}
         prefill={editorTarget.prefill}
         onBack={() => {
-          setEditorTarget(null);
-          setView('list');
+          navList();
         }}
       />
     );
@@ -567,7 +696,7 @@ export function AdminApp() {
     return (
       <TaxonomyManager
         onBack={() => {
-          setView('list');
+          navList();
         }}
       />
     );
@@ -577,7 +706,7 @@ export function AdminApp() {
     return (
       <AppearanceManager
         onBack={() => {
-          setView('list');
+          navList();
         }}
       />
     );
@@ -598,7 +727,7 @@ export function AdminApp() {
           <button
             onClick={() => {
               setEditorTarget({ type, slug: null });
-              setView('editor');
+              navView('editor');
             }}
             className="rounded-xl px-5 py-2.5 text-[15px] font-semibold text-white transition-transform hover:scale-[1.03] active:scale-95"
             style={{ background: 'var(--accent)' }}
@@ -622,7 +751,7 @@ export function AdminApp() {
             href="/admin"
             onClick={(e) => {
               e.preventDefault();
-              setView('taxonomy');
+              navView('taxonomy');
             }}
             className="rounded-xl border border-line px-5 py-2.5 text-[15px] font-medium text-ink transition-colors hover:border-accent/60 hover:text-accent"
           >
@@ -632,7 +761,7 @@ export function AdminApp() {
             href="/admin"
             onClick={(e) => {
               e.preventDefault();
-              setView('appearance');
+              navView('appearance');
             }}
             className="rounded-xl border border-line px-5 py-2.5 text-[15px] font-medium text-ink transition-colors hover:border-accent/60 hover:text-accent"
           >
@@ -662,6 +791,40 @@ export function AdminApp() {
         ))}
       </div>
 
+      {/* 视图切换：编辑表格 / 前端排列预览 */}
+      <div className="mt-5 inline-flex items-center gap-1 rounded-xl border border-line bg-panel/40 p-1">
+        <span className="mono-label px-2 text-[10px] text-ink-faint">视图</span>
+        <button
+          onClick={() => setListMode('table')}
+          className={`rounded-lg px-4 py-1.5 text-[13px] font-medium transition-colors ${
+            listMode === 'table' ? 'bg-accent text-white' : 'text-ink-soft hover:text-ink'
+          }`}
+        >
+          编辑列表
+        </button>
+        <button
+          onClick={() => setListMode('preview')}
+          title="模拟前端笔记页的排列（按年分组 + 日期排序 + 同日按标题）"
+          className={`rounded-lg px-4 py-1.5 text-[13px] font-medium transition-colors ${
+            listMode === 'preview' ? 'bg-accent text-white' : 'text-ink-soft hover:text-ink'
+          }`}
+        >
+          预览排列
+        </button>
+      </div>
+
+      {listMode === 'preview' ? (
+        <ListPreview
+          posts={posts}
+          typeLabel={TYPE_LABELS[type]}
+          onEdit={(slug) => {
+            setEditorTarget({ type, slug });
+            navView('editor');
+          }}
+          onReorder={reorderPosts}
+        />
+      ) : (
+        <div className="contents">
       {error && (
         <div className="mt-6 rounded-xl border border-accent/40 bg-accent/5 px-5 py-4 text-[14px] text-accent">
           {error}
@@ -789,6 +952,12 @@ export function AdminApp() {
                 按住 <span className="text-accent">SHIFT</span> 点击可连续多选
               </span>
             </div>
+            {rowMsg && (
+              <div className="flex items-center justify-between border-b border-line bg-accent/5 px-4 py-1.5">
+                <span className="font-mono text-[12px] text-accent">{rowMsg}</span>
+                <span className="font-mono text-[11px] text-ink-faint">点击行的「日期 / 分类」可直接修改</span>
+              </div>
+            )}
             <table className="w-full">
             <thead>
               <tr className="border-b border-line text-left">
@@ -828,27 +997,114 @@ export function AdminApp() {
                     />
                   </td>
                   <td className="px-5 py-3.5">
-                    <div className="text-[15px] font-medium text-ink">{p.title || p.slug}</div>
-                    <div className="mt-0.5 font-mono text-[11px] text-ink-faint">/{p.slug}</div>
+                    <button
+                      onClick={() => {
+                        setEditorTarget({ type, slug: p.slug });
+                        navView('editor');
+                      }}
+                      title="点击进入编辑"
+                      className="block w-full max-w-md rounded px-1 -mx-1 py-0.5 text-left transition-colors hover:bg-accent/5"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="text-[15px] font-medium text-ink transition-colors group-hover:text-accent">
+                          {p.title || p.slug}
+                        </div>
+                        {p.hidden && (
+                          <span className="shrink-0 rounded border border-dashed border-ink-faint/60 px-1.5 py-0.5 font-mono text-[10px] tracking-[0.12em] text-ink-faint">
+                            已隐藏
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-0.5 font-mono text-[11px] text-ink-faint">/{p.slug}</div>
+                    </button>
                   </td>
-                  <td className="hidden whitespace-nowrap px-4 py-3.5 font-mono text-[13px] text-ink-soft md:table-cell">
-                    {p.date}
-                  </td>
-                  <td className="hidden px-4 py-3.5 md:table-cell">
-                    {p.category ? (
-                      <span className="rounded-md border border-line px-2.5 py-1 text-[12px] text-ink-soft">
-                        {p.category}
-                        {p.chapter ? ` / ${p.chapter}` : ''}
+                  <td className="hidden whitespace-nowrap px-4 py-3.5 md:table-cell">
+                    {rowEdit?.slug === p.slug && rowEdit.field === 'date' ? (
+                      <span className="inline-flex items-center gap-1">
+                        <input
+                          autoFocus
+                          type="text"
+                          defaultValue={p.date}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') saveRowDate(p.slug, (e.target as HTMLInputElement).value);
+                            else if (e.key === 'Escape') setRowEdit(null);
+                          }}
+                          onBlur={(e) => saveRowDate(p.slug, e.target.value)}
+                          title="支持 2026/09/01 或 2026-09-01，Enter / 失焦保存"
+                          style={{ width: '7.4rem' }}
+                          className="rounded-md border border-line bg-panel px-2 py-1 font-mono text-[13px] text-ink outline-none focus:border-accent/60"
+                        />
+                        <button
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => setRowEdit(null)}
+                          title="取消"
+                          className="px-1 text-[12px] text-ink-faint transition-colors hover:text-accent"
+                        >
+                          ✕
+                        </button>
                       </span>
                     ) : (
-                      <span className="text-[12px] text-ink-faint">—</span>
+                      <button
+                        onClick={() => setRowEdit({ slug: p.slug, field: 'date', draft: p.date })}
+                        title="点击修改日期"
+                        className="rounded px-1 py-0.5 font-mono text-[13px] text-ink-soft transition-colors hover:bg-accent/5 hover:text-accent"
+                      >
+                        {p.date}
+                      </button>
+                    )}
+                  </td>
+                  <td className="hidden px-4 py-3.5 md:table-cell">
+                    {rowEdit?.slug === p.slug && rowEdit.field === 'category' ? (
+                      <span className="inline-flex items-center gap-1">
+                        <TaxonomySelect
+                          variant="dropdown"
+                          value={rowEdit.draft}
+                          options={catCandidates}
+                          onChange={(v) => setRowEdit({ slug: p.slug, field: 'category', draft: v })}
+                          onPick={(v) => saveRowCategory(p.slug, v)}
+                          placeholder="留空 = 移到未分类"
+                          className="w-44"
+                        />
+                        {!catCandidates.includes(rowEdit.draft.trim()) && (
+                          <button
+                            type="button"
+                            onClick={() => saveRowCategory(p.slug, rowEdit.draft)}
+                            title="保存新分类"
+                            className="rounded-md px-1.5 py-1 text-[13px] text-accent transition-colors hover:bg-accent/10"
+                          >
+                            ✓
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setRowEdit(null)}
+                          title="取消"
+                          className="rounded-md px-1.5 py-1 text-[12px] text-ink-faint transition-colors hover:text-accent"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setRowEdit({ slug: p.slug, field: 'category', draft: p.category || '' })}
+                        title="点击修改分类"
+                        className="max-w-full rounded px-1 py-0.5 transition-colors hover:bg-accent/5"
+                      >
+                        {p.category ? (
+                          <span className="inline-block truncate rounded-md border border-line px-2.5 py-1 text-[12px] text-ink-soft">
+                            {p.category}
+                            {p.chapter ? ` / ${p.chapter}` : ''}
+                          </span>
+                        ) : (
+                          <span className="text-[12px] text-ink-faint">—</span>
+                        )}
+                      </button>
                     )}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3.5 text-right">
                     <button
                       onClick={() => {
                         setEditorTarget({ type, slug: p.slug });
-                        setView('editor');
+                        navView('editor');
                       }}
                       className="rounded-lg px-3 py-1.5 text-[13px] font-medium text-ink-soft transition-colors hover:text-accent"
                     >
@@ -867,7 +1123,9 @@ export function AdminApp() {
           </table>
           </>
         )}
-      </div>
+        </div>
+        </div>
+      )}
 
       {/* ============ 批量导入弹窗（portal 到 body：页面进入动画容器带 transform，
           直接 fixed 会失效显示为虚影） ============ */}
@@ -1119,6 +1377,14 @@ export function AdminApp() {
                 批量修改
               </button>
               <button
+                onClick={batchHide}
+                disabled={batchBusy}
+                title="隐藏所选文章（前台不再显示，后台仍可恢复）"
+                className="rounded-lg border border-dashed border-ink-faint/50 px-4 py-1.5 text-[13.5px] font-medium text-ink-soft transition-colors hover:border-accent/60 hover:text-accent disabled:opacity-50"
+              >
+                批量隐藏
+              </button>
+              <button
                 onClick={batchDelete}
                 disabled={batchBusy}
                 className="rounded-lg px-4 py-1.5 text-[13.5px] font-semibold text-white transition-transform hover:scale-[1.03] active:scale-95 disabled:opacity-50"
@@ -1281,6 +1547,45 @@ export function AdminApp() {
                         ))}
                       </div>
                     )}
+                  </div>
+                </div>
+
+                {/* 隐藏 / 恢复显示 */}
+                <div className="rounded-xl border border-line p-4">
+                  <label className="flex items-center gap-3">
+                    <span className="text-[14.5px] font-medium text-ink">隐藏 / 显示</span>
+                    <span className="ml-auto font-mono text-[11px] text-ink-faint">HIDDEN</span>
+                  </label>
+                  <div className="mt-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {(
+                        [
+                          ['', '不修改', '保持文章当前状态'],
+                          ['hide', '隐藏', '前台不再显示（后台仍可见、可恢复）'],
+                          ['show', '恢复显示', '取消隐藏，前台重新可见'],
+                        ] as const
+                      ).map(([val, label]) => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setBeHidden(val)}
+                          className={`rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors ${
+                            beHidden === val
+                              ? 'bg-accent text-white'
+                              : 'border border-line text-ink-soft hover:border-accent/50 hover:text-accent'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-2 font-mono text-[11px] text-ink-faint">
+                      {beHidden === 'hide'
+                        ? '将所选文章标记为隐藏（frontmatter hidden: true），前台列表与直链都不再显示'
+                        : beHidden === 'show'
+                          ? '清除所选文章的隐藏标记'
+                          : '默认：不对隐藏状态做任何改动'}
+                    </p>
                   </div>
                 </div>
               </div>

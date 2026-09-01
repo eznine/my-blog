@@ -13,6 +13,10 @@ export interface BasePost {
   category: string;
   chapter?: string;
   tags: string[];
+  /** 同一天内的手动排序（后台预览拖拽生成，小在前） */
+  order?: number;
+  /** 后台「隐藏」：前台列表与直接访问均不显示 */
+  hidden?: boolean;
   html: string;
 }
 
@@ -37,6 +41,8 @@ interface RawFrontmatter {
   chapter?: string;
   tags?: string[];
   status?: string;
+  order?: number;
+  hidden?: boolean;
   links?: { label: string; url: string }[];
   tech?: string[];
   demo?: string;
@@ -214,13 +220,17 @@ async function loadDir<T extends BasePost>(
         category: fm.category ?? (folder ? folderCategory(folder) ?? '未分类' : '未分类'),
         chapter: fm.chapter ?? (subFolder ? folderChapter(subFolder) : undefined),
         tags: fm.tags ?? [],
+        order: fm.order !== undefined ? Number(fm.order) || 0 : undefined,
+        hidden: fm.hidden === true || String(fm.hidden).toLowerCase() === 'true' || undefined,
         html,
         ...decorate(fm),
       } as T;
     })
   );
 
-  return posts.sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title, 'zh'));
+  return posts
+    .filter((p) => !(p.hidden === true || String(p.hidden).toLowerCase() === 'true'))
+    .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title, 'zh'));
 }
 
 export const getNotes = cache(() => loadDir<Note>('notes', () => ({})));

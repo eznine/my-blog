@@ -1,11 +1,9 @@
 ---
 title: "NumPy"
-date: "2026-09-01"
+date: "2026-04-29"
 category: "Python"
 tags: ["python"]
 ---
-
-
 
 # NumPy
 

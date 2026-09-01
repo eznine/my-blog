@@ -398,6 +398,19 @@ iframe {
   opacity: 1;
 }
 
+/* 笔记卡片左上角淡网格纹理（制图坐标网隐喻，常驻不 hover 也见） */
+.card-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse 120% 100% at 0% 0%, #000 15%, transparent 72%);
+  mask-image: radial-gradient(ellipse 120% 100% at 0% 0%, #000 15%, transparent 72%);
+  opacity: 0.5;
+}
+
 /* 卡片粒子画布 */
 .explore-card .sparks {
   position: absolute;

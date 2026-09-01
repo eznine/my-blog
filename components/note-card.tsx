@@ -8,6 +8,7 @@ type CardNote = Pick<Note, 'slug' | 'title' | 'date' | 'summary' | 'category' | 
 /**
  * 笔记卡片：保持原列表的横排布局（日期 | 标题 | 类别在右，摘要标题下一行），
  * 只在外层套上 explore-card 卡片外壳与 hover 动效（上浮 + 角标 + 火花）。
+ * 默认点缀（不 hover 也可见）：日期前常驻呼吸红点 + 左上网格纹理，让卡片不显空。
  */
 export function NoteCard({ note }: { note: CardNote }) {
   const tags = note.tags.slice(0, 3);
@@ -17,10 +18,15 @@ export function NoteCard({ note }: { note: CardNote }) {
     <Link href={`/notes/${note.slug}`} className="group block h-full">
       <div className="explore-card flex h-full flex-col rounded-2xl p-5">
         <span className="corner" aria-hidden="true" />
+        {/* 左上角淡网格纹理（制图坐标网隐喻，常驻） */}
+        <span className="card-grid" aria-hidden="true" />
         <SparkField />
         {/* 行一：日期 | 标题 | 类别 | 标签 | READ →（横排，原列表结构） */}
         <div className="relative flex min-w-0 items-center gap-3">
-          <span className="w-16 shrink-0 font-mono text-[13.5px] text-ink-soft">{note.date.slice(5)}</span>
+          <span className="flex shrink-0 items-center gap-2">
+            <span className="marker-dot is-live" aria-hidden="true" />
+            <span className="w-16 font-mono text-[13.5px] text-ink-soft">{note.date.slice(5)}</span>
+          </span>
           <h3
             className="min-w-0 flex-1 truncate text-lg leading-snug font-semibold text-ink transition-colors group-hover:text-accent"
             title={note.title}

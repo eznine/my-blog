@@ -5,50 +5,8 @@
     <link>https://github.com/eznine/</link>
     <description>地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 01 Sep 2026 12:13:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 01 Sep 2026 15:47:59 GMT</lastBuildDate>
     <atom:link href="https://github.com/eznine/feed.xml" rel="self" type="application/rss+xml"/>
-    <item>
-      <title>(FVC)基于像元二分模型的植被覆盖度反演</title>
-      <link>https://github.com/eznine/notes/fvc/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/fvc/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>可视化</title>
-      <link>https://github.com/eznine/notes/5-2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/5-2/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>ABM（主体模式）</title>
-      <link>https://github.com/eznine/notes/abm/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/abm/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>CA-Markov-操作</title>
-      <link>https://github.com/eznine/notes/ca-markov/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/ca-markov/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>CA（元胞自动机）</title>
-      <link>https://github.com/eznine/notes/ca/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/ca/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>CLUE</title>
-      <link>https://github.com/eznine/notes/clue/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/clue/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
     <item>
       <title>CSS</title>
       <link>https://github.com/eznine/notes/css/</link>
@@ -57,163 +15,205 @@
       <description></description>
     </item>
     <item>
-      <title>DInSAR-形变监测</title>
-      <link>https://github.com/eznine/notes/dinsar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/dinsar/</guid>
+      <title>ABM（主体模式）</title>
+      <link>https://github.com/eznine/notes/gis-abm/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-abm/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>HTML</title>
-      <link>https://github.com/eznine/notes/html/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/html/</guid>
+      <title>CA-Markov-操作</title>
+      <link>https://github.com/eznine/notes/gis-ca-markov/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-ca-markov/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>InSAR-制作DEM</title>
-      <link>https://github.com/eznine/notes/insar-dem/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/insar-dem/</guid>
+      <title>CA（元胞自动机）</title>
+      <link>https://github.com/eznine/notes/gis-ca/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-ca/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>JS代码转成Python</title>
-      <link>https://github.com/eznine/notes/js-python/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/js-python/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>JavaScript</title>
-      <link>https://github.com/eznine/notes/javascript/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/javascript/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>MCR</title>
-      <link>https://github.com/eznine/notes/mcr/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/mcr/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>MSPA/MCR构建生态网络</title>
-      <link>https://github.com/eznine/notes/mspa-mcr/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/mspa-mcr/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>NumPy</title>
-      <link>https://github.com/eznine/notes/numpy/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/numpy/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>创建地图</title>
-      <link>https://github.com/eznine/notes/p2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/p2/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>导入数据</title>
-      <link>https://github.com/eznine/notes/p3/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/p3/</guid>
+      <title>CLUE</title>
+      <link>https://github.com/eznine/notes/gis-clue/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-clue/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>PLUS-操作</title>
-      <link>https://github.com/eznine/notes/plus/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/plus/</guid>
+      <link>https://github.com/eznine/notes/gis-plus/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-plus/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>Notion 文章导出索引</title>
-      <link>https://github.com/eznine/notes/readme/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/readme/</guid>
+      <title>变化检测</title>
+      <link>https://github.com/eznine/notes/gis-13/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-13/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>SAR</title>
-      <link>https://github.com/eznine/notes/sar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/sar/</guid>
+      <title>土地利用变化可视化</title>
+      <link>https://github.com/eznine/notes/gis-14/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-14/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>SAR数据处理</title>
-      <link>https://github.com/eznine/notes/sar-2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/sar-2/</guid>
+      <title>土地利用</title>
+      <link>https://github.com/eznine/notes/gis-ca-2/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-ca-2/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>SBAS-InSAR</title>
-      <link>https://github.com/eznine/notes/sbas-insar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/sbas-insar/</guid>
+      <title>城市扩张</title>
+      <link>https://github.com/eznine/notes/gis-15/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-15/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>第 01 节 · 第一张地图</title>
-      <link>https://github.com/eznine/notes/webgis-leaflet-01/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-01/</guid>
+      <title>多模型耦合与集成</title>
+      <link>https://github.com/eznine/notes/gis-16/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-16/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>第 02 节 · 底图与瓦片源</title>
-      <link>https://github.com/eznine/notes/webgis-leaflet-02/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-02/</guid>
+      <title>情景设计</title>
+      <link>https://github.com/eznine/notes/gis-17/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-17/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>第 03 节 · 标记与图标</title>
-      <link>https://github.com/eznine/notes/webgis-leaflet-03/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-03/</guid>
+      <title>数据来源、类型、作用</title>
+      <link>https://github.com/eznine/notes/gis-18/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-18/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>第 05 节 · GeoJSON 图层（数据上地图）</title>
-      <link>https://github.com/eznine/notes/webgis-leaflet-05-geojson/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-05-geojson/</guid>
+      <title>机器学习解释</title>
+      <link>https://github.com/eznine/notes/gis-19/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-19/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>第 06 节 · 事件与交互</title>
-      <link>https://github.com/eznine/notes/webgis-leaflet-06/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-06/</guid>
+      <title>概念、分类体系</title>
+      <link>https://github.com/eznine/notes/gis-20/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-20/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>第 07 节 · 图层组织与控件</title>
-      <link>https://github.com/eznine/notes/webgis-leaflet-07/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-07/</guid>
+      <title>模型校准</title>
+      <link>https://github.com/eznine/notes/gis-21/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-21/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>第 08 节 · 常用插件</title>
-      <link>https://github.com/eznine/notes/webgis-leaflet-08/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-08/</guid>
+      <title>空间显式预测</title>
+      <link>https://github.com/eznine/notes/gis-22/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-22/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>第 09 节 · 类体系全景</title>
-      <link>https://github.com/eznine/notes/webgis-leaflet-09/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-09/</guid>
+      <title>空间格局与景观生态指标</title>
+      <link>https://github.com/eznine/notes/gis-23/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-23/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>经济学与一般均衡模型耦合</title>
+      <link>https://github.com/eznine/notes/gis-24/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-24/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>结构分析</title>
+      <link>https://github.com/eznine/notes/gis-25/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-25/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>统计解释模型</title>
+      <link>https://github.com/eznine/notes/gis-26/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-26/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>转移矩阵</title>
+      <link>https://github.com/eznine/notes/gis-27/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-27/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>遥感制图</title>
+      <link>https://github.com/eznine/notes/gis-28/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-28/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>非空间显示预测</title>
+      <link>https://github.com/eznine/notes/gis-29/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-29/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>预测概述</title>
+      <link>https://github.com/eznine/notes/gis-30/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-30/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>驱动因素框架</title>
+      <link>https://github.com/eznine/notes/gis-31/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-31/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>MCR</title>
+      <link>https://github.com/eznine/notes/gis-mcr/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-mcr/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>MSPA/MCR构建生态网络</title>
+      <link>https://github.com/eznine/notes/gis-mspa-mcr/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-mspa-mcr/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>景观格局指数</title>
+      <link>https://github.com/eznine/notes/gis-10/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-10/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>景观连通性</title>
+      <link>https://github.com/eznine/notes/gis-11/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/gis-11/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>

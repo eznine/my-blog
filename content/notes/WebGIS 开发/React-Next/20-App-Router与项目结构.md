@@ -3,8 +3,12 @@ title: "第 20 节 · App Router 与项目结构"
 date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "React-Next"
+order: 58
 tags: ["web"]
 ---
+
+
+
 
 # 第 20 节 · App Router 与项目结构
 

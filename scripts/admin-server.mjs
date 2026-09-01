@@ -163,6 +163,19 @@ function parseFrontmatter(raw) {
 
 const yamlStr = (v) => JSON.stringify(String(v));
 
+/** 解析日期：支持 YYYY/MM/DD 与 YYYY-MM-DD（非法日期返回 null），规范化输出 YYYY-MM-DD */
+function normalizeDate(v) {
+  const m = String(v).trim().match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+  if (!m) return null;
+  const y = +m[1];
+  const mo = +m[2];
+  const d = +m[3];
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  const dt = new Date(Date.UTC(y, mo - 1, d));
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== d) return null;
+  return `${String(y).padStart(4, '0')}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
 function buildFrontmatter(meta) {
   const lines = ['---'];
   lines.push(`title: ${yamlStr(meta.title || '未命名')}`);
@@ -170,6 +183,9 @@ function buildFrontmatter(meta) {
   if (meta.summary) lines.push(`summary: ${yamlStr(meta.summary)}`);
   if (meta.category) lines.push(`category: ${yamlStr(meta.category)}`);
   if (meta.chapter) lines.push(`chapter: ${yamlStr(meta.chapter)}`);
+  if (meta.order !== undefined && meta.order !== null && meta.order !== '')
+    lines.push(`order: ${Number(meta.order) || 0}`);
+  if (meta.hidden === true || meta.hidden === 'true') lines.push('hidden: true');
   if (Array.isArray(meta.tags) && meta.tags.length) lines.push(`tags: ${JSON.stringify(meta.tags)}`);
   if (meta.status) lines.push(`status: ${yamlStr(meta.status)}`);
   if (Array.isArray(meta.tech) && meta.tech.length) lines.push(`tech: ${JSON.stringify(meta.tech)}`);
@@ -306,6 +322,8 @@ async function handle(req, res) {
           tags: Array.isArray(data.tags) ? data.tags : [],
           summary: data.summary ?? '',
           status: data.status ?? '',
+          order: data.order !== undefined && data.order !== null && data.order !== '' ? Number(data.order) : undefined,
+          hidden: data.hidden === true || data.hidden === 'true' || undefined,
         };
       })
       .sort((a, b) => String(b.date).localeCompare(String(a.date)));
@@ -338,6 +356,7 @@ async function handle(req, res) {
   if (p === '/api/posts' && req.method === 'PUT') {
     if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
     const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+    if (body.hidden === false) delete body.hidden;
     const old = listFiles(type).find((f) => f.slug === body.slug);
     if (!old) return json(res, 404, { error: '文章不存在' });
 
@@ -351,6 +370,50 @@ async function handle(req, res) {
     fs.writeFileSync(target, buildFrontmatter(body) + '\n' + (body.content || ''), 'utf-8');
     if (target !== old.file) fs.unlinkSync(old.file);
     return json(res, 200, { ok: true, slug: newSlug });
+  }
+
+  /* ---- 列表快速修改（日期/分类）：只改 frontmatter、原地写回，不移动文件（slug 不变）。
+        与编辑页的区别：编辑页改分类会搬文件；这里只改元数据，目录整理走编辑/批量修改 ---- */
+  if (p === '/api/posts/meta' && req.method === 'PATCH') {
+    if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
+    const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+    if (!body.slug) return json(res, 400, { error: '参数不完整' });
+    const f = listFiles(type).find((x) => x.slug === body.slug);
+    if (!f) return json(res, 404, { error: '文章不存在' });
+    const raw = fs.readFileSync(f.file, 'utf-8');
+    const { data, content } = parseFrontmatter(raw);
+    if (typeof body.date === 'string' && body.date.trim()) {
+      const d = normalizeDate(body.date);
+      if (!d) return json(res, 400, { error: '日期格式无效，支持 2026/09/01 或 2026-09-01' });
+      data.date = d;
+    }
+    if (typeof body.category === 'string') {
+      const c = body.category.trim();
+      if (c) data.category = c;
+      else delete data.category;
+    }
+    fs.writeFileSync(f.file, buildFrontmatter(data) + '\n' + (content || ''), 'utf-8');
+    return json(res, 200, { ok: true, slug: f.slug, date: data.date, category: data.category });
+  }
+
+  /* ---- 同日排序：批量写入 order 字段（前台与预览按 date → order → 标题排序） ---- */
+  if (p === '/api/posts/reorder' && req.method === 'POST') {
+    if (!TYPES.includes(type)) return json(res, 400, { error: '无效的内容类型' });
+    const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+    const list = Array.isArray(body.list) ? body.list : [];
+    if (!list.length) return json(res, 200, { ok: true, updated: 0 });
+    const files = new Map(listFiles(type).map((f) => [f.slug, f]));
+    let updated = 0;
+    for (const it of list) {
+      const f = files.get(it.slug);
+      if (!f) continue;
+      const raw = fs.readFileSync(f.file, 'utf-8');
+      const { data, content } = parseFrontmatter(raw);
+      data.order = Number(it.order) || 0;
+      fs.writeFileSync(f.file, buildFrontmatter(data) + '\n' + (content || ''), 'utf-8');
+      updated++;
+    }
+    return json(res, 200, { ok: true, updated });
   }
 
   /* ---- 删除（并清理变空的章节/大类目录） ---- */
@@ -451,7 +514,8 @@ async function handle(req, res) {
       const removeTags = (Array.isArray(body.removeTags) ? body.removeTags : [])
         .map((t) => String(t).trim())
         .filter(Boolean);
-      if (!setCategory && !setChapter && !addTags.length && !removeTags.length)
+      const hiddenAction = String(body.hiddenAction || '').trim(); // '' | 'hide' | 'show'
+      if (!setCategory && !setChapter && !addTags.length && !removeTags.length && !hiddenAction)
         return json(res, 400, { error: '没有可应用的修改' });
 
       let updated = 0;
@@ -473,6 +537,10 @@ async function handle(req, res) {
         if (addTags.length) tags = [...new Set([...tags, ...addTags])];
         if (removeTags.length) tags = tags.filter((t) => !removeTags.includes(t));
         meta.tags = tags;
+
+        // 隐藏 / 恢复显示
+        if (hiddenAction === 'hide') meta.hidden = true;
+        else if (hiddenAction === 'show') delete meta.hidden;
 
         if (!setCategory && !setChapter) {
           // 仅改标签：原地重写，不动文件位置与 slug

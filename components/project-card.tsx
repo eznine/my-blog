@@ -2,14 +2,11 @@ import Link from 'next/link';
 import type { Project } from '@/lib/content';
 import { SparkField } from './spark-field';
 
-export function ProjectCard({ project, index = 0 }: { project: Project; index?: number }) {
+export function ProjectCard({ project }: { project: Project }) {
   return (
     <article className="explore-card relative flex h-full flex-col rounded-2xl p-7">
       <span className="corner" aria-hidden="true" />
       <SparkField />
-      <span className="ghost-num pointer-events-none absolute right-6 top-5 text-6xl">
-        {String(index + 1).padStart(2, '0')}
-      </span>
       <div className="relative flex items-center gap-2.5 font-mono text-[12px] tracking-[0.14em] text-ink-faint">
         <span className="marker-dot !h-[5px] !w-[5px]" />
         {project.date} · {project.category}

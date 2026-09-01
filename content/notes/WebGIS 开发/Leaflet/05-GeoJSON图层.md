@@ -3,8 +3,12 @@ title: "第 05 节 · GeoJSON 图层（数据上地图）"
 date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "Leaflet"
+order: 21
 tags: ["web","leaflet"]
 ---
+
+
+
 
 # 第 05 节 · GeoJSON 图层（数据上地图）
 

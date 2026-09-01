@@ -61,8 +61,10 @@ function readDir(dir) {
         title: data.title ?? titleMatch?.[1]?.trim() ?? relPath,
         summary: data.summary ?? '',
         date,
+        hidden: data.hidden === true || String(data.hidden).toLowerCase() === 'true',
       };
     })
+    .filter((it) => !it.hidden)
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 

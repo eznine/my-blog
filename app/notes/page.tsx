@@ -21,6 +21,7 @@ export default async function NotesPage() {
     category: n.category,
     chapter: n.chapter,
     tags: n.tags,
+    order: n.order,
   }));
 
   return (
