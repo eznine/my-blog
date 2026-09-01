@@ -158,6 +158,41 @@ body {
     0 2px 10px var(--bg);
 }
 
+/* ============ 移动端视口适配：svh 计入浏览器工具栏，防止内容被遮挡 ============ */
+.hero-scroll-section {
+  height: calc(260vh + 3.5rem);
+}
+
+.hero-sticky-viewport {
+  height: 100vh;
+}
+
+@supports (height: 100svh) {
+  .hero-scroll-section {
+    height: calc(260svh + 3.5rem);
+  }
+
+  .hero-sticky-viewport {
+    height: 100svh;
+  }
+}
+
+/* 安全区（刘海屏底部横条）通用抬升 */
+.safe-bottom {
+  bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+.safe-bottom-btn {
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* 页面底部给悬浮浏览器栏留出呼吸空间（仅移动端） */
+@media (max-width: 767px) {
+  main {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
 /* ============ 全站文字背景晕光：等高线不再干扰阅读（text-shadow 可继承） ============ */
 header,
 main,

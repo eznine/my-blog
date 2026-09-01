@@ -99,8 +99,8 @@ export function HeroScroll({
   const [lat, lon] = site.coords.match(/(\d+\.\d+)/g)?.map(Number) ?? [37.74, 112.66];
 
   return (
-    <section ref={stageRef} className="hero-scroll-section relative -mt-14 h-[calc(260vh+3.5rem)] border-b border-line">
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden pt-16">
+    <section ref={stageRef} className="hero-scroll-section relative -mt-14 border-b border-line">
+      <div className="hero-sticky-viewport sticky top-0 flex items-center overflow-hidden pt-16">
         {/* 等高线背景由 layout 的全站固定层渲染（滚动驱动 topoState） */}
 
         {/* 粒子尘埃：随进度淡入 */}
@@ -136,7 +136,7 @@ export function HeroScroll({
 
           <h1
             data-hs="0.12,0.36"
-            className="hero-shadow mt-10 text-[2.9rem] leading-[1.08] font-black tracking-tight text-ink md:text-[4.6rem]"
+            className="hero-shadow mt-6 text-[2.9rem] leading-[1.08] font-black tracking-tight text-ink md:mt-10 md:text-[4.6rem]"
             style={{ opacity: 0 }}
           >
             {site.hero.titleLines.map((line, i) => (
@@ -147,11 +147,11 @@ export function HeroScroll({
             ))}
           </h1>
 
-          <p data-hs="0.32,0.52" className="hero-shadow mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft" style={{ opacity: 0 }}>
+          <p data-hs="0.32,0.52" className="hero-shadow mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft md:mt-8" style={{ opacity: 0 }}>
             {site.hero.bio}
           </p>
 
-          <div data-hs="0.48,0.64" className="mt-11 flex flex-wrap items-center gap-5" style={{ opacity: 0 }}>
+          <div data-hs="0.48,0.64" className="mt-8 flex flex-wrap items-center gap-5 md:mt-11" style={{ opacity: 0 }}>
             <Link
               href="/notes"
               className="group relative overflow-hidden rounded-xl px-8 py-3.5 text-base font-semibold text-white transition-transform duration-300 hover:scale-[1.04] active:scale-95"
@@ -180,7 +180,7 @@ export function HeroScroll({
 
           <div
             data-hs="0.64,0.84"
-            className="mt-10 grid max-w-2xl grid-cols-3 gap-4"
+            className="mt-8 grid max-w-2xl grid-cols-3 gap-4 md:mt-10"
             style={{ opacity: 0 }}
           >
             {[
@@ -204,7 +204,7 @@ export function HeroScroll({
 
         <div
           data-hs-hint
-          className="mono-label absolute bottom-7 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5"
+          className="mono-label safe-bottom absolute left-1/2 flex -translate-x-1/2 flex-col items-center gap-2.5"
         >
           <svg viewBox="0 0 24 24" className="h-6 w-6 animate-bounce text-accent" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 4v14m0 0 6-6m-6 6-6-6" />

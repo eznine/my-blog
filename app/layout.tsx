@@ -42,7 +42,7 @@ export default function RootLayout({
           </div>
           {/* 全站文字暗纱：内容列后方压暗等高线，所有页面与首页一致的可读性 */}
           <div className="veil-layer pointer-events-none fixed inset-0 -z-10" aria-hidden="true" />
-          <div className="relative flex min-h-screen flex-col">
+          <div className="relative flex min-h-svh flex-col">
             <SiteHeader siteName={site.siteName} />
             <main className="flex-1 pt-14">{children}</main>
             <SiteFooter />

@@ -11,7 +11,7 @@ export function SiteFooter() {
         className="pointer-events-none absolute inset-x-0 -top-px h-px"
         style={{ background: 'linear-gradient(90deg, transparent, var(--accent), transparent)', opacity: 0.7 }}
       />
-      <div className="mx-auto max-w-6xl px-6 py-14">
+      <div className="mx-auto max-w-6xl px-6 pb-24 pt-14 md:pb-14">
         <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
           <div>
             <BrandLogo className="h-9" />
