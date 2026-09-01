@@ -293,8 +293,8 @@ export function SiteHeader({ siteName }: { siteName: string }) {
         type="button"
         onClick={scrollTop}
         aria-label="回到顶部"
-        className={`glass safe-bottom-btn fixed right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full text-ink-soft shadow-[var(--shadow)] transition-all duration-300 hover:text-accent ${
-          showTop ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'
+        className={`glass safe-bottom-btn fixed right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full text-ink-soft shadow-[var(--shadow)] transition-opacity duration-300 hover:text-accent ${
+          showTop ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
       >
         <ArrowUpIcon />

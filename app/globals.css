@@ -165,6 +165,8 @@ body {
 
 .hero-sticky-viewport {
   min-height: 100vh;
+  /* 只裁横向溢出（clip 不产生滚动容器，不影响纵向生长与 sticky） */
+  overflow-x: clip;
 }
 
 @supports (height: 100svh) {
@@ -177,9 +179,27 @@ body {
   }
 }
 
-/* 安全区（刘海屏底部横条）通用抬升 */
-.safe-bottom {
-  bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+/* 封面底部提示：锚定可视视口底部（容器高于视口时仍贴屏幕底，不会被顶出视野） */
+.hero-hint {
+  top: calc(100vh - 5.5rem - env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 768px) {
+  .hero-hint {
+    top: calc(100vh - 7rem - env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@supports (height: 100svh) {
+  .hero-hint {
+    top: calc(100svh - 5.5rem - env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (min-width: 768px) {
+    .hero-hint {
+      top: calc(100svh - 7rem - env(safe-area-inset-bottom, 0px));
+    }
+  }
 }
 
 .safe-bottom-btn {
