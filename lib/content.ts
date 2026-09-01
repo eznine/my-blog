@@ -140,8 +140,9 @@ const IMG_DIR_NAME = 'content-images';
 const base = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 function copyImageAndRewrite(url: string, mdFileDir: string): string | null {
-  // 跳过绝对 URL、data URI、根路径
-  if (/^(https?:|data:|\/)/.test(url)) return null;
+  // 跳过外链与 data URI；站内绝对路径（如 /uploads/）补 base 前缀
+  if (/^(https?:|data:)/.test(url)) return null;
+  if (url.startsWith('/')) return `${base}${url}`;
   // URL 解码 + 剥离 ?query / #hash（Notion 导出常带 ?width=）
   const decoded = decodeURIComponent(url).split(/[?#]/)[0].trim();
   if (!decoded) return null;
