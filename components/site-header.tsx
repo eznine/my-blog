@@ -115,7 +115,10 @@ export function SiteHeader({ siteName }: { siteName: string }) {
         return;
       }
       const rect = hero.getBoundingClientRect();
-      const total = Math.max(1, hero.offsetHeight - window.innerHeight);
+      // 与 hero-scroll.tsx 一致：分母用 sticky 容器实际高度（视口高度）
+      const viewport = hero.querySelector<HTMLElement>('.hero-sticky-viewport');
+      const vh = viewport?.offsetHeight || window.innerHeight;
+      const total = Math.max(1, hero.offsetHeight - vh);
       const p = clamp01(-rect.top / total);
       setIntro(p < 0.15);
     };

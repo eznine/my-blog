@@ -96,7 +96,7 @@ public/uploads/      后台上传的图片
 9. **commit 582d96a**「第一次双端调试，页面独立修改」
 10. 封面底部经纬度改橙色
 11. **部署上线**：推送到 github.com/eznine/my-blog（强推覆盖旧版 HTML 小站），GitHub Actions 自动构建发布到 https://eznine.github.io/my-blog；后台密码已更换为随机强密码（不再用 eznine）；README.md 已写
-12. **移动端/低窗口视口适配**：vh→svh 全站替换 + 安全区抬升（封面提示/回到顶部/页脚）；后用户再报「内容被裁掉、滚动也不显示」——根因是封面 sticky 容器**定高+overflow-hidden**，内容高于视口时被永久裁切。最终方案：容器改 `min-height:100svh` + 去掉 overflow-hidden（随内容生长），滚动进度分母改用容器实际高度，动画跑完才上滑释放
+12. **移动端/低窗口视口适配**：vh→svh 全站替换 + 安全区抬升（封面提示/回到顶部/页脚）；后用户再报「内容被裁掉、滚动也不显示」——根因是封面 sticky 容器**定高+overflow-hidden**，内容高于视口时被永久裁切。曾试「容器 min-height 生长」方案（失败：sticky 高于视口时开场模型被破坏——p=1 时只显示上半截、卡片永远看不到、舞台尾部出现空隙）。**最终方案：sticky 恢复定高 100svh + 内容区 `.hero-content-zone`（上避导航 4rem、下避提示 8rem）+ JS 整体缩放适配（fit()：超高时 translateY 补偿 + scale，任何视口第一屏完整可见）**；底部提示留空必须 ≥ 提示自身高度(~108px)+浏览器底栏，否则末行经纬度被底栏盖住（8rem 起步）；禁 `overscroll-behavior-x` 消除安卓横向过滚指示条
 
 ## 六、用户的偏好与协作习惯（重要！）
 
