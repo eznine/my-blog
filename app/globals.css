@@ -79,6 +79,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* 与 body 一致：任何页面都不允许横向滚动（含 html 层，覆盖部分国产浏览器行为） */
+  overflow-x: hidden;
 }
 
 body {

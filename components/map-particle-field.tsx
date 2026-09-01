@@ -53,15 +53,19 @@ export function MapParticleField({ className }: { className?: string }) {
     }
     let particles: P[] = [];
     let landmarks: Landmark[] = [];
+    let layoutW = 0;
+    let layoutH = 0;
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.max(1, rect.width * dpr);
-      canvas.height = Math.max(1, rect.height * dpr);
+      layoutW = rect.width;
+      layoutH = rect.height;
+      canvas.width = Math.max(1, Math.round(rect.width * dpr));
+      canvas.height = Math.max(1, Math.round(rect.height * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const w = rect.width;
-      const h = rect.height;
+      const w = layoutW;
+      const h = layoutH;
       particles = Array.from({ length: Math.round((w * h) / 16000) }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -173,8 +177,8 @@ export function MapParticleField({ className }: { className?: string }) {
     };
 
     const draw = () => {
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
+      const w = layoutW;
+      const h = layoutH;
       ctx.clearRect(0, 0, w, h);
       drawGraticule(w, h);
       drawParticles(w, h);

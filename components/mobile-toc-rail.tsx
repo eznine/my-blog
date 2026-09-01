@@ -6,14 +6,15 @@ import type { Heading } from '@/lib/md';
 import { useActiveId } from './toc';
 
 /**
- * 移动端右侧章节指示器：扇形短横线（无外框）。
- * 手指在横线上滑动时，每条横线浮出对应章节文字；划到的那条横线变长、文字橙色高亮，其余默认色。
- * 当前阅读章节的横线常驻橙色。仅 <xl 显示（xl+ 用左侧 DesktopToc）。
+ * 移动端右侧章节指示器：等长短横线（无外框）。
+ * 手指在滑轨上纵向拖动：跟随手指实时高亮对应章节（文字浮出、横线变长橙色），
+ * 抬手即平滑滚动到该章节。点击单条横线同样可跳转。
+ * touch-action:none 让拖动不被浏览器滚动/长按菜单接管。
  * createPortal 到 body，避免被页面过渡动画的 transform 祖先破坏 fixed 定位。
  */
 export function MobileTocRail({ headings }: { headings: Heading[] }) {
   const activeId = useActiveId(headings);
-  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const railRef = useRef<HTMLDivElement>(null);
 
@@ -30,23 +31,35 @@ export function MobileTocRail({ headings }: { headings: Heading[] }) {
     if (!rail) return;
     const rect = rail.getBoundingClientRect();
     const ratio = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
-    setHoverIdx(Math.min(headings.length - 1, Math.round(ratio * (headings.length - 1))));
+    return Math.min(headings.length - 1, Math.round(ratio * (headings.length - 1)));
   };
 
   const rail = (
     <div
       ref={railRef}
-      className="fixed right-3 top-1/2 z-30 flex -translate-y-1/2 flex-col items-end gap-3 xl:hidden"
+      className="fixed right-3 top-1/2 z-30 flex -translate-y-1/2 touch-none flex-col items-end gap-3 select-none xl:hidden"
+      style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'none', touchAction: 'none' }}
       onPointerDown={(e) => {
         e.currentTarget.setPointerCapture(e.pointerId);
-        pick(e.clientY);
+        const idx = pick(e.clientY);
+        if (idx !== undefined) setDragIdx(idx);
       }}
-      onPointerMove={(e) => pick(e.clientY)}
-      onPointerUp={() => setHoverIdx(null)}
-      onPointerLeave={() => setHoverIdx(null)}
+      onPointerMove={(e) => {
+        if (dragIdx === null) return;
+        const idx = pick(e.clientY);
+        if (idx !== undefined) setDragIdx(idx);
+      }}
+      onPointerUp={() => {
+        if (dragIdx !== null) {
+          scrollTo(headings[dragIdx].id);
+          setDragIdx(null);
+        }
+      }}
+      onPointerCancel={() => setDragIdx(null)}
+      onContextMenu={(e) => e.preventDefault()}
     >
       {headings.map((h, i) => {
-        const isHover = hoverIdx === i;
+        const isDrag = dragIdx === i;
         const isActive = activeId === h.id;
         const len = 18;
         return (
@@ -56,20 +69,21 @@ export function MobileTocRail({ headings }: { headings: Heading[] }) {
             onClick={() => scrollTo(h.id)}
             aria-label={h.text}
             className="relative flex h-4 w-12 items-center justify-end"
+            style={{ touchAction: 'none' }}
           >
             <span
               className={`h-[3px] rounded-full transition-all duration-300 ${
-                isActive || isHover ? 'bg-accent' : 'bg-ink-faint'
+                isActive || isDrag ? 'bg-accent' : 'bg-ink-faint'
               }`}
-              style={{ width: isHover ? len + 10 : len }}
+              style={{ width: isDrag ? len + 10 : len }}
             />
-            {hoverIdx !== null && (
+            {dragIdx !== null && (
               <span
                 className={`pointer-events-none absolute max-w-[60vw] truncate whitespace-nowrap rounded-md bg-panel/90 px-2 py-0.5 text-[15px] shadow-[var(--shadow)] backdrop-blur transition-all duration-200 ${
-                  isHover ? 'right-11' : 'right-8'
+                  isDrag ? 'right-11' : 'right-8'
                 }`}
               >
-                <span className={isHover ? 'font-semibold text-accent' : 'text-ink-soft'}>{h.text}</span>
+                <span className={isDrag ? 'font-semibold text-accent' : 'text-ink-soft'}>{h.text}</span>
               </span>
             )}
           </button>
