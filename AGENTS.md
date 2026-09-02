@@ -187,5 +187,5 @@ public/uploads/      后台上传的图片
 
 * 服务器小内存：build 需 `NODE_OPTIONS='--max-old-space-size=2048'`，OOM(SIGKILL) 时加 swap 解决
 
-* 防火墙只放行 80/443/22；SSH 免密（本地 `ssh eznine` 别名）。**敏感凭据绝不写进本文件与 README**
+* **后台登录密码生效要诀（2026-09-02 血泪教训）**：admin-server **启动时一次性读取密码进内存**，之后改 site.config.json **必须重启服务才生效**。曾因本机 3001 有个 12:26 启动的旧进程（内存还是旧随机密码），用户改文件+换浏览器都登不进 → 杀掉旧进程（netstat -ano | findstr :3001 找 PID）重启即可。**GitHub Pages 上的后台登录请求实际发到访问者本机 127.0.0.1:3001**（api.ts API_BASE：构建时没传 NEXT_PUBLIC_ADMIN_API 就回落本机 3001）——用户"在 GitHub Pages 上登录"验证的是他本机服务的密码，不是服务器！正经用后台请走 eznine.xyz。测试密码时**别用 shell 拼接 JSON**（引号转义地狱），用 PowerShell ConvertTo-Base64 后在服务器 base64 -d 落文件 -d @file 最稳
 
