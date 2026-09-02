@@ -9,7 +9,7 @@
 // 若 API_BASE 以 /api 结尾而 path 也以 /api 开头，去掉重复段，避免拼出 /api/api/xxx。
 const API_BASE_RAW = (process.env.NEXT_PUBLIC_ADMIN_API as string) || 'http://127.0.0.1:3001';
 
-function apiUrl(path: string): string {
+export function apiUrl(path: string): string {
   const base = API_BASE_RAW.replace(/\/+$/, '');
   const p = path.startsWith('/') ? path : `/${path}`;
   if (base.endsWith('/api') && p.startsWith('/api')) return base.slice(0, -4) + p;
