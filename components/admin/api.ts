@@ -4,7 +4,20 @@
 
 // 本地开发默认直连 127.0.0.1:3001；服务器部署时构建命令注入
 // NEXT_PUBLIC_ADMIN_API=/api 走同源相对路径（由 Nginx 反代到后台服务）
-export const API_BASE = (process.env.NEXT_PUBLIC_ADMIN_API as string) || 'http://127.0.0.1:3001';
+//
+// 注意：请求路径本身以 /api 开头（如 /api/login），所以这里做归一化——
+// 若 API_BASE 以 /api 结尾而 path 也以 /api 开头，去掉重复段，避免拼出 /api/api/xxx。
+const API_BASE_RAW = (process.env.NEXT_PUBLIC_ADMIN_API as string) || 'http://127.0.0.1:3001';
+
+function apiUrl(path: string): string {
+  const base = API_BASE_RAW.replace(/\/+$/, '');
+  const p = path.startsWith('/') ? path : `/${path}`;
+  if (base.endsWith('/api') && p.startsWith('/api')) return base.slice(0, -4) + p;
+  return base + p;
+}
+
+/** 供组件展示（AI 面板等需要完整 URL）用的基础地址 */
+export const API_BASE = API_BASE_RAW;
 const TOKEN_KEY = 'ez-admin-token';
 
 export function getToken(): string {
@@ -31,7 +44,7 @@ export class ApiError extends Error {
 export async function api<T = unknown>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(API_BASE + path, {
+    res = await fetch(apiUrl(path), {
       ...init,
       headers: {
         'Content-Type': 'application/json',
@@ -50,7 +63,7 @@ export async function api<T = unknown>(path: string, init?: RequestInit): Promis
 export async function uploadImage(file: File): Promise<string> {
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}/api/upload?name=${encodeURIComponent(file.name)}`, {
+    res = await fetch(apiUrl(`/api/upload?name=${encodeURIComponent(file.name)}`), {
       method: 'POST',
       headers: { 'x-admin-token': getToken() },
       body: file,
