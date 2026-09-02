@@ -173,7 +173,9 @@ public/uploads/      后台上传的图片
 
 * 服务器：Azure VM Ubuntu 22.04（公网 IP 20.214.241.113），仓库在 `/srv/my-blog`
 
-* **域名与三个入口（用户强调，勿混）**：本地（`npm run dev`）、GitHub Pages（https://eznine.github.io/my-blog）、**eznine.xyz（用户域名，DNS A 记录解析到云服务器 IP 20.214.241.113，即服务器同一站点）**。域名解析已生效，DNS 无需再动
+* **双方案并存（2026-09 定稿）**：**GitHub Pages = A（静态）**，**eznine.xyz = C（动态 standalone）**。服务器跑 dynamic 分支，`my-blog-web.service`（Next standalone，端口 3210）由 Nginx 反代，`my-blog-admin.service`（3001）无 AUTO_REBUILD（dynamic 保存即生效 3s TTL）；旧 `my-blog.service`（serve out -p 3000）已停用。部署脚本归档在 `c:\Users\alex\.trae-cn\work\6a96f5f7ae22e4cbbacb3102\deploy-c.sh`（Nginx 反代模板 + stale systemd）。**教训**：standalone 构建后必须把 public/ 和 .next/static/ 复制进 .next/standalone/；systemd 启服务前先 `fuser -k 3210/tcp` 清残留进程，否则 EADDRINUSE 无限 auto-restart
+
+* **域名与三个入口（用户强调，勿混）**：本地（`npm run dev`）、GitHub Pages（https://eznine.github.io/my-blog，跑 main/A）、**eznine.xyz（用户域名，DNS A 记录解析到云服务器 IP 20.214.241.113，即服务器同一站点，跑 dynamic/C）**。域名解析已生效，DNS 无需再动
 
 * 架构：Nginx（80）托管 `out/` 静态站 + `/api/` 反代 127.0.0.1:3001（`proxy_buffering off` 必须，否则 AI 流式断）+ systemd 服务 `my-blog-admin`（开机自启，跑 `node scripts/admin-server.mjs`）
 
