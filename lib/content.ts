@@ -1,9 +1,36 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { cache } from 'react';
 import matter from 'gray-matter';
 import { renderMarkdown } from './md';
+
+/* ---------------- 模块级 TTL 缓存（dynamic 模式专用） ----------------
+ * React cache() 只在单次请求内缓存，跨请求不缓存——dynamic 模式下每次页面访问
+ * 都会重新扫描全部 md + 渲染 markdown，2s+ 延迟。这里改为模块级 3 秒 TTL：
+ * 3 秒内跨请求复用同一份解析结果（快），3 秒后自动重读（后台保存后最快 3 秒生效）。
+ */
+const CONTENT_TTL = 3000;
+const contentCache = new Map<string, { at: number; value: unknown }>();
+
+function ttl<T>(key: string, loader: () => Promise<T>): () => Promise<T> {
+  return async () => {
+    const hit = contentCache.get(key);
+    if (hit && Date.now() - hit.at < CONTENT_TTL) return hit.value as T;
+    const value = await loader();
+    contentCache.set(key, { at: Date.now(), value });
+    return value;
+  };
+}
+
+function ttlSync<T>(key: string, loader: () => T): () => T {
+  return () => {
+    const hit = contentCache.get(key);
+    if (hit && Date.now() - hit.at < CONTENT_TTL) return hit.value as T;
+    const value = loader();
+    contentCache.set(key, { at: Date.now(), value });
+    return value;
+  };
+}
 
 export interface BasePost {
   slug: string;
@@ -234,16 +261,16 @@ async function loadDir<T extends BasePost>(
     .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title, 'zh'));
 }
 
-export const getNotes = cache(() => loadDir<Note>('notes', () => ({})));
+export const getNotes = ttl('notes', () => loadDir<Note>('notes', () => ({})));
 
-export const getResearch = cache(() =>
+export const getResearch = ttl('research', () =>
   loadDir<Research>('research', (fm) => ({
     status: fm.status,
     links: fm.links,
   }))
 );
 
-export const getProjects = cache(() =>
+export const getProjects = ttl('projects', () =>
   loadDir<Project>('projects', (fm) => ({
     tech: fm.tech,
     demo: fm.demo,
@@ -269,7 +296,7 @@ export interface PageDoc {
   html: string;
 }
 
-export const getPages = cache(async (): Promise<PageDoc[]> => {
+export const getPages = ttl('pages', async (): Promise<PageDoc[]> => {
   const abs = path.join(process.cwd(), 'content', 'pages');
   if (!fs.existsSync(abs)) return [];
   const files = fs.readdirSync(abs).filter((f) => f.endsWith('.md'));

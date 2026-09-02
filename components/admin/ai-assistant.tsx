@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { api, getToken, API_BASE, type PostType } from './api';
+import { api, getToken, apiUrl, type PostType } from './api';
 import { getAiContext, onAiContext, notifyAiDataChanged, notifyAiInsertContent } from '@/lib/ai-context';
 
 interface ChatMsg {
@@ -76,7 +76,7 @@ export function AiAssistant({ onClose }: { onClose: () => void }) {
     };
     try {
       const token = getToken();
-      const res = await fetch(`${API_BASE}/api/ai/chat`, {
+      const res = await fetch(apiUrl('/api/ai/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-token': token || '' },
         body: JSON.stringify({
