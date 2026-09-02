@@ -24,6 +24,7 @@
     { "href": "/notes", "label": "笔记" },
     { "href": "/research", "label": "研究" },
     { "href": "/projects", "label": "项目" },
+    { "href": "/tools", "label": "工具" },
     { "href": "/archive", "label": "归档" },
     { "href": "/about", "label": "关于" }
   ],

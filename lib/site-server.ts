@@ -20,6 +20,7 @@ const COPY_FILES = [
   '06-关于页.json',
   '07-搜索页.json',
   '08-404页.json',
+  '09-工具页.json',
 ];
 
 /** 丢弃 "_开头" 的说明字段 */
@@ -41,7 +42,7 @@ function readCopy(name: string): Record<string, unknown> {
 }
 
 function loadSite(): SiteConfig {
-  const [g, h, n, r, p, a, ab, se, nf] = COPY_FILES.map((f) => strip(readCopy(f)));
+  const [g, h, n, r, p, a, ab, se, nf, t] = COPY_FILES.map((f) => strip(readCopy(f)));
   return {
     ...g,
     hero: h.hero,
@@ -58,6 +59,7 @@ function loadSite(): SiteConfig {
       archive: a.page,
       about: ab.page,
       search: se.page,
+      tools: t,
     },
     notesBrowser: n.browser,
     notFound: nf.notFound,

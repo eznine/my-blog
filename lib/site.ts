@@ -7,6 +7,7 @@ import archiveCfg from '../content/copy/05-归档页.json';
 import aboutCfg from '../content/copy/06-关于页.json';
 import searchCfg from '../content/copy/07-搜索页.json';
 import notFoundCfg from '../content/copy/08-404页.json';
+import toolsCfg from '../content/copy/09-工具页.json';
 
 /**
  * 全站文案：content/copy/ 下按页面拆分（00-站点信息 → 08-404页）。
@@ -129,6 +130,26 @@ export interface SiteConfig {
       indexLabel: string;
       noMatchLabel: string;
     };
+    tools: {
+      page: { code: string; en: string; title: string; desc: string; count: string };
+      dem: {
+        title: string;
+        en: string;
+        status: string;
+        desc: string;
+        open: string;
+        hint: string;
+        offline: string;
+        checking: string;
+        retry: string;
+      };
+      future: {
+        title: string;
+        en: string;
+        hint: string;
+        items: { name: string; desc: string; status: string }[];
+      };
+    };
   };
   story: { intro: string; sections: StorySection[]; quote: string };
   notesBrowser: {
@@ -170,6 +191,7 @@ const a = strip(archiveCfg as unknown as Record<string, unknown>);
 const ab = strip(aboutCfg as unknown as Record<string, unknown>);
 const se = strip(searchCfg as unknown as Record<string, unknown>);
 const nf = strip(notFoundCfg as unknown as Record<string, unknown>);
+const t = strip(toolsCfg as unknown as Record<string, unknown>);
 
 export const site = {
   ...g,
@@ -187,6 +209,7 @@ export const site = {
     archive: a.page,
     about: ab.page,
     search: se.page,
+    tools: t,
   },
   notesBrowser: n.browser,
   notFound: nf.notFound,
