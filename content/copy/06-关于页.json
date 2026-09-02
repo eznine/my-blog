@@ -1,10 +1,15 @@
 {
-  "_说明": "关于页文案：从上到下依次是页头标题、正文故事（一句话/我在学什么/为什么做这个网站/找到我/尾声引文）、教育经历、研究兴趣、技能栈、页脚注记。个人信息（姓名/单位/邮箱/坐标）在 00-站点信息.json 里，因为页脚和首页也要用。story 里 link 的 label 是展示文字，href 是跳转地址。",
+  "_说明": "关于页文案：从上到下依次是页头标题、页头注记（identity 身份 / affiliation 单位 / coords 坐标 / github / email——全部在本页可独立改）、正文故事（一句话/我在学什么/为什么做这个网站/找到我/尾声引文）、教育经历、研究兴趣、技能栈、页脚注记。title 里的 {name} 会用 00-站点信息.json 的姓名替换；footer 里的 {coords} 用本页 coords 替换。story 里 link 的 label 是展示文字，href 是跳转地址。",
 
   "page": {
     "code": "05",
     "en": "ABOUT",
     "title": "关于 · {name}",
+    "identity": "地理信息科学",
+    "affiliation": "山西师范大学 · 地理信息科学",
+    "coords": "37.74°N · 112.66°E",
+    "github": "https://github.com/eznine",
+    "email": "ezninfl@gmail.com",
     "education": "EDUCATION · 教育经历",
     "interests": "INTERESTS · 研究兴趣",
     "skills": "SKILLS · 技能栈",

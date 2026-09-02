@@ -19,18 +19,18 @@ export default async function AboutPage() {
       <Reveal>
         <PageHeader code={site.pages.about.code} en={site.pages.about.en} title={site.pages.about.title.replace('{name}', site.name)}>
           <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-soft">
-            <span>{site.identity}</span>
+            <span>{site.pages.about.identity}</span>
             <span className="text-ink-faint">/</span>
-            <span>{site.affiliation}</span>
+            <span>{site.pages.about.affiliation}</span>
             <span className="text-ink-faint">/</span>
-            <span className="font-mono text-[12px] tracking-wider">{site.coords}</span>
+            <span className="font-mono text-[12px] tracking-wider">{site.pages.about.coords}</span>
           </div>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-            <a href={site.github} target="_blank" rel="noreferrer" className="text-accent hover:text-accent-2">
+            <a href={site.pages.about.github} target="_blank" rel="noreferrer" className="text-accent hover:text-accent-2">
               GitHub ↗
             </a>
-            <a href={`mailto:${site.email}`} className="text-accent hover:text-accent-2">
-              {site.email}
+            <a href={`mailto:${site.pages.about.email}`} className="text-accent hover:text-accent-2">
+              {site.pages.about.email}
             </a>
           </div>
         </PageHeader>
@@ -136,7 +136,7 @@ export default async function AboutPage() {
       <Reveal>
         <footer className="mt-14 border-t border-line pt-6 text-center">
           <p className="font-mono text-[11px] tracking-[0.18em] text-ink-faint uppercase">
-            {site.pages.about.footer.replace('{coords}', site.coords)}
+            {site.pages.about.footer.replace('{coords}', site.pages.about.coords)}
           </p>
         </footer>
       </Reveal>
