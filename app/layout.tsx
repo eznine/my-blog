@@ -36,7 +36,7 @@ export default function RootLayout({
         />
         {/* 外观配置（content/appearance.json）：覆盖字号与颜色变量 */}
         <style id="ez-appearance" dangerouslySetInnerHTML={{ __html: appearanceCss }} />
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <CursorGlow />
           {/* 桌面端右侧滚动进度（细轨 + 橙色圆圈），仅 xl+ 显示 */}
           <ScrollProgressDot />
