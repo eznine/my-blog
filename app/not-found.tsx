@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { site } from '@/lib/site';
+import { site } from '@/lib/site-server';
 
 export default function NotFound() {
   return (

@@ -1,13 +1,18 @@
 ﻿import type { Metadata } from 'next';
 import { getPage } from '@/lib/content';
-import { site } from '@/lib/site';
+import { site } from '@/lib/site-server';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
 
-export const metadata: Metadata = {
-  title: site.pages.about.title.replace('{name}', site.name),
-  description: `${site.name} · ${site.identity} · ${site.affiliation}`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: site.pages.about.title.replace('{name}', site.name),
+    description: `${site.name} · ${site.identity} · ${site.affiliation}`,
+  };
+}
+
+// 动态模式：每次请求实时读取内容
+export const dynamic = 'force-dynamic';
 
 export default async function AboutPage() {
   const doc = await getPage('about');

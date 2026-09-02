@@ -1,18 +1,45 @@
 import type { Metadata } from 'next';
+import fs from 'node:fs';
+import path from 'node:path';
 import { getNotes } from '@/lib/content';
 import { NotesBrowser } from '@/components/notes-browser';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
-import { site } from '@/lib/site';
-import taxonomy from '@/content/taxonomy.json';
+import { site } from '@/lib/site-server';
 
-export const metadata: Metadata = {
-  title: site.pages.notes.title,
-  description: site.pages.notes.desc,
+interface TaxonomyShape {
+  categories: { notes: string[]; research: string[]; projects: string[] };
+  chapters: Record<string, string[]>;
+  tags: string[];
+}
+const EMPTY_TAXONOMY: TaxonomyShape = {
+  categories: { notes: [], research: [], projects: [] },
+  chapters: {},
+  tags: [],
 };
+
+/** 动态模式：运行时读取 taxonomy.json（后台分类管理保存后实时生效） */
+function getTaxonomy(): TaxonomyShape {
+  try {
+    return {
+      ...EMPTY_TAXONOMY,
+      ...JSON.parse(fs.readFileSync(path.join(process.cwd(), 'content', 'taxonomy.json'), 'utf-8')),
+    };
+  } catch {
+    return EMPTY_TAXONOMY;
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: site.pages.notes.title, description: site.pages.notes.desc };
+}
+
+// 动态模式：每次请求实时读取内容，后台保存后无需构建即可看到最新
+export const dynamic = 'force-dynamic';
 
 export default async function NotesPage() {
   const notes = await getNotes();
+  const taxonomy = getTaxonomy();
   const items = notes.map((n) => ({
     slug: n.slug,
     title: n.title,

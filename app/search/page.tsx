@@ -2,12 +2,14 @@ import type { Metadata } from 'next';
 import { buildSearchIndex } from '@/lib/search';
 import { SearchClient } from '@/components/search-client';
 import { PageHeader } from '@/components/page-header';
-import { site } from '@/lib/site';
+import { site } from '@/lib/site-server';
 
-export const metadata: Metadata = {
-  title: site.pages.search.title,
-  description: site.pages.search.desc,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: site.pages.search.title, description: site.pages.search.desc };
+}
+
+// 动态模式：每次请求实时生成搜索索引
+export const dynamic = 'force-dynamic';
 
 export default async function SearchPage() {
   const items = await buildSearchIndex();

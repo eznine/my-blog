@@ -2,6 +2,9 @@ import cfg from '../content/appearance.json';
 
 /**
  * 全站外观配置（content/appearance.json）。
+ * 本文件为「编译期静态版」，供 client 组件使用（后台外观管理器的
+ * 预览样式、默认值、拾色器回退色）。
+ * layout（server）请用 lib/appearance-server.ts（动态版，改外观即见）。
  * sizes 控制各区域字号（覆盖 globals.css 的 --fs-* 默认值）；
  * colors 按主题覆盖文字/强调色，空字符串表示使用主题默认色。
  */
@@ -79,9 +82,4 @@ export function appearanceCssFrom(c: Partial<AppearanceConfig> | null | undefine
   return [sizeCss, themeCss(':root', c?.colors?.light), themeCss('.dark', c?.colors?.dark)]
     .filter(Boolean)
     .join('\n');
-}
-
-/** 生成注入 layout 的样式片段（读取 content/appearance.json） */
-export function buildAppearanceCss(): string {
-  return appearanceCssFrom(appearance);
 }

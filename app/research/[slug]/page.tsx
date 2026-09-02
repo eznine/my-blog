@@ -4,10 +4,8 @@ import { getResearch, formatDate } from '@/lib/content';
 import { extractHeadings } from '@/lib/md';
 import { ArticleShell } from '@/components/article-shell';
 
-export async function generateStaticParams() {
-  const posts = await getResearch();
-  return posts.map((r) => ({ slug: r.slug }));
-}
+// 动态模式：每次请求实时读取内容，后台保存后无需构建即可看到最新
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

@@ -10,7 +10,8 @@ import notFoundCfg from '../content/copy/08-404页.json';
 
 /**
  * 全站文案：content/copy/ 下按页面拆分（00-站点信息 → 08-404页）。
- * 这里合并成统一结构，组件一律用 site.xxx 取值。
+ * 本文件为「编译期静态版」，供 client 组件使用（导航/页脚/按钮文案，
+ * 变化低频）。server 页面请用 lib/site-server.ts（动态版，改文案即见）。
  * 各文件里的 "_说明" 字段是给人看的注释，合并时丢弃。
  */
 

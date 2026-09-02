@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import { getNotes, getProjects, getResearch } from '@/lib/content';
-import { site } from '@/lib/site';
+import { site } from '@/lib/site-server';
 import { HeroScroll } from '@/components/hero-scroll';
 import { Reveal } from '@/components/reveal';
 import { SparkField } from '@/components/spark-field';
 import { NoteCard } from '@/components/note-card';
 import { ProjectCard } from '@/components/project-card';
 import { ResearchItem } from '@/components/research-item';
+
+// 动态模式：每次请求实时读取内容，后台保存后无需构建即可看到最新
+export const dynamic = 'force-dynamic';
 
 const AREA_PATHS: Record<string, string> = {
   RS: 'M3 8.5 12 4l9 4.5-9 4.5-9-4.5Zm0 4.5L12 17.5 21 13M3 16l9 4.5 9-4.5',
@@ -60,7 +63,14 @@ export default async function HomePage() {
   return (
     <div>
       {/* ================= HERO：滚动驱动的开场（等高线放大 + 文字浮现） ================= */}
-      <HeroScroll notes={notes.length} research={research.length} projects={projects.length} />
+      <HeroScroll
+        notes={notes.length}
+        research={research.length}
+        projects={projects.length}
+        hero={site.hero}
+        coords={site.coords}
+        github={site.github}
+      />
 
       <div className="mx-auto max-w-6xl px-6">
         {/* ================= 方向 ================= */}

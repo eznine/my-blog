@@ -5,23 +5,24 @@ import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { CursorGlow } from '@/components/cursor-glow';
 import { ScrollProgressDot } from '@/components/scroll-progress-dot';
-import { site } from '@/lib/site';
-import { buildAppearanceCss } from '@/lib/appearance';
+import { site } from '@/lib/site-server';
+import { buildAppearanceCss } from '@/lib/appearance-server';
 import './globals.css';
 
-export const metadata: Metadata = {
-  title: {
-    default: site.meta.title,
-    template: site.meta.titleTemplate,
-  },
-  description: site.meta.description || site.bio,
-};
-
-const appearanceCss = buildAppearanceCss();
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: {
+      default: site.meta.title,
+      template: site.meta.titleTemplate,
+    },
+    description: site.meta.description || site.bio,
+  };
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const appearanceCss = buildAppearanceCss();
   return (
     <html lang="zh-CN" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="transition-colors duration-300">

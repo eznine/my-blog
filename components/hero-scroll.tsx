@@ -32,12 +32,22 @@ export function HeroScroll({
   notes,
   research,
   projects,
+  hero,
+  coords,
+  github,
 }: {
   notes: number;
   research: number;
   projects: number;
+  hero?: typeof site.hero;
+  coords?: string;
+  github?: string;
 }) {
   const stageRef = useRef<HTMLElement>(null);
+  // 优先使用 server 传入的动态文案（改文案即见）；未传时回退编译期静态值
+  const heroCfg = hero ?? site.hero;
+  const coordsCfg = coords ?? site.coords;
+  const githubCfg = github ?? site.github;
 
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -100,7 +110,7 @@ export function HeroScroll({
     };
   }, []);
 
-  const [lat, lon] = site.coords.match(/(\d+\.\d+)/g)?.map(Number) ?? [37.74, 112.66];
+  const [lat, lon] = coordsCfg.match(/(\d+\.\d+)/g)?.map(Number) ?? [37.74, 112.66];
 
   return (
     <section ref={stageRef} className="hero-scroll-section relative -mt-14 border-b border-line">
@@ -132,10 +142,10 @@ export function HeroScroll({
           <div data-hs="0.05,0.22" className="mono-label flex flex-wrap items-center gap-4" style={{ opacity: 0 }}>
             <span className="flex items-center gap-2.5 rounded-full border border-accent/50 px-3.5 py-1.5 !text-accent">
               <span className="marker-dot is-live !h-[6px] !w-[6px]" />
-              {site.hero.badge}
+              {heroCfg.badge}
             </span>
             <span className="hidden h-px w-20 bg-line md:block" />
-            <span className="hidden md:inline">{site.hero.mapLabel}</span>
+            <span className="hidden md:inline">{heroCfg.mapLabel}</span>
           </div>
 
           <h1
@@ -143,7 +153,7 @@ export function HeroScroll({
             className="hero-shadow mt-6 text-[2.9rem] leading-[1.08] font-black tracking-tight text-ink md:mt-10 md:text-[4.6rem]"
             style={{ opacity: 0 }}
           >
-            {site.hero.titleLines.map((line, i) => (
+            {heroCfg.titleLines.map((line, i) => (
               <Fragment key={i}>
                 {i > 0 && <br />}
                 <span className="grad-text glow-text">{line}</span>
@@ -152,7 +162,7 @@ export function HeroScroll({
           </h1>
 
           <p data-hs="0.32,0.52" className="hero-shadow mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft md:mt-8" style={{ opacity: 0 }}>
-            {site.hero.bio}
+            {heroCfg.bio}
           </p>
 
           <div data-hs="0.48,0.64" className="mt-8 flex flex-wrap items-center gap-5 md:mt-11" style={{ opacity: 0 }}>
@@ -162,7 +172,7 @@ export function HeroScroll({
               style={{ background: 'var(--accent)' }}
             >
               <span className="relative z-10" style={{ textShadow: 'none' }}>
-                {site.hero.ctaNotes}
+                {heroCfg.ctaNotes}
               </span>
               <span className="absolute inset-0 -translate-x-full bg-white/25 transition-transform duration-500 group-hover:translate-x-full" />
             </Link>
@@ -170,15 +180,15 @@ export function HeroScroll({
               href="/projects"
               className="rounded-xl border border-line-strong px-7 py-3.5 text-base font-medium text-ink transition-all hover:border-accent hover:text-accent"
             >
-              {site.hero.ctaProjects}
+              {heroCfg.ctaProjects}
             </Link>
             <a
-              href={site.github}
+              href={githubCfg}
               target="_blank"
               rel="noreferrer"
               className="text-base text-ink-faint transition-colors hover:text-accent"
             >
-              {site.hero.github}
+              {heroCfg.github}
             </a>
           </div>
 
@@ -188,9 +198,9 @@ export function HeroScroll({
             style={{ opacity: 0 }}
           >
             {[
-              { n: notes, ...site.hero.stats[0] },
-              { n: research, ...site.hero.stats[1] },
-              { n: projects, ...site.hero.stats[2] },
+              {n: notes, ...heroCfg.stats[0]},
+              { n: research, ...heroCfg.stats[1] },
+              { n: projects, ...heroCfg.stats[2] },
             ].map((s) => (
               <Link key={s.label} href={s.href} className="explore-card group rounded-2xl px-6 py-6">
                 <span className="corner" aria-hidden="true" />
@@ -213,9 +223,9 @@ export function HeroScroll({
           <svg viewBox="0 0 24 24" className="h-6 w-6 animate-bounce text-accent" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M12 4v14m0 0 6-6m-6 6-6-6" />
           </svg>
-          <span>{site.hero.scrollHint}</span>
-          <span>{site.hero.scrollHintEn}</span>
-          <span className="!text-accent">{site.coords}</span>
+          <span>{heroCfg.scrollHint}</span>
+          <span>{heroCfg.scrollHintEn}</span>
+          <span className="!text-accent">{coordsCfg}</span>
         </div>
       </div>
     </section>

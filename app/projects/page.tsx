@@ -3,12 +3,14 @@ import { getProjects } from '@/lib/content';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
 import { ProjectCard } from '@/components/project-card';
-import { site } from '@/lib/site';
+import { site } from '@/lib/site-server';
 
-export const metadata: Metadata = {
-  title: site.pages.projects.title,
-  description: site.pages.projects.desc,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: site.pages.projects.title, description: site.pages.projects.desc };
+}
+
+// 动态模式：每次请求实时读取内容，后台保存后无需构建即可看到最新
+export const dynamic = 'force-dynamic';
 
 export default async function ProjectsPage() {
   const projects = await getProjects();

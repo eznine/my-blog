@@ -3,12 +3,14 @@ import Link from 'next/link';
 import { getNotes, getResearch, getProjects } from '@/lib/content';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
-import { site } from '@/lib/site';
+import { site } from '@/lib/site-server';
 
-export const metadata: Metadata = {
-  title: site.pages.archive.title,
-  description: site.pages.archive.desc,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: site.pages.archive.title, description: site.pages.archive.desc };
+}
+
+// 动态模式：每次请求实时读取内容，后台保存后无需构建即可看到最新
+export const dynamic = 'force-dynamic';
 
 export default async function ArchivePage() {
   const [notes, research, projects] = await Promise.all([getNotes(), getResearch(), getProjects()]);

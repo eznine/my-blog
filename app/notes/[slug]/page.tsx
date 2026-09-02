@@ -4,10 +4,8 @@ import { getNotes, formatDate } from '@/lib/content';
 import { extractHeadings } from '@/lib/md';
 import { ArticleShell } from '@/components/article-shell';
 
-export async function generateStaticParams() {
-  const notes = await getNotes();
-  return notes.map((n) => ({ slug: n.slug }));
-}
+// 动态模式：每次请求实时读取内容，后台保存后无需构建即可看到最新
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

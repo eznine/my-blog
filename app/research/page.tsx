@@ -3,12 +3,14 @@ import { getResearch } from '@/lib/content';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
 import { ResearchItem } from '@/components/research-item';
-import { site } from '@/lib/site';
+import { site } from '@/lib/site-server';
 
-export const metadata: Metadata = {
-  title: site.pages.research.title,
-  description: site.pages.research.desc,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: site.pages.research.title, description: site.pages.research.desc };
+}
+
+// 动态模式：每次请求实时读取内容，后台保存后无需构建即可看到最新
+export const dynamic = 'force-dynamic';
 
 export default async function ResearchPage() {
   const research = await getResearch();
