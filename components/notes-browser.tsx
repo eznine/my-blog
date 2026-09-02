@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { site } from '@/lib/site';
+import { useSite } from '@/components/site-provider';
 import { NoteCard } from '@/components/note-card';
 import { Reveal } from '@/components/reveal';
 
@@ -36,6 +36,7 @@ export function NotesBrowser({
   /** 各分类下章节的展示顺序；未收录的章节排在后面 */
   chapterOrder?: Record<string, string[]>;
 }) {
+  const site = useSite();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string | null>(null);
   const [chapter, setChapter] = useState<string | null>(null);
@@ -281,6 +282,7 @@ function ChapterPanel({
   activeChapter: string | null;
   onSelect: (ch: string | null) => void;
 }) {
+  const site = useSite();
   return (
     <div
       className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${

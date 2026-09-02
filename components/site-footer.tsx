@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { site } from '@/lib/site';
+import { site } from '@/lib/site-server';
 import { BrandLogo } from './brand-logo';
 import { SiteUtilities } from './site-utilities';
 

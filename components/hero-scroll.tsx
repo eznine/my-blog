@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { Fragment, useLayoutEffect, useRef } from 'react';
-import { site } from '@/lib/site';
+import { useSite } from './site-provider';
+import type { SiteConfig } from '@/lib/site';
 import { hasVisitedNonHome } from '@/lib/nav-state';
 import { topoState } from './topo-shader-field';
 import { MapParticleField } from './map-particle-field';
@@ -39,10 +40,11 @@ export function HeroScroll({
   notes: number;
   research: number;
   projects: number;
-  hero?: typeof site.hero;
+  hero?: SiteConfig['hero'];
   coords?: string;
   github?: string;
 }) {
+  const site = useSite();
   const stageRef = useRef<HTMLElement>(null);
   // 优先使用 server 传入的动态文案（改文案即见）；未传时回退编译期静态值
   const heroCfg = hero ?? site.hero;

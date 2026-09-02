@@ -5,6 +5,7 @@ import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { CursorGlow } from '@/components/cursor-glow';
 import { ScrollProgressDot } from '@/components/scroll-progress-dot';
+import { SiteProvider } from '@/components/site-provider';
 import { site } from '@/lib/site-server';
 import { buildAppearanceCss } from '@/lib/appearance-server';
 import './globals.css';
@@ -37,6 +38,7 @@ export default function RootLayout({
         {/* 外观配置（content/appearance.json）：覆盖字号与颜色变量 */}
         <style id="ez-appearance" dangerouslySetInnerHTML={{ __html: appearanceCss }} />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <SiteProvider value={site}>
           <CursorGlow />
           {/* 桌面端右侧滚动进度（细轨 + 橙色圆圈），仅 xl+ 显示 */}
           <ScrollProgressDot />
@@ -54,6 +56,7 @@ export default function RootLayout({
             <main className="flex-1 pt-14">{children}</main>
             <SiteFooter />
           </div>
+          </SiteProvider>
         </ThemeProvider>
       </body>
     </html>

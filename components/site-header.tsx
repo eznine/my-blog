@@ -6,9 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ThemeToggle } from './theme-toggle';
 import { BrandLogo } from './brand-logo';
 import { markVisitedNonHome } from '@/lib/nav-state';
-import { site } from '@/lib/site';
-
-const NAV = site.nav;
+import { useSite } from './site-provider';
 
 function SearchIcon() {
   return (
@@ -36,6 +34,8 @@ function ArrowUpIcon() {
 }
 
 export function SiteHeader({ siteName }: { siteName: string }) {
+  const site = useSite();
+  const NAV = site.nav;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   // 水合前隐藏，避免导航栏闪现

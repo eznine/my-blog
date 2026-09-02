@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { site } from '@/lib/site';
+import { useSite } from './site-provider';
 
 /**
  * 页脚信息区的站点工具：光标光效开关 + 后台入口。
  * 光效偏好持久化在 localStorage（'ez-glow'），切换即时生效（自定义事件通知 CursorGlow）。
  */
 export function SiteUtilities() {
+  const site = useSite();
   const [glow, setGlow] = useState(true);
 
   useEffect(() => {

@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { searchItems, type SearchItem } from '@/lib/search-core';
-import { site } from '@/lib/site';
+import { useSite } from '@/components/site-provider';
 
 const TYPE_ORDER: SearchItem['type'][] = ['note', 'research', 'project'];
 
 export function SearchClient({ items }: { items: SearchItem[] }) {
+  const site = useSite();
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<SearchItem['type'] | null>(null);
 
