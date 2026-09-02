@@ -7,22 +7,38 @@
 #   1. standalone 里的 content / public/uploads / public/content-images
 #      一律用【符号链接】指向仓库根目录的真实目录——后台改文案/传图片
 #      立即生效（standalone 里若是复制副本，改动永远不会反映）。
-#   2. 全部目录归 eznine:eznine（web 服务以 eznine 运行，root 属主会
-#      导致运行时写图片 EACCES 500）。
+#   2. git / npm / build 一律以 eznine 身份执行（runuser），不再产生
+#      root 属主文件——之前 sudo 直接跑导致 .git/.next 归 root，
+#      git pull 失败、运行时写图片 EACCES 500。
+#   3. 启动时自愈：把 .git/.next/content 等属主修正为 eznine。
 # =====================================================================
 set -e
 cd /srv/my-blog
 
+# 以 eznine 身份执行命令（脚本通常被 sudo 调用，避免再写出 root 文件）
+AS_EZNINE() {
+  if [ "$(id -u)" = "0" ]; then
+    runuser -u eznine -- "$@"
+  else
+    "$@"
+  fi
+}
+
+echo "==> [0/6] 自愈：修正历史 sudo 遗留的 root 属主"
+if [ "$(id -u)" = "0" ]; then
+  chown -R eznine:eznine .git .next content public 2>/dev/null || true
+fi
+
 echo "==> [1/6] git 拉取 dynamic"
-git checkout -- public/feed.xml public/sitemap.xml 2>/dev/null || true
-git checkout dynamic
-git pull --ff-only origin dynamic
+AS_EZNINE git checkout -- public/feed.xml public/sitemap.xml 2>/dev/null || true
+AS_EZNINE git checkout dynamic
+AS_EZNINE git pull --ff-only origin dynamic
 
 echo "==> [2/6] 安装依赖（如有变化）"
-npm install --no-audit --no-fund --loglevel=error
+AS_EZNINE npm install --no-audit --no-fund --loglevel=error
 
 echo "==> [3/6] 构建 standalone"
-NEXT_PUBLIC_ADMIN_API=/api NODE_OPTIONS='--max-old-space-size=2048' npx next build
+AS_EZNINE env NEXT_PUBLIC_ADMIN_API=/api NODE_OPTIONS='--max-old-space-size=2048' npx next build
 
 echo "==> [4/6] 组装 standalone（静态资源复制 + 内容目录符号链接）"
 S=.next/standalone
@@ -41,7 +57,9 @@ rm -rf $S/public/content-images
 ln -sfn ../../../public/content-images $S/public/content-images
 
 echo "==> [5/6] 修正属主（web 服务以 eznine 运行）"
-chown -R eznine:eznine .next public/uploads public/content-images 2>/dev/null || true
+if [ "$(id -u)" = "0" ]; then
+  chown -R eznine:eznine .next public/uploads public/content-images 2>/dev/null || true
+fi
 
 echo "==> [6/6] 重启 web 服务与后台服务"
 systemctl restart my-blog-web.service
