@@ -26,7 +26,398 @@ try {
 const PASSWORD = process.env.ADMIN_PASSWORD || cfg.adminPassword || 'eznine';
 const TOKEN = crypto.createHash('sha256').update(PASSWORD + SALT).digest('hex');
 
-const TYPES = ['notes', 'research', 'projects'];
+/* ---- AI 接入配置（环境变量优先，兜底 site.config.json 的 ai 字段） ---- */
+const AI = {
+  baseURL: (process.env.ADMIN_AI_BASE_URL || cfg.ai?.baseURL || '').trim(),
+  apiKey: (process.env.ADMIN_AI_API_KEY || cfg.ai?.apiKey || '').trim(),
+  model: (process.env.ADMIN_AI_MODEL || cfg.ai?.model || 'deepseek-chat').trim(),
+};
+
+/* ---- AI 助手工具定义（OpenAI 兼容 function calling） ---- */
+const TYPES_NAMES = ['notes', 'research', 'projects'];
+const AI_TOOLS = [
+  {
+    type: 'function',
+    function: {
+      name: 'list_posts',
+      description: '列出指定类型的所有文章（标题/日期/分类/章节/标签/摘要），可按关键词过滤，用于了解站点内容。',
+      parameters: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', enum: TYPES_NAMES, description: '文章类型' },
+          keyword: { type: 'string', description: '标题/摘要/标签中的关键词，可省略' },
+          category: { type: 'string', description: '按大类过滤' },
+          chapter: { type: 'string', description: '按章节过滤' },
+        },
+        required: ['type'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'get_post',
+      description:
+        '读取一篇文章的完整 Markdown 正文与元信息，仅用于润色/重写/扩写正文。注意：正文可能很长，如果只是改日期、分类、章节、标签、可见性这类元信息，不需要调用本工具——直接用 update_post 传要改的字段即可。',
+      parameters: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', enum: TYPES_NAMES, description: '文章类型' },
+          slug: { type: 'string', description: '文章 slug（URL 标识）' },
+        },
+        required: ['type', 'slug'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'get_taxonomy',
+      description: '查看站点现有的大类、章节与标签候选，用于给文章归类。',
+      parameters: { type: 'object', properties: {} },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'update_post',
+      description:
+        '修改一篇文章的元信息或正文，字段级合并：只传需要修改的字段，其余字段（含正文）自动保留，因此无需先调用 get_post。改日期/分类/标签/可见性只传对应字段即可。注意：这是写操作，执行前必须先向用户说明将做的修改并征得确认。修改正文时 content 必须是完整 Markdown 全文，此时可先 get_post 取得原文。',
+      parameters: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', enum: TYPES_NAMES },
+          slug: { type: 'string', description: '文章 slug' },
+          date: { type: 'string', description: '修改日期（YYYY-MM-DD）' },
+          title: { type: 'string' },
+          summary: { type: 'string' },
+          category: { type: 'string', description: '大类，留空字符串表示移出分类' },
+          chapter: { type: 'string' },
+          tags: { type: 'array', items: { type: 'string' }, description: '完整标签列表' },
+          status: { type: 'string' },
+          hidden: { type: 'boolean', description: 'true=隐藏，false=显示' },
+          content: { type: 'string', description: '新的完整 Markdown 正文' },
+        },
+        required: ['type', 'slug'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'batch_update',
+      description:
+        '批量修改多篇文章的分类/章节/标签/可见性。slugs 直接从 list_posts 的结果里取，不要逐篇 get_post。注意：这是写操作，执行前必须先向用户说明修改范围并征得确认。',
+      parameters: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', enum: TYPES_NAMES },
+          slugs: {
+            type: 'array',
+            items: { type: 'string' },
+            description: '要修改的文章 slug 列表，最多 50 篇',
+            maxItems: 50,
+          },
+          setCategory: { type: 'boolean', description: '是否修改分类' },
+          category: { type: 'string' },
+          setChapter: { type: 'boolean', description: '是否修改章节' },
+          chapter: { type: 'string' },
+          addTags: { type: 'array', items: { type: 'string' }, description: '要追加的标签' },
+          removeTags: { type: 'array', items: { type: 'string' }, description: '要移除的标签' },
+          hide: { type: 'boolean', description: 'true=隐藏，false=显示' },
+        },
+        required: ['type', 'slugs'],
+      },
+    },
+  },
+];
+
+/* ---- AI 工具执行（读工具直接执行；写工具只登记等前端确认） ---- */
+function aiListPosts(args) {
+  const t = TYPES.includes(args.type) ? args.type : 'notes';
+  const q = String(args.keyword || '').trim().toLowerCase();
+  const items = listFiles(t).map(({ slug, relPath, file }) => {
+    const { data, content } = parseFrontmatter(fs.readFileSync(file, 'utf-8'));
+    const eff = effectiveTaxonomy(relPath, data);
+    const titleMatch = content.match(/^#\s+(.+)$/m);
+    return {
+      slug,
+      title: data.title ?? titleMatch?.[1]?.trim() ?? slug,
+      date: data.date ?? '',
+      category: eff.category ?? '',
+      chapter: eff.chapter ?? '',
+      tags: Array.isArray(data.tags) ? data.tags : [],
+      summary: data.summary ?? '',
+      status: data.status ?? '',
+    };
+  });
+  const filtered = items.filter((p) => {
+    if (args.category && p.category !== args.category) return false;
+    if (args.chapter && p.chapter !== args.chapter) return false;
+    if (q) {
+      const hay = `${p.title} ${p.summary} ${p.category} ${p.chapter} ${p.tags.join(' ')}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  const LIMIT = 50;
+  const list = filtered.slice(0, LIMIT);
+  return { type: t, total: filtered.length, truncated: filtered.length > LIMIT, items: list };
+}
+
+async function aiGetPost(args) {
+  const t = TYPES.includes(args.type) ? args.type : 'notes';
+  const found = listFiles(t).find((f) => f.slug === args.slug);
+  if (!found) return { error: `未找到文章 slug=${args.slug}（${t}）` };
+  const { data, content } = parseFrontmatter(fs.readFileSync(found.file, 'utf-8'));
+  return { type: t, slug: args.slug, meta: data, relPath: found.relPath, content };
+}
+
+function aiGetTaxonomy() {
+  const taxFile = path.join(CONTENT, 'taxonomy.json');
+  let tax = { categories: { notes: [], research: [], projects: [] }, chapters: {}, tags: [] };
+  try {
+    tax = { ...tax, ...JSON.parse(fs.readFileSync(taxFile, 'utf-8')) };
+  } catch {}
+  const usedCats = new Set();
+  const usedChapters = new Set();
+  const usedTags = new Set();
+  for (const t of TYPES) {
+    for (const { relPath, file } of listFiles(t)) {
+      const { data } = parseFrontmatter(fs.readFileSync(file, 'utf-8'));
+      const eff = effectiveTaxonomy(relPath, data);
+      if (eff.category) usedCats.add(eff.category);
+      if (eff.chapter) usedChapters.add(`${eff.category} / ${eff.chapter}`);
+      for (const tag of Array.isArray(data.tags) ? data.tags : []) usedTags.add(tag);
+    }
+  }
+  return { candidates: tax, used: { categories: [...usedCats], chapters: [...usedChapters], tags: [...usedTags] } };
+}
+
+function aiEndpoint() {
+  const base = AI.baseURL.replace(/\/+$/, '');
+  return base.endsWith('/chat/completions') ? base : `${base}/chat/completions`;
+}
+
+async function aiComplete(msgs, { tools } = {}) {
+  const body = { model: AI.model, messages: msgs, temperature: 0.5 };
+  if (tools?.length) body.tools = tools;
+  let r;
+  try {
+    r = await fetch(aiEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${AI.apiKey}` },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    throw new Error(`无法连接 AI 服务：${err?.message || err}`);
+  }
+  const raw = await r.text().catch(() => '');
+  if (!r.ok) {
+    // 模型不支持 tools 时，去掉 tools 降级重试一次
+    if (tools?.length && /tools|function/.test(raw) && r.status === 400) {
+      return aiComplete(msgs, {});
+    }
+    throw new Error(`AI 服务返回 ${r.status}：${raw.slice(0, 300) || '无响应'}`);
+  }
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    throw new Error('AI 返回无法解析');
+  }
+  return data.choices?.[0]?.message ?? null;
+}
+
+/* ---- 流式调用一次模型：逐 token 回调 onEvent（chunk / 内部累积） ---- */
+async function aiStreamComplete(msgs, { tools } = {}, onEvent) {
+  const body = { model: AI.model, messages: msgs, temperature: 0.5, stream: true };
+  if (tools?.length) body.tools = tools;
+  let r;
+  try {
+    r = await fetch(aiEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${AI.apiKey}` },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    throw new Error(`无法连接 AI 服务：${err?.message || err}`);
+  }
+  if (!r.ok || !r.body) {
+    const raw = await r.text().catch(() => '');
+    if (tools?.length && /tools|function/.test(raw) && r.status === 400) {
+      throw new Error('__NO_TOOLS__');
+    }
+    throw new Error(`AI 服务返回 ${r.status}：${raw.slice(0, 300) || '无响应'}`);
+  }
+  const reader = r.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '';
+  let msg = null;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let nl;
+    while ((nl = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, nl).trim();
+      buf = buf.slice(nl + 1);
+      if (!line.startsWith('data:')) continue;
+      const data = line.slice(5).trim();
+      if (data === '[DONE]') {
+        buf = '';
+        break;
+      }
+      let j;
+      try {
+        j = JSON.parse(data);
+      } catch {
+        continue;
+      }
+      const d = j.choices?.[0]?.delta;
+      if (!d) continue;
+      if (d.role) {
+        msg = msg || { role: d.role, content: '' };
+      }
+      if (d.content) {
+        msg = msg || { role: 'assistant', content: '' };
+        msg.content += d.content;
+        onEvent?.({ type: 'chunk', text: d.content });
+      }
+      if (Array.isArray(d.tool_calls)) {
+        msg = msg || { role: 'assistant', content: '' };
+        msg.tool_calls = msg.tool_calls || [];
+        for (const tc of d.tool_calls) {
+          const i = tc.index ?? 0;
+          while (msg.tool_calls.length <= i)
+            msg.tool_calls.push({ id: '', type: 'function', function: { name: '', arguments: '' } });
+          if (tc.id) msg.tool_calls[i].id = tc.id;
+          if (tc.function?.name) msg.tool_calls[i].function.name += tc.function.name;
+          if (tc.function?.arguments) msg.tool_calls[i].function.arguments += tc.function.arguments;
+        }
+      }
+    }
+  }
+  return msg;
+}
+
+/* ---- Agent 循环（流式）：工具日志与最终正文实时发给前端 ---- */
+async function runAgentStream(userMessages, context, onEvent) {
+  const system =
+    '你是「未完成的地图」博客后台的管理助手，站点作者是地理信息科学方向的研究生。你可以通过工具了解与修改后台内容：' +
+    'list_posts / get_post / get_taxonomy 为只读，可以直接调用；' +
+    'update_post / batch_update 是写操作：这两种工具的调用会被系统安全地放入「待用户确认」队列，而不会直接执行任何修改，' +
+    '所以你应当放心直接调用它们（参数填具体），并在回复中向用户清楚说明准备做什么改动；用户在前端点击确认后修改才会真正落盘。不要只是口头描述改动而拒绝调用工具。' +
+    '效率原则：改日期/分类/章节/标签/可见性等元信息时，直接调用 update_post 只传要改的字段即可，不要先 get_post 读全文（正文很长，会浪费大量时间与 token）；' +
+    '批量修改（如把一批隐藏文章全部设为显示）时，先 list_posts 一次拿到 slug 列表，再直接调用一次 batch_update 完成，绝对不要逐篇 get_post。' +
+    '只有润色/重写/扩写正文时才需要 get_post 读取全文，并在给出结果时直接输出完整的新 Markdown 正文。' +
+    '文风朴素专业，少堆砌术语；回答用中文。' +
+    (context ? `\n\n【当前界面上下文】\n${context}` : '');
+  const msgs = [{ role: 'system', content: system }, ...userMessages];
+  const pending = [];
+  for (let round = 0; round < 6; round++) {
+    let msg;
+    try {
+      msg = await aiStreamComplete(msgs, { tools: AI_TOOLS }, onEvent);
+    } catch (err) {
+      if (err?.message === '__NO_TOOLS__') {
+        // 模型不支持 tools（去掉 tools 非流式重试一次）
+        msg = await aiComplete(msgs, {});
+        if (msg?.content) onEvent?.({ type: 'chunk', text: msg.content });
+      } else {
+        throw err;
+      }
+    }
+    if (!msg) {
+      onEvent?.({ type: 'done', pending, reply: '' });
+      return;
+    }
+    const calls = Array.isArray(msg.tool_calls) ? msg.tool_calls : [];
+    if (!calls.length) {
+      onEvent?.({ type: 'done', pending, reply: msg.content ?? '' });
+      return;
+    }
+    msgs.push({ role: 'assistant', content: msg.content ?? null, tool_calls: msg.tool_calls });
+    for (const tc of calls) {
+      let args = {};
+      try {
+        args = JSON.parse(tc.function.arguments || '{}');
+      } catch {}
+      const name = tc.function.name;
+      let out;
+      try {
+        if (name === 'list_posts') out = aiListPosts(args);
+        else if (name === 'get_post') out = await aiGetPost(args);
+        else if (name === 'get_taxonomy') out = aiGetTaxonomy();
+        else if (name === 'update_post' || name === 'batch_update') {
+          out = { pending: true, note: '写操作待用户确认，前端确认后会执行，请先向用户说明改动内容并等待确认。' };
+          pending.push({ name, args });
+        } else out = { error: `未知工具：${name}` };
+      } catch (err) {
+        out = { error: `工具执行失败：${err?.message || err}` };
+      }
+      onEvent?.({ type: 'tool', log: aiToolFriendly(name, args) });
+      msgs.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify(out).slice(0, 20000) });
+    }
+  }
+  onEvent?.({ type: 'done', pending, reply: '本次对话的工具调用次数已达上限，请把要求拆分后再试。' });
+}
+
+function aiToolFriendly(name, args) {
+  if (name === 'list_posts') return `查询文章列表（${args.type || 'notes'}）`;
+  if (name === 'get_post') return `读取文章《${args.slug}》全文`;
+  if (name === 'get_taxonomy') return '查询分类标签';
+  if (name === 'update_post') return `修改文章《${args.slug}》`;
+  if (name === 'batch_update') return `批量修改 ${(args.slugs || []).length} 篇文章`;
+  return name;
+}
+
+async function runAgent(userMessages, context) {
+  const system =
+    '你是「未完成的地图」博客后台的管理助手，站点作者是地理信息科学方向的研究生。你可以通过工具了解与修改后台内容：' +
+    'list_posts / get_post / get_taxonomy 为只读，可以直接调用；' +
+    'update_post / batch_update 是写操作：这两种工具的调用会被系统安全地放入「待用户确认」队列，而不会直接执行任何修改，' +
+    '所以你应当放心直接调用它们（参数填具体），并在回复中向用户清楚说明准备做什么改动；用户在前端点击确认后修改才会真正落盘。不要只是口头描述改动而拒绝调用工具。' +
+    '效率原则：改日期/分类/章节/标签/可见性等元信息时，直接调用 update_post 只传要改的字段即可，不要先 get_post 读全文（正文很长，会浪费大量时间与 token）；' +
+    '批量修改（如把一批隐藏文章全部设为显示）时，先 list_posts 一次拿到 slug 列表，再直接调用一次 batch_update 完成，绝对不要逐篇 get_post。' +
+    '只有润色/重写/扩写正文时才需要 get_post 读取全文，并在给出结果时直接输出完整的新 Markdown 正文。' +
+    '文风朴素专业，少堆砌术语；回答用中文。' +
+    (context ? `\n\n【当前界面上下文】\n${context}` : '');
+  const msgs = [{ role: 'system', content: system }, ...userMessages];
+  const pending = [];
+  const toolLog = [];
+  for (let round = 0; round < 6; round++) {
+    const msg = await aiComplete(msgs, { tools: AI_TOOLS });
+    if (!msg) return { reply: 'AI 没有返回内容', pending, toolLog };
+    const calls = Array.isArray(msg.tool_calls) ? msg.tool_calls : [];
+    if (!calls.length) return { reply: msg.content ?? '', pending, toolLog };
+    msgs.push({ role: 'assistant', content: msg.content ?? null, tool_calls: msg.tool_calls });
+    for (const tc of calls) {
+      let args = {};
+      try {
+        args = JSON.parse(tc.function.arguments || '{}');
+      } catch {}
+      const name = tc.function.name;
+      let out;
+      try {
+        if (name === 'list_posts') out = aiListPosts(args);
+        else if (name === 'get_post') out = await aiGetPost(args);
+        else if (name === 'get_taxonomy') out = aiGetTaxonomy();
+        else if (name === 'update_post' || name === 'batch_update') {
+          out = { pending: true, note: '写操作待用户确认，前端确认后会执行，请先向用户说明改动内容并等待确认。' };
+          pending.push({ name, args });
+        } else out = { error: `未知工具：${name}` };
+      } catch (err) {
+        out = { error: `工具执行失败：${err?.message || err}` };
+      }
+      toolLog.push({ name, args, friendly: aiToolFriendly(name, args) });
+      msgs.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify(out).slice(0, 20000) });
+    }
+  }
+  return { reply: '本次对话的工具调用次数已达上限，请把要求拆分后再试。', pending, toolLog };
+}
+ 
+ const TYPES = ['notes', 'research', 'projects'];
 
 /* ---------------- 与 lib/content.ts 一致的 slug 规则 ---------------- */
 
@@ -288,7 +679,7 @@ async function handle(req, res) {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+      'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type,x-admin-token',
     });
     return res.end();
@@ -674,6 +1065,64 @@ async function handle(req, res) {
     }
     fs.writeFileSync(taxFile, JSON.stringify(tax, null, 2) + '\n', 'utf-8');
     return json(res, 200, { ok: true, updated });
+  }
+
+  /* ---- AI 代理：/api/ai/chat（OpenAI 兼容 /chat/completions，仅本地后台使用）
+       两种请求格式：
+       1) { text, mode:'polish' } —— 旧版一键润色
+       2) { messages:[{role,content}...], context? } —— AI 助手多轮对话（Agent） ---- */
+  if (p === '/api/ai/chat' && req.method === 'POST') {
+    try {
+      const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+      if (!AI.baseURL || !AI.apiKey)
+        return json(res, 400, {
+          error:
+            '未配置 AI：请在 site.config.json 添加 ai 字段（baseURL / apiKey / model），或用环境变量 ADMIN_AI_BASE_URL / ADMIN_AI_API_KEY / ADMIN_AI_MODEL',
+        });
+
+      // 格式 2：Agent 多轮对话
+      if (Array.isArray(body.messages)) {
+        const msgs = body.messages
+          .filter((m) => m && typeof m.content === 'string' && m.content.trim())
+          .map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }));
+        if (!msgs.length) return json(res, 400, { error: '对话内容为空' });
+        const context = String(body.context || '').slice(0, 6000);
+
+        // 流式：NDJSON 逐事件输出（工具日志 + 文字增量）
+        if (body.stream === true) {
+          res.writeHead(200, {
+            'Content-Type': 'application/x-ndjson; charset=utf-8',
+            'Cache-Control': 'no-cache',
+            Connection: 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+          });
+          try {
+            await runAgentStream(msgs, context, (ev) => res.write(JSON.stringify(ev) + '\n'));
+          } catch (err) {
+            res.write(JSON.stringify({ type: 'error', message: `AI 代理异常：${err?.message || err}` }) + '\n');
+          }
+          res.end();
+          return;
+        }
+
+        const out = await runAgent(msgs, context);
+        return json(res, 200, { ok: true, ...out });
+      }
+
+      // 格式 1：一键润色（保留旧行为）
+      const text = String(body.text || '').trim();
+      if (!text) return json(res, 400, { error: '正文为空，无法润色' });
+      const system =
+        '你是中文 GIS 技术博客（未完成的地图）的写作助手，作者是地理信息科学方向研究生，文风朴素专业、少堆砌术语。请润色用户提供的 Markdown 文章：修正错别字与语法、理顺句式与段落，保留原有结构、层级、代码块、图片、链接与列表，不新增虚假事实，不改变排版骨架，直接输出润色后的完整 Markdown。';
+      const msg = await aiComplete([
+        { role: 'system', content: system },
+        { role: 'user', content: `请润色下面这篇 Markdown 文章，直接输出润色后的完整内容：\n\n${text}` },
+      ]);
+      if (!msg) return json(res, 502, { error: 'AI 返回内容为空，请检查 model 名称是否正确' });
+      return json(res, 200, { ok: true, text: msg.content ?? '' });
+    } catch (err) {
+      return json(res, 500, { error: `AI 代理异常：${err?.message || err}` });
+    }
   }
 
   /* ---- 图片上传（原始二进制 body，?name= 文件名） ---- */

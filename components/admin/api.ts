@@ -2,7 +2,9 @@
 
 /** 后台 API 客户端：目标是本地 admin-server（127.0.0.1:3001） */
 
-export const API_BASE = 'http://127.0.0.1:3001';
+// 本地开发默认直连 127.0.0.1:3001；服务器部署时构建命令注入
+// NEXT_PUBLIC_ADMIN_API=/api 走同源相对路径（由 Nginx 反代到后台服务）
+export const API_BASE = (process.env.NEXT_PUBLIC_ADMIN_API as string) || 'http://127.0.0.1:3001';
 const TOKEN_KEY = 'ez-admin-token';
 
 export function getToken(): string {

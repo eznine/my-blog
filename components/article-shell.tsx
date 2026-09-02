@@ -4,6 +4,7 @@ import { DesktopToc } from './desktop-toc';
 import { MobileTocRail } from './mobile-toc-rail';
 import { ReadingProgress } from './reading-progress';
 import { TagChip } from './tag-chip';
+import { SparkField } from './spark-field';
 
 export interface AdjacentLink {
   href: string;
@@ -90,16 +91,24 @@ export function ArticleShell({
                     href={prev.href}
                     className="explore-card group rounded-xl p-5"
                   >
-                    <div className="mono-label">← 较新一篇</div>
-                    <div className="mt-2 text-[16px] font-semibold text-ink group-hover:text-accent">{prev.title}</div>
+                    <span className="corner" aria-hidden="true" />
+                    <SparkField />
+                    <div className="relative">
+                      <div className="mono-label">← 上一篇</div>
+                      <div className="mt-2 text-[16px] font-semibold text-ink group-hover:text-accent">{prev.title}</div>
+                    </div>
                   </Link>
                 ) : (
                   <div />
                 )}
                 {next && (
                   <Link href={next.href} className="explore-card group rounded-xl p-5 text-right">
-                    <div className="mono-label">较旧一篇 →</div>
-                    <div className="mt-2 text-[16px] font-semibold text-ink group-hover:text-accent">{next.title}</div>
+                    <span className="corner" aria-hidden="true" />
+                    <SparkField />
+                    <div className="relative">
+                      <div className="mono-label">下一篇 →</div>
+                      <div className="mt-2 text-[16px] font-semibold text-ink group-hover:text-accent">{next.title}</div>
+                    </div>
                   </Link>
                 )}
               </nav>

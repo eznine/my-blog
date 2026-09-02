@@ -21,6 +21,8 @@ import { TaxonomyManager } from './taxonomy-manager';
 import { AppearanceManager } from './appearance-manager';
 import { TaxonomySelect } from './taxonomy-select';
 import { ListPreview } from './list-preview';
+import { AiAssistant } from './ai-assistant';
+import { setAiContext, onAiDataChanged } from '@/lib/ai-context';
 
 type View = 'login' | 'list' | 'editor' | 'taxonomy' | 'appearance';
 
@@ -113,6 +115,7 @@ interface EditorTarget {
 
 export function AdminApp() {
   const [view, setView] = useState<View>('login');
+  const [aiOpen, setAiOpen] = useState(false);
 
   /* ---- 视图与浏览器历史联动：进入编辑/分类/外观可 pushState，浏览器后退/「返回」可直接回列表 ---- */
   const navView = (v: View) => {
@@ -125,6 +128,30 @@ export function AdminApp() {
     if (window.history.state?.v) window.history.back();
     else setView('list');
   };
+
+  /* ---- AI 助手：右侧侧边栏（打开时把内容挤过去，不遮挡）；未打开时是右侧竖条入口 ---- */
+  const aiControl = aiOpen ? (
+    <AiAssistant
+      onClose={() => {
+        setAiOpen(false);
+      }}
+    />
+  ) : (
+    <button
+      onClick={() => setAiOpen(true)}
+      title="打开 AI 助手"
+      className="sticky top-24 flex h-32 w-9 shrink-0 items-center justify-center rounded-lg border border-line bg-panel/90 font-mono text-[11px] tracking-[0.2em] text-ink-soft backdrop-blur transition-colors hover:border-accent/60 hover:text-accent"
+      style={{ writingMode: 'vertical-rl', boxShadow: 'var(--shadow)' }}
+    >
+      AI 助手
+    </button>
+  );
+  const renderView = (node: ReactNode) => (
+    <div className="flex items-start gap-5">
+      <div className="min-w-0 flex-1">{node}</div>
+      {aiControl}
+    </div>
+  );
   useEffect(() => {
     const onPop = () => {
       const st = window.history.state as { v?: View } | null;
@@ -328,6 +355,28 @@ export function AdminApp() {
     if (view === 'list') loadPosts(type);
   }, [view, type, loadPosts]);
 
+  /* ---- AI 助手上下文：列表页告诉 AI 当前看到了什么 ---- */
+  useEffect(() => {
+    if (view !== 'list') return;
+    const f = posts
+      .filter((p) =>
+        listQuery.trim()
+          ? `${p.title} ${p.summary ?? ''} ${(p.tags || []).join(' ')}`.toLowerCase().includes(listQuery.trim().toLowerCase())
+          : true
+      )
+      .filter((p) => (listCat ? p.category === listCat : true))
+      .filter((p) => (listChapter ? p.chapter === listChapter : true))
+      .filter((p) => (listTag ? (p.tags || []).includes(listTag) : true));
+    const head = `正在查看：${TYPE_LABELS[type]} 文章列表\n当前筛选：分类=${listCat ?? '不限'} 章节=${listChapter ?? '不限'} 标签=${listTag ?? '不限'} 关键词=${listQuery || '无'}\n共 ${f.length} 篇：`;
+    const lines = f.slice(0, 60).map(
+      (p) => `- ${p.slug} | ${p.title} | ${p.date ?? ''} | ${p.category ?? ''}/${p.chapter ?? ''} | 标签:${(p.tags || []).join(',') || '无'}`
+    );
+    setAiContext(`${head}\n${lines.join('\n')}`);
+  }, [view, type, posts, listQuery, listCat, listChapter, listTag]);
+
+  /* ---- AI 助手执行写操作后，刷新列表 ---- */
+  useEffect(() => onAiDataChanged(() => loadPosts(type)), [type, loadPosts]);
+
   const remove = async (slug: string, title: string) => {
     if (!window.confirm(`确定删除《${title}》？此操作会删除源文件，不可恢复。`)) return;
     try {
@@ -521,7 +570,7 @@ export function AdminApp() {
       }
       return true;
     });
-  }, [posts, listQuery, listCat, listTag]);
+  }, [posts, listQuery, listCat, listChapter, listTag]);
 
   const allSelected = filteredPosts.length > 0 && filteredPosts.every((p) => selected.has(p.slug));
   const toggleAll = () =>
@@ -679,7 +728,7 @@ export function AdminApp() {
 
   /* ================= 编辑器 / 分类标签 ================= */
   if (view === 'editor' && editorTarget) {
-    return (
+    return renderView(
       <PostEditor
         key={editorTarget.slug || 'new'}
         type={editorTarget.type}
@@ -693,7 +742,7 @@ export function AdminApp() {
   }
 
   if (view === 'taxonomy') {
-    return (
+    return renderView(
       <TaxonomyManager
         onBack={() => {
           navList();
@@ -703,7 +752,7 @@ export function AdminApp() {
   }
 
   if (view === 'appearance') {
-    return (
+    return renderView(
       <AppearanceManager
         onBack={() => {
           navList();
@@ -713,7 +762,7 @@ export function AdminApp() {
   }
 
   /* ================= 文章列表 ================= */
-  return (
+  return renderView(
     <div className="mx-auto max-w-6xl px-6 pb-24 pt-10 md:pt-14">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>

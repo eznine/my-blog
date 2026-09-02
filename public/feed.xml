@@ -2,218 +2,218 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>EZNINE · 张鹏</title>
-    <link>https://github.com/eznine/my-blog/</link>
+    <link>https://github.com/eznine/</link>
     <description>地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 01 Sep 2026 16:15:19 GMT</lastBuildDate>
-    <atom:link href="https://github.com/eznine/my-blog/feed.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>Wed, 02 Sep 2026 04:26:37 GMT</lastBuildDate>
+    <atom:link href="https://github.com/eznine/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>气溶胶反演</title>
-      <link>https://github.com/eznine/my-blog/notes/42/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/42/</guid>
+      <link>https://github.com/eznine/notes/42/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/42/</guid>
       <pubDate>Fri, 12 Jun 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>秸秆焚烧遥感监测</title>
-      <link>https://github.com/eznine/my-blog/notes/36/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/36/</guid>
+      <link>https://github.com/eznine/notes/36/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/36/</guid>
       <pubDate>Tue, 19 May 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>NumPy</title>
-      <link>https://github.com/eznine/my-blog/notes/python-numpy/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-numpy/</guid>
+      <link>https://github.com/eznine/notes/python-numpy/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-numpy/</guid>
       <pubDate>Wed, 29 Apr 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>geopandas</title>
-      <link>https://github.com/eznine/my-blog/notes/python-geopandas/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-geopandas/</guid>
+      <link>https://github.com/eznine/notes/python-geopandas/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-geopandas/</guid>
       <pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>rasterio</title>
-      <link>https://github.com/eznine/my-blog/notes/python-rasterio/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-rasterio/</guid>
+      <link>https://github.com/eznine/notes/python-rasterio/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-rasterio/</guid>
       <pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>SAR</title>
-      <link>https://github.com/eznine/my-blog/notes/sar-sar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/sar-sar/</guid>
+      <link>https://github.com/eznine/notes/sar-sar/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/sar-sar/</guid>
       <pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>高分辨率影像预处理</title>
-      <link>https://github.com/eznine/my-blog/notes/envi-41/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/envi-41/</guid>
+      <link>https://github.com/eznine/notes/envi-41/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/envi-41/</guid>
       <pubDate>Wed, 11 Mar 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>SBAS-InSAR</title>
-      <link>https://github.com/eznine/my-blog/notes/sar-sbas-insar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/sar-sbas-insar/</guid>
+      <link>https://github.com/eznine/notes/sar-sbas-insar/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/sar-sbas-insar/</guid>
       <pubDate>Tue, 03 Mar 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>DInSAR-形变监测</title>
-      <link>https://github.com/eznine/my-blog/notes/sar-dinsar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/sar-dinsar/</guid>
+      <link>https://github.com/eznine/notes/sar-dinsar/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/sar-dinsar/</guid>
       <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>InSAR-制作DEM</title>
-      <link>https://github.com/eznine/my-blog/notes/sar-insar-dem/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/sar-insar-dem/</guid>
+      <link>https://github.com/eznine/notes/sar-insar-dem/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/sar-insar-dem/</guid>
       <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>SAR数据处理</title>
-      <link>https://github.com/eznine/my-blog/notes/sar-sar-2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/sar-sar-2/</guid>
+      <link>https://github.com/eznine/notes/sar-sar-2/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/sar-sar-2/</guid>
       <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>(FVC)基于像元二分模型的植被覆盖度反演</title>
-      <link>https://github.com/eznine/my-blog/notes/fvc/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/fvc/</guid>
+      <link>https://github.com/eznine/notes/fvc/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/fvc/</guid>
       <pubDate>Sat, 21 Feb 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>可视化</title>
-      <link>https://github.com/eznine/my-blog/notes/geemap-5-2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/geemap-5-2/</guid>
+      <link>https://github.com/eznine/notes/geemap-5-2/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-5-2/</guid>
       <pubDate>Mon, 09 Feb 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>JS代码转成Python</title>
-      <link>https://github.com/eznine/my-blog/notes/geemap-js-python/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/geemap-js-python/</guid>
+      <link>https://github.com/eznine/notes/geemap-js-python/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-js-python/</guid>
       <pubDate>Fri, 06 Feb 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>数据导出</title>
-      <link>https://github.com/eznine/my-blog/notes/geemap-32/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/geemap-32/</guid>
+      <link>https://github.com/eznine/notes/geemap-32/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-32/</guid>
       <pubDate>Fri, 06 Feb 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>导入数据</title>
-      <link>https://github.com/eznine/my-blog/notes/geemap-p3/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/geemap-p3/</guid>
+      <link>https://github.com/eznine/notes/geemap-p3/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-p3/</guid>
       <pubDate>Mon, 02 Feb 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>创建地图</title>
-      <link>https://github.com/eznine/my-blog/notes/geemap-p2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/geemap-p2/</guid>
+      <link>https://github.com/eznine/notes/geemap-p2/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-p2/</guid>
       <pubDate>Sat, 31 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>基于高分辨率影像城市绿地信息提取</title>
-      <link>https://github.com/eznine/my-blog/notes/envi-34/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/envi-34/</guid>
+      <link>https://github.com/eznine/notes/envi-34/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/envi-34/</guid>
       <pubDate>Fri, 30 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>水质监测（富营养化）</title>
-      <link>https://github.com/eznine/my-blog/notes/35/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/35/</guid>
+      <link>https://github.com/eznine/notes/35/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/35/</guid>
       <pubDate>Fri, 30 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>配置</title>
-      <link>https://github.com/eznine/my-blog/notes/geemap-33/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/geemap-33/</guid>
+      <link>https://github.com/eznine/notes/geemap-33/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-33/</guid>
       <pubDate>Thu, 29 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>模块</title>
-      <link>https://github.com/eznine/my-blog/notes/python-5/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-5/</guid>
+      <link>https://github.com/eznine/notes/python-5/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-5/</guid>
       <pubDate>Sat, 24 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>错误与异常</title>
-      <link>https://github.com/eznine/my-blog/notes/python-6/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-6/</guid>
+      <link>https://github.com/eznine/notes/python-6/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-6/</guid>
       <pubDate>Tue, 20 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>面向对象</title>
-      <link>https://github.com/eznine/my-blog/notes/python-7/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-7/</guid>
+      <link>https://github.com/eznine/notes/python-7/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-7/</guid>
       <pubDate>Sun, 18 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>低分辨率影像预处理</title>
-      <link>https://github.com/eznine/my-blog/notes/envi-modis/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/envi-modis/</guid>
+      <link>https://github.com/eznine/notes/envi-modis/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/envi-modis/</guid>
       <pubDate>Sat, 17 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>遥感影像处理</title>
-      <link>https://github.com/eznine/my-blog/notes/envi-40/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/envi-40/</guid>
+      <link>https://github.com/eznine/notes/envi-40/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/envi-40/</guid>
       <pubDate>Sat, 17 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>数据容器</title>
-      <link>https://github.com/eznine/my-blog/notes/python-4/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-4/</guid>
+      <link>https://github.com/eznine/notes/python-4/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-4/</guid>
       <pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>软件操作</title>
-      <link>https://github.com/eznine/my-blog/notes/envi-38/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/envi-38/</guid>
+      <link>https://github.com/eznine/notes/envi-38/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/envi-38/</guid>
       <pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>软件认识</title>
-      <link>https://github.com/eznine/my-blog/notes/envi-39/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/envi-39/</guid>
+      <link>https://github.com/eznine/notes/envi-39/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/envi-39/</guid>
       <pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>函数</title>
-      <link>https://github.com/eznine/my-blog/notes/python-2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-2/</guid>
+      <link>https://github.com/eznine/notes/python-2/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-2/</guid>
       <pubDate>Wed, 14 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
       <title>基础语法</title>
-      <link>https://github.com/eznine/my-blog/notes/python-3/</link>
-      <guid isPermaLink="true">https://github.com/eznine/my-blog/notes/python-3/</guid>
+      <link>https://github.com/eznine/notes/python-3/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/python-3/</guid>
       <pubDate>Sun, 11 Jan 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>

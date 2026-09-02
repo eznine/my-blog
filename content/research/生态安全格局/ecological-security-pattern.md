@@ -1,11 +1,13 @@
 ---
 title: "黄土矿区生态安全格局构建：MSPA + MCR + 电路理论"
-date: 2026-03-20
-category: 生态安全格局
-tags: [MSPA, MCR, InVEST, 电路理论, 景观连通性]
-status: 在研
+date: "2026-03-20"
 summary: "以黄土高原采煤沉陷区为研究区，耦合形态学空间格局分析、最小累积阻力模型与电路理论，识别生态源地、廊道与战略节点。"
+category: "生态安全格局"
+hidden: true
+tags: ["MSPA","MCR","InVEST","电路理论","景观连通性"]
+status: "在研"
 ---
+
 
 ## 研究背景
 

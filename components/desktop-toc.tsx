@@ -9,7 +9,8 @@ export function DesktopToc({ headings }: { headings: Heading[] }) {
   if (headings.length === 0) return null;
 
   return (
-    <nav aria-label="目录" className="sticky top-24 hidden w-60 shrink-0 self-start xl:block">
+    <nav aria-label="目录" className="sticky top-24 hidden w-60 shrink-0 self-start overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:block"
+      style={{ maxHeight: 'calc(100svh - 7rem)' }}>
       <div className="mono-label mb-4 flex items-center gap-2.5">
         <span className="marker-dot is-live !h-[5px] !w-[5px]" />
         INDEX · 目录

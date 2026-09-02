@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { renderMarkdown } from '@/lib/md';
 import { TaxonomySelect } from './taxonomy-select';
+import { setAiContext } from '@/lib/ai-context';
 import {
   api,
   uploadImage,
@@ -131,6 +132,34 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+  const setRef = useRef(set);
+  setRef.current = set;
+
+  /* ---- AI 助手上下文：把正在编辑的文章告诉 AI ---- */
+  useEffect(() => {
+    const ctx = [
+      `正在编辑：${TYPE_LABELS[type]} 文章（slug: ${slug ?? '（新建）'}）`,
+      `标题：${form.title || '（未填）'}`,
+      `分类：${form.category || '（未分类）'} / 章节：${form.chapter || '（无章节）'}`,
+      `标签：${form.tags.join(', ') || '无'}`,
+      `状态：${form.status || '默认'}`,
+      '',
+      '【正文 Markdown】',
+      form.content.slice(0, 15000) || '（正文为空）',
+    ].join('\n');
+    setAiContext(ctx.slice(0, 20000));
+  });
+
+  /* ---- AI 助手「应用到正文」事件 ---- */
+  useEffect(() => {
+    const onInsert = (e: Event) => {
+      const text = (e as CustomEvent<string>).detail;
+      if (!text) return;
+      setRef.current('content', text.replace(/^#\s+.+\n+/, '').replace(/^---[\s\S]*?---\s*/, ''));
+    };
+    window.addEventListener('ai-insert-content', onInsert);
+    return () => window.removeEventListener('ai-insert-content', onInsert);
+  }, []);
 
   /* ---- 标签 ---- */
   const allTagSuggestions = useMemo(() => {
@@ -502,6 +531,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
                 {uploading ? '上传中…' : '图片 ↑'}
               </button>
               <input ref={fileRef} type="file" accept="image/*" hidden onChange={onImage} />
+              <span className="mx-1 h-4 w-px bg-line" />
               <div className="ml-auto flex items-center gap-3">
                 <span className="font-mono text-[11px] text-ink-faint">
                   {form.content.length} 字符
