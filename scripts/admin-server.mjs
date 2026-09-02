@@ -12,9 +12,10 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { spawn } from 'node:child_process';
+import { spawn, execSync } from 'node:child_process';
 
 const PORT = Number(process.env.ADMIN_PORT || 3001);
+const SERVER_STARTED_AT = Date.now();
 const ROOT = process.cwd();
 const CONTENT = path.join(ROOT, 'content');
 const UPLOADS = path.join(ROOT, 'public', 'uploads');
@@ -749,6 +750,27 @@ async function handle(req, res) {
     const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
     if (body.password === PASSWORD) return json(res, 200, { ok: true, token: TOKEN });
     return json(res, 401, { error: '密码错误' });
+  }
+
+  /* ---- 版本信息（无需鉴权）：最近一次 git 提交 + 服务启动时间 ---- */
+  if (p === '/api/version' && req.method === 'GET') {
+    let commit = '';
+    let committedAt = '';
+    let branch = '';
+    try {
+      commit = execSync('git rev-parse --short HEAD', { cwd: ROOT, encoding: 'utf-8' }).trim();
+      committedAt = execSync('git log -1 --format=%cd --date=iso-strict', {
+        cwd: ROOT,
+        encoding: 'utf-8',
+      }).trim();
+      branch = execSync('git rev-parse --abbrev-ref HEAD', { cwd: ROOT, encoding: 'utf-8' }).trim();
+    } catch {}
+    return json(res, 200, {
+      commit: commit || 'unknown',
+      branch: branch || 'unknown',
+      committedAt,
+      serverStartedAt: new Date(SERVER_STARTED_AT).toISOString(),
+    });
   }
 
   /* ---- 其余全部需要鉴权 ---- */

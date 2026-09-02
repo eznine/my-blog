@@ -146,7 +146,10 @@ export function TopoShaderField({ className }: { className?: string }) {
     const uInk = U('uInk');
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // 移动端性能优先：分辨率降到 1 倍像素、帧率限 30fps（背景动效肉眼几乎无差，功耗/卡顿大幅改善）
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 2);
+    const frameInterval = isMobile ? 33 : 0;
 
     let ink: number[] = [0.925, 0.898, 0.82];
     const readInk = () => {
@@ -213,14 +216,17 @@ export function TopoShaderField({ className }: { className?: string }) {
 
     let raf = 0;
     let running = true;
+    let lastDraw = 0;
     const loop = (now: number) => {
       if (!running) return;
+      raf = requestAnimationFrame(loop);
+      if (frameInterval && now - lastDraw < frameInterval) return;
+      lastDraw = now;
       cur[0] += 0.1 * (tgt[0] - cur[0]);
       cur[1] += 0.1 * (tgt[1] - cur[1]);
       act += 0.06 * (tgtOn - act);
       if (act < 0.001) act = 0;
       draw(now, t0);
-      raf = requestAnimationFrame(loop);
     };
 
     const ro = new ResizeObserver(resize);

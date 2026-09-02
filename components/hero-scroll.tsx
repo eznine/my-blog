@@ -62,16 +62,25 @@ export function HeroScroll({
     });
     const hint = stage.querySelector<HTMLElement>('[data-hs-hint]');
 
-    // 站内返回首页：直接定位到开场完成处（p=1），不再重播开场（瞬时跳转，避免 smooth 滚动动画）
+    // 站内返回首页：直接定位到开场完成处（p=1），不再重播开场。
+    // 持续钉住 1.2s：Next 路由切换会带 smooth 滚动把位置拉回顶部，期间反复归位，钉住期结束后恢复原滚动行为。
     const viewportEl = stage.querySelector<HTMLElement>('.hero-sticky-viewport');
     if (hasVisitedNonHome()) {
-      const vh = viewportEl?.offsetHeight || window.innerHeight;
-      const y = stage.getBoundingClientRect().top + window.scrollY + stage.offsetHeight - vh;
       const el = document.documentElement;
-      const prev = el.style.scrollBehavior;
+      const prevBehavior = el.style.scrollBehavior;
       el.style.scrollBehavior = 'auto';
-      window.scrollTo(0, Math.max(0, y));
-      el.style.scrollBehavior = prev;
+      const targetY = () => {
+        const vh = viewportEl?.offsetHeight || window.innerHeight;
+        return Math.max(0, stage.getBoundingClientRect().top + window.scrollY + stage.offsetHeight - vh);
+      };
+      window.scrollTo(0, targetY());
+      const until = performance.now() + 1200;
+      const pin = () => {
+        window.scrollTo(0, targetY());
+        if (performance.now() < until) requestAnimationFrame(pin);
+        else el.style.scrollBehavior = prevBehavior;
+      };
+      requestAnimationFrame(pin);
     }
 
     let raf = 0;

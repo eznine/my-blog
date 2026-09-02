@@ -315,6 +315,25 @@ export function AdminApp() {
       .finally(() => setChecked(true));
   }, []);
 
+  /* ---- 版本信息：最近一次代码修改（提交编号/时间）+ 服务启动时间 ---- */
+  const [version, setVersion] = useState<{
+    commit: string;
+    branch: string;
+    committedAt: string;
+    serverStartedAt: string;
+  } | null>(null);
+  useEffect(() => {
+    api<{ commit: string; branch: string; committedAt: string; serverStartedAt: string }>('/api/version')
+      .then(setVersion)
+      .catch(() => {});
+  }, []);
+  const fmtVer = (iso: string) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+
   const login = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -770,6 +789,11 @@ export function AdminApp() {
             <span className="marker-dot is-live !h-[5px] !w-[5px]" />
             ADMIN · 内容管理
           </div>
+          {version && (
+            <div className="mono-label mt-1.5 !text-ink-faint" title={`分支 ${version.branch} · 服务启动 ${fmtVer(version.serverStartedAt)}`}>
+              VER {version.commit} · 代码修改 {fmtVer(version.committedAt)} · 服务启动 {fmtVer(version.serverStartedAt)}
+            </div>
+          )}
           <h1 className="mt-3 text-3xl font-black tracking-tight text-ink">文章管理</h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
