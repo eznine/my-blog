@@ -167,3 +167,21 @@ public/uploads/      后台上传的图片
 
 * [ ] feed.xml 生成脚本若确认不要 RSS 可删
 
+## 八、生产部署（自建服务器，2026-09 上线）
+
+* 服务器：Azure VM Ubuntu 22.04（公网 IP 20.214.241.113），仓库在 `/srv/my-blog`
+
+* 架构：Nginx（80）托管 `out/` 静态站 + `/api/` 反代 127.0.0.1:3001（`proxy_buffering off` 必须，否则 AI 流式断）+ systemd 服务 `my-blog-admin`（开机自启，跑 `node scripts/admin-server.mjs`）
+
+* **部署流程（重要）**：本地改完代码 → `git push` → 服务器 `cd /srv/my-blog && git checkout -- public/feed.xml public/sitemap.xml && git pull && NEXT_PUBLIC_ADMIN_API=/api NODE_OPTIONS='--max-old-space-size=2048' npm run build` → **必须** **`sudo systemctl restart my-blog-admin`**（后台是旧代码进程，不重启新功能/接口不生效）
+
+* **NEXT\_PUBLIC\_ADMIN\_API=/api 必须传**：不传则后台页所有 API 硬编码指向访问者本机 127.0.0.1:3001，后台全废；验证方法 `grep -rl '127.0.0.1:3001' out/_next | wc -l` 应为 0
+
+* 服务器 `site.config.json`（adminPassword + ai 配置）不入库，修改后同样要重启服务才生效
+
+* 访问：`http://20.214.241.113` 前台、`/admin` 后台；Azure NSG 已开放 80/443（443 暂未启用证书），公网直连 3001 未开放（安全）
+
+* 服务器小内存：build 需 `NODE_OPTIONS='--max-old-space-size=2048'`，OOM(SIGKILL) 时加 swap 解决
+
+* 防火墙只放行 80/443/22；SSH 免密（本地 `ssh eznine` 别名）。**敏感凭据绝不写进本文件与 README**
+

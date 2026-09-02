@@ -12,6 +12,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { spawn } from 'node:child_process';
 
 const PORT = Number(process.env.ADMIN_PORT || 3001);
 const ROOT = process.cwd();
@@ -32,6 +33,64 @@ const AI = {
   apiKey: (process.env.ADMIN_AI_API_KEY || cfg.ai?.apiKey || '').trim(),
   model: (process.env.ADMIN_AI_MODEL || cfg.ai?.model || 'deepseek-chat').trim(),
 };
+
+/* ---- 自动重建（服务器部署用，ADMIN_AUTO_REBUILD=1 时启用）：
+      内容/外观/分类保存后防抖触发 npm run build（DIST_DIR=out.tmp），
+      成功后原子切换 out/，前台立即生效、构建过程不闪断。 ---- */
+const AUTO_REBUILD = process.env.ADMIN_AUTO_REBUILD === '1';
+let rebuildTimer = null;
+let rebuilding = false;
+let pendingAgain = false;
+
+function scheduleRebuild(delay = 2500) {
+  if (!AUTO_REBUILD) return;
+  clearTimeout(rebuildTimer);
+  rebuildTimer = setTimeout(runRebuild, delay);
+}
+
+function runRebuild() {
+  if (rebuilding) {
+    pendingAgain = true;
+    return;
+  }
+  rebuilding = true;
+  const started = Date.now();
+  const child = spawn('npm', ['run', 'build'], {
+    cwd: ROOT,
+    env: {
+      ...process.env,
+      DIST_DIR: 'out.tmp',
+      NEXT_PUBLIC_ADMIN_API: process.env.NEXT_PUBLIC_ADMIN_API || '/api',
+      NODE_OPTIONS: '--max-old-space-size=2048',
+    },
+    shell: true,
+    stdio: 'inherit',
+  });
+  child.on('exit', (code) => {
+    rebuilding = false;
+    if (code === 0) {
+      try {
+        const outDir = path.join(ROOT, 'out');
+        const tmpDir = path.join(ROOT, 'out.tmp');
+        const oldDir = outDir + '.old';
+        if (fs.existsSync(oldDir)) fs.rmSync(oldDir, { recursive: true, force: true });
+        if (fs.existsSync(outDir)) fs.renameSync(outDir, oldDir);
+        fs.renameSync(tmpDir, outDir);
+        fs.rmSync(oldDir, { recursive: true, force: true });
+        console.log(`[rebuild] OK ${Date.now() - started}ms, out/ 已切换`);
+      } catch (e) {
+        console.error('[rebuild] 切换 out/ 失败:', e.message);
+      }
+    } else {
+      console.error(`[rebuild] build 失败 code=${code}`);
+      fs.rmSync(path.join(ROOT, 'out.tmp'), { recursive: true, force: true });
+    }
+    if (pendingAgain) {
+      pendingAgain = false;
+      scheduleRebuild(500);
+    }
+  });
+}
 
 /* ---- AI 助手工具定义（OpenAI 兼容 function calling） ---- */
 const TYPES_NAMES = ['notes', 'research', 'projects'];
@@ -740,6 +799,7 @@ async function handle(req, res) {
     const { file, slug } = placeFile(type, dirs, meta.slug || meta.title || '');
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, buildFrontmatter(meta) + '\n' + (meta.content || ''), 'utf-8');
+    scheduleRebuild();
     return json(res, 200, { ok: true, slug });
   }
 
@@ -760,6 +820,7 @@ async function handle(req, res) {
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, buildFrontmatter(body) + '\n' + (body.content || ''), 'utf-8');
     if (target !== old.file) fs.unlinkSync(old.file);
+    scheduleRebuild();
     return json(res, 200, { ok: true, slug: newSlug });
   }
 
@@ -784,6 +845,7 @@ async function handle(req, res) {
       else delete data.category;
     }
     fs.writeFileSync(f.file, buildFrontmatter(data) + '\n' + (content || ''), 'utf-8');
+    scheduleRebuild();
     return json(res, 200, { ok: true, slug: f.slug, date: data.date, category: data.category });
   }
 
@@ -804,6 +866,7 @@ async function handle(req, res) {
       fs.writeFileSync(f.file, buildFrontmatter(data) + '\n' + (content || ''), 'utf-8');
       updated++;
     }
+    scheduleRebuild();
     return json(res, 200, { ok: true, updated });
   }
 
@@ -821,6 +884,7 @@ async function handle(req, res) {
       const grand = path.dirname(parent);
       if (path.dirname(grand) === typeRoot && !fs.readdirSync(grand).length) fs.rmdirSync(grand);
     } catch {}
+    scheduleRebuild();
     return json(res, 200, { ok: true });
   }
 
@@ -863,6 +927,7 @@ async function handle(req, res) {
       fs.writeFileSync(file, buildFrontmatter(meta) + '\n' + content, 'utf-8');
       items.push({ slug, title: meta.title });
     }
+    scheduleRebuild();
     return json(res, 200, { ok: true, imported: items.length, items, skipped });
   }
 
@@ -891,6 +956,7 @@ async function handle(req, res) {
         fs.unlinkSync(f.file);
         cleanupEmpty(f.file);
       }
+      scheduleRebuild();
       return json(res, 200, { ok: true, deleted: files.length });
     }
 
@@ -954,6 +1020,7 @@ async function handle(req, res) {
         }
         updated += 1;
       }
+      scheduleRebuild();
       return json(res, 200, { ok: true, updated, moved });
     }
 
@@ -976,6 +1043,7 @@ async function handle(req, res) {
     }
     const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
     fs.writeFileSync(file, JSON.stringify(body, null, 2) + '\n', 'utf-8');
+    scheduleRebuild();
     return json(res, 200, { ok: true });
   }
 
@@ -1008,9 +1076,12 @@ async function handle(req, res) {
       }
       return json(res, 200, data);
     }
-    const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
-    fs.writeFileSync(file, JSON.stringify(body, null, 2) + '\n', 'utf-8');
-    return json(res, 200, { ok: true });
+    if (req.method === 'PUT') {
+      const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+      fs.writeFileSync(file, JSON.stringify(body, null, 2) + '\n', 'utf-8');
+      scheduleRebuild();
+      return json(res, 200, { ok: true });
+    }
   }
 
   /* ---- 重命名大类 / 章节：级联更新该类型所有文章的 frontmatter 与 taxonomy ---- */
@@ -1064,6 +1135,7 @@ async function handle(req, res) {
       tax.chapters[owner] = tax.chapters[owner].map((c) => (c === from ? to : c));
     }
     fs.writeFileSync(taxFile, JSON.stringify(tax, null, 2) + '\n', 'utf-8');
+    scheduleRebuild();
     return json(res, 200, { ok: true, updated });
   }
 
