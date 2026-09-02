@@ -1,5 +1,4 @@
 ﻿import type { Metadata } from 'next';
-import { getPage } from '@/lib/content';
 import { site } from '@/lib/site';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
@@ -9,9 +8,7 @@ export const metadata: Metadata = {
   description: `${site.name} · ${site.identity} · ${site.affiliation}`,
 };
 
-export default async function AboutPage() {
-  const doc = await getPage('about');
-
+export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 pb-10 pt-10 md:pt-14">
       <Reveal>
@@ -34,11 +31,51 @@ export default async function AboutPage() {
         </PageHeader>
       </Reveal>
 
-      {doc && (
-        <Reveal>
-          <div className="md-body mt-10 page-enter" dangerouslySetInnerHTML={{ __html: doc.html }} />
-        </Reveal>
-      )}
+      <Reveal>
+        <div className="mt-10 md-body page-enter">
+          <p className="text-[17px] leading-relaxed">{site.story.intro}</p>
+
+          {site.story.sections.map((section) => (
+            <section key={section.title} className="mt-10">
+              <h2 className="mb-4 text-[22px] font-bold text-ink">{section.title}</h2>
+
+              {section.type === 'list' && (
+                <ul className="space-y-3">
+                  {section.items?.map((item) => (
+                    <li key={item.label} className="text-[16px] leading-relaxed text-ink">
+                      <span className="font-semibold text-ink">{item.label}</span>
+                      <span className="text-ink-soft">：{item.desc}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {section.type === 'text' && (
+                <p className="text-[16px] leading-relaxed text-ink">{section.text}</p>
+              )}
+
+              {section.type === 'links' && (
+                <ul className="space-y-3">
+                  {section.links?.map((link) => (
+                    <li key={link.label} className="text-[16px] leading-relaxed">
+                      <a href={link.href} target="_blank" rel="noreferrer" className="text-accent hover:text-accent-2">
+                        {link.label}
+                      </a>
+                      {link.text && <span className="text-ink-soft">：{link.text}</span>}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+
+          {site.story.quote && (
+            <blockquote className="mt-12 border-l-4 border-accent pl-5 text-[17px] italic text-ink-soft">
+              {site.story.quote}
+            </blockquote>
+          )}
+        </div>
+      </Reveal>
 
       <Reveal>
         <section className="mt-14 border-t border-line pt-8">

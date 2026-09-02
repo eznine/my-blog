@@ -1,5 +1,5 @@
 {
-  "_说明": "关于页文案：从上到下依次是页头标题、教育经历、研究兴趣、技能栈、页脚注记。个人信息（姓名/单位/邮箱/坐标）在 00-全局.json 里，因为页脚和首页也要用。",
+  "_说明": "关于页文案：从上到下依次是页头标题、正文故事（一句话/我在学什么/为什么做这个网站/找到我/尾声引文）、教育经历、研究兴趣、技能栈、页脚注记。个人信息（姓名/单位/邮箱/坐标）在 00-站点信息.json 里，因为页脚和首页也要用。story 里 link 的 label 是展示文字，href 是跳转地址。",
 
   "page": {
     "code": "05",
@@ -9,6 +9,36 @@
     "interests": "INTERESTS · 研究兴趣",
     "skills": "SKILLS · 技能栈",
     "footer": "{coords} · DATUM WGS 84 · END OF SHEET"
+  },
+
+  "story": {
+    "intro": "我是张鹏，一名地理信息科学方向的学生。白天和遥感影像、空间数据打交道，晚上把学到的东西整理成笔记——这个网站就是我的野外记录簿。",
+    "sections": [
+      {
+        "title": "我在学什么",
+        "type": "list",
+        "items": [
+          { "label": "遥感与生态参数", "desc": "从辐射定标到生态安全格局，一条链路走下来；" },
+          { "label": "InSAR 形变监测", "desc": "SBAS 时序分析在矿区地面塌陷中的应用；" },
+          { "label": "WebGIS 与可视化", "desc": "MapLibre / Cesium 把分析结果做成能交互的地图；" },
+          { "label": "可解释机器学习", "desc": "XGBoost-SHAP 把黑箱模型翻译成地理机制。" }
+        ]
+      },
+      {
+        "title": "为什么做这个网站",
+        "type": "text",
+        "text": "科研做得再好，讲不出来等于没做。写作是把模糊的理解逼成清晰结论的最好方式——所以我把学习笔记、研究过程和做过的项目都放在这里，既是给自己的知识库，也是给同路人的参考。"
+      },
+      {
+        "title": "找到我",
+        "type": "links",
+        "links": [
+          { "label": "GitHub", "href": "https://github.com/eznine" },
+          { "label": "邮箱", "href": "mailto:ezninfl@gmail.com", "text": "ezninfl@gmail.com" }
+        ]
+      }
+    ],
+    "quote": "「地图是对世界最诚实的简化。」"
   },
 
   "education": [

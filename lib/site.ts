@@ -31,6 +31,20 @@ export interface EducationItem {
   detail: string;
 }
 
+export interface StoryLink {
+  label: string;
+  href: string;
+  text?: string;
+}
+
+export interface StorySection {
+  title: string;
+  type: 'list' | 'text' | 'links';
+  items?: { label: string; desc: string }[];
+  text?: string;
+  links?: StoryLink[];
+}
+
 export interface SiteConfig {
   name: string;
   siteName: string;
@@ -102,6 +116,7 @@ export interface SiteConfig {
       noMatchLabel: string;
     };
   };
+  story: { intro: string; sections: StorySection[]; quote: string };
   notesBrowser: {
     placeholder: string;
     cat: string;
@@ -150,6 +165,7 @@ export const site = {
   education: ab.education,
   researchInterests: ab.researchInterests,
   skills: ab.skills,
+  story: ab.story,
   pages: {
     notes: n.page,
     research: r.page,
