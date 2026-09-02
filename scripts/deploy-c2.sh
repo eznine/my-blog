@@ -31,8 +31,9 @@ AS_EZNINE() {
 
 echo "==> [0/8] 自愈：修正历史 sudo 遗留的 root 属主 + admin 服务身份"
 if [ "$(id -u)" = "0" ]; then
-  chown -R eznine:eznine .git .next content public 2>/dev/null || true
-  chown eznine:eznine site.config.json 2>/dev/null || true
+  # 全仓归 eznine（含 package*.json / node_modules——历史 sudo 装依赖会留下 root 属主，
+  # 导致后续 npm install 以 eznine 身份写 package-lock.json 时 EACCES）
+  chown -R eznine:eznine . 2>/dev/null || true
   # git 安全目录白名单（以 eznine 跑 git 时避免 dubious ownership 拦截）
   runuser -u eznine -- git config --global --add safe.directory /srv/my-blog 2>/dev/null || true
   # admin 服务必须以 eznine 运行（drop-in 覆盖，不动原 unit 文件）
