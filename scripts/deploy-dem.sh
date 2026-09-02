@@ -37,7 +37,7 @@ AS_EZNINE() {
 echo "==> [1/5] 安装 Python 依赖"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y -qq python3-gdal python3-numpy python3-requests python3-dotenv python3-geopandas >/dev/null
+apt-get install -y -qq python3-gdal gdal-bin python3-numpy python3-requests python3-dotenv python3-geopandas >/dev/null
 echo "    OK"
 
 echo "==> [2/5] 解压应用到 $DEM_ROOT"
