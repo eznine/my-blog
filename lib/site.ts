@@ -102,7 +102,20 @@ export interface SiteConfig {
       typeResearch: string;
       typeProject: string;
     };
-    about: { code: string; en: string; title: string; education: string; interests: string; skills: string; footer: string };
+    about: {
+      code: string;
+      en: string;
+      title: string;
+      identity: string;
+      affiliation: string;
+      coords: string;
+      github: string;
+      email: string;
+      education: string;
+      interests: string;
+      skills: string;
+      footer: string;
+    };
     search: {
       code: string;
       en: string;

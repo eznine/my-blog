@@ -143,6 +143,8 @@ public/uploads/      后台上传的图片
 
 20. **桌面端滚动条个性化（「右侧滑动的条个性化、别贴屏幕、橙色圆圈代表当前进度」——曾误改移动端目录滑轨被纠正「我指的不是目录，是最右侧的滑轨，手机版不用做」）**：① 移动端目录滑轨 `mobile-toc-rail.tsx` 保持原版不动（等长横线、贴边 right-3）；② 桌面端（xl+）**隐藏原生滚动条**（globals.css @media 1280px：webkit width:0 + Firefox scrollbar-width:none）；③ 新建 `components/scroll-progress-dot.tsx` 全站挂 layout——屏幕右缘内侧细轨（right-3、top/bottom 22vh 不贴边不贴底）上悬浮**橙色发光圆圈**，位置 = scrollTop/可滚高度（随滚动移动=进度），滚过 80px 淡入，点击轨道/拖动圆点可跳转；④ 移动端保持原生滚动条。**教训**：用户说「右侧滑动的条」默认指**浏览器滚动条**而非自定义目录组件——先看截图/红框再动手，别凭第一印象改错对象（这是本会话第二次「改错范围、先还原再说」）。
 
+21. **全站默认浅色 + 首页返回跳转持久化 + 关于页正文迁入 copy JSON（2026-09-02，main b258ad5 / dynamic c7c4c22）**：① **默认主题浅色**——app/layout.tsx ThemeProvider 从 `defaultTheme="dark" enableSystem` 改为 `defaultTheme="light" enableSystem={false}`（不再跟随系统深浅，新访客必为浅色；注意 localStorage 曾存 dark 的旧访客需手动切一次）；② **首页开场跳过标记持久化**——lib/nav-state.ts 从内存变量改为 sessionStorage（KEY `ez-visited-non-home`）：同标签页内刷新/前进后退不丢、关闭标签页重置，修复「从别的页面点首页又重播开屏下滑动画」；③ **关于页正文 JSON 化**——content/pages/about.md 删除，正文（intro + 我在学什么 list + 为什么做这个网站 text + 找到我 links + 结尾引文 quote）全部搬入 content/copy/06-关于页.json 的 `story` 字段，app/about/page.tsx 与 lib/site.ts / lib/site-server.ts 同步改造（SiteConfig 新增 `story` 类型）；④ 服务器已重建，`Zhangpeng1.` 登录验证 200 OK。**教训**：用户反复强调的后台密码就是 `Zhangpeng1.`（一个点），与服务器 sudo 密码 `Zhangpeng1...`（三点）不同——先把用户给的密码逐字确认再改服务器文件，别在中途改成猜测值。
+
 ## 六、用户的偏好与协作习惯（重要！）
 
 * **快速**：不要无谓操作，小改动不用浏览器调试，大改动才确认；表述直接，不喜欢反复确认
