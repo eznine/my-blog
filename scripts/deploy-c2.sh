@@ -41,10 +41,26 @@ if [ "$(id -u)" = "0" ]; then
   systemctl daemon-reload
 fi
 
-echo "==> [1/8] git 拉取 dynamic"
+echo "==> [1/8] git 拉取 dynamic（未提交的内容改动自动 stash 保护，拉完恢复）"
 AS_EZNINE git checkout -- public/feed.xml public/sitemap.xml 2>/dev/null || true
 AS_EZNINE git checkout dynamic
+# 后台（admin）改的是 content/ 与 public/ 下的 tracked 文件，且从不 commit。
+# 部署前若不清掉它们，git pull 会和远端改动冲突中止。先 stash 暂存（不丢），
+# 拉完再 pop 恢复——这样「网上后台改的内容」永远不会被「代码更新」吞掉。
+HAS_LOCAL=$(AS_EZNINE git status --porcelain --untracked-files=no -- content public | wc -l)
+if [ "$HAS_LOCAL" -gt 0 ]; then
+  echo "    检测到 ${HAS_LOCAL} 个未提交内容改动，先 stash 保护，拉完自动恢复"
+  AS_EZNINE git stash push -m "deploy:auto-protect $(date +%s)" -- content public || true
+fi
 AS_EZNINE git pull --ff-only origin dynamic
+if [ "$HAS_LOCAL" -gt 0 ]; then
+  echo "    恢复 stash 的内容改动"
+  if ! AS_EZNINE git stash pop; then
+    echo "    ⚠ stash 恢复有冲突（远端也改了同一文件）。请手动处理："
+    echo "       cd /srv/my-blog && git stash list && git status"
+    exit 1
+  fi
+fi
 
 echo "==> [2/8] 安装依赖（如有变化）"
 AS_EZNINE npm install --no-audit --no-fund --loglevel=error
