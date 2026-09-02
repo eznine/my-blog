@@ -173,6 +173,8 @@ public/uploads/      后台上传的图片
 
 * 服务器：Azure VM Ubuntu 22.04（公网 IP 20.214.241.113），仓库在 `/srv/my-blog`
 
+* **域名与三个入口（用户强调，勿混）**：本地（`npm run dev`）、GitHub Pages（https://eznine.github.io/my-blog）、**eznine.xyz（用户域名，DNS A 记录解析到云服务器 IP 20.214.241.113，即服务器同一站点）**。域名解析已生效，DNS 无需再动
+
 * 架构：Nginx（80）托管 `out/` 静态站 + `/api/` 反代 127.0.0.1:3001（`proxy_buffering off` 必须，否则 AI 流式断）+ systemd 服务 `my-blog-admin`（开机自启，跑 `node scripts/admin-server.mjs`）
 
 * **部署流程（重要）**：本地改完代码 → `git push` → 服务器 `cd /srv/my-blog && git checkout -- public/feed.xml public/sitemap.xml && git pull && NEXT_PUBLIC_ADMIN_API=/api NODE_OPTIONS='--max-old-space-size=2048' npm run build` → **必须** **`sudo systemctl restart my-blog-admin`**（后台是旧代码进程，不重启新功能/接口不生效）
