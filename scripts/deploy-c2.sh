@@ -122,6 +122,20 @@ server {
         proxy_read_timeout 600s;
     }
 
+    # DEM 下载器（独立 Python 服务 127.0.0.1:8081，相对路径前端）
+    # 无尾斜杠的 /dem 重定向补斜杠，避免相对路径解析错乱
+    location = /dem { return 308 /dem/; }
+
+    location /dem/ {
+        proxy_pass http://127.0.0.1:8081/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 600s;
+    }
+
     location /uploads/ {
         alias /srv/my-blog/public/uploads/;
         expires 7d;

@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
 /**
- * DEM 下载器嵌入组件（本地工具）。
- * 检测 127.0.0.1:8080 的服务是否在线：在线则嵌入 iframe（新窗口可开），
- * 离线则提示先启动本地服务。no-cors 探测只区分「网络可达/不可达」，
- * 不受后端 CORS 头影响（仅关心服务在不在跑）。
+ * DEM 下载器嵌入组件。
+ * 自动区分环境：
+ *   - 本地（localhost / 127.0.0.1）：直连本机 127.0.0.1:8080（用户开 DEM_DOWN 的 bat 启动）
+ *   - 服务器：走博客同源反代路径 <basePath>/dem/（Nginx → 127.0.0.1:8081，避开后台 /api/ 前缀）
+ * no-cors 探测只区分「网络可达/不可达」，不受 CORS 头影响（仅关心服务在不在跑）。
  */
 
 export interface DemCopy {
@@ -21,17 +22,30 @@ export interface DemCopy {
   retry: string;
 }
 
-const DEM_URL = 'http://127.0.0.1:8080';
+function demBase(): string {
+  if (typeof window === 'undefined') return '/dem/';
+  const h = window.location.hostname;
+  if (h === 'localhost' || h === '127.0.0.1' || h.startsWith('192.168.') || h.startsWith('10.')) return 'http://127.0.0.1:8080';
+  // 服务器：同源反代路径（eznine.xyz 根路径下挂 /dem/）
+  return '/dem/';
+}
 
 export function DemDownloader({ copy }: { copy: DemCopy }) {
   const [state, setState] = useState<'checking' | 'online' | 'offline'>('checking');
   const [opened, setOpened] = useState(false);
+  const [base, setBase] = useState('/dem/');
+
+  // 水合后确定 base（SSR/静态渲染在服务器端无法读 window）
+  useEffect(() => {
+    setBase(demBase());
+  }, []);
 
   const probe = useCallback(() => {
     setState('checking');
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 2500);
-    fetch(`${DEM_URL}/api/health`, { mode: 'no-cors', cache: 'no-store', signal: ctrl.signal })
+    const health = base.endsWith('/') ? `${base}api/health` : `${base}/api/health`;
+    fetch(health, { mode: 'no-cors', cache: 'no-store', signal: ctrl.signal })
       .then(() => {
         clearTimeout(timer);
         setState('online');
@@ -40,9 +54,11 @@ export function DemDownloader({ copy }: { copy: DemCopy }) {
         clearTimeout(timer);
         setState('offline');
       });
-  }, []);
+  }, [base]);
 
-  useEffect(probe, [probe]);
+  useEffect(() => {
+    if (base) probe();
+  }, [base, probe]);
 
   return (
     <article className="explore-card relative flex h-full flex-col rounded-2xl p-6 md:p-7">
@@ -79,7 +95,7 @@ export function DemDownloader({ copy }: { copy: DemCopy }) {
           </button>
         )}
         <a
-          href={DEM_URL}
+          href={base}
           target="_blank"
           rel="noreferrer"
           className="cursor-pointer rounded-lg border border-line px-5 py-2.5 text-[14px] font-medium text-ink-soft transition-colors hover:border-accent/60 hover:text-accent"
@@ -108,7 +124,7 @@ export function DemDownloader({ copy }: { copy: DemCopy }) {
         <div className="relative mt-5">
           <div className="flex items-center justify-between border border-line bg-panel-solid px-4 py-2.5">
             <span className="font-mono text-[11px] tracking-[0.14em] text-ink-faint">
-              {copy.en} · {DEM_URL}
+              {copy.en} · {base}
             </span>
             <button
               type="button"
@@ -119,7 +135,7 @@ export function DemDownloader({ copy }: { copy: DemCopy }) {
             </button>
           </div>
           <iframe
-            src={DEM_URL}
+            src={base}
             title={copy.title}
             loading="lazy"
             className="block h-[72vh] min-h-[520px] w-full border border-t-0 border-line bg-panel-solid"
