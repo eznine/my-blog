@@ -33,6 +33,8 @@ echo "==> [0/8] 自愈：修正历史 sudo 遗留的 root 属主 + admin 服务�
 if [ "$(id -u)" = "0" ]; then
   chown -R eznine:eznine .git .next content public 2>/dev/null || true
   chown eznine:eznine site.config.json 2>/dev/null || true
+  # git 安全目录白名单（以 eznine 跑 git 时避免 dubious ownership 拦截）
+  runuser -u eznine -- git config --global --add safe.directory /srv/my-blog 2>/dev/null || true
   # admin 服务必须以 eznine 运行（drop-in 覆盖，不动原 unit 文件）
   mkdir -p /etc/systemd/system/my-blog-admin.service.d
   printf '[Service]\nUser=eznine\nGroup=eznine\n' > /etc/systemd/system/my-blog-admin.service.d/user.conf
@@ -79,6 +81,9 @@ server {
     listen 80 default_server;
     listen [::]:80 default_server;
     server_name _;
+
+    # 批量导入/上传图片允许大 body（默认 1m 会直接 413 拒掉带图 md 导入）
+    client_max_body_size 64m;
 
     location / {
         proxy_pass http://127.0.0.1:3210;
