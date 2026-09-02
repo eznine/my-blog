@@ -6,23 +6,25 @@ import { SiteFooter } from '@/components/site-footer';
 import { CursorGlow } from '@/components/cursor-glow';
 import { ScrollProgressDot } from '@/components/scroll-progress-dot';
 import { SiteProvider } from '@/components/site-provider';
-import { site } from '@/lib/site-server';
+import { getSite } from '@/lib/site-server';
 import { buildAppearanceCss } from '@/lib/appearance-server';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const s = getSite();
   return {
     title: {
-      default: site.meta.title,
-      template: site.meta.titleTemplate,
+      default: s.meta.title,
+      template: s.meta.titleTemplate,
     },
-    description: site.meta.description || site.bio,
+    description: s.meta.description || s.bio,
   };
 }
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const site = getSite();
   const appearanceCss = buildAppearanceCss();
   return (
     <html lang="zh-CN" data-scroll-behavior="smooth" suppressHydrationWarning>

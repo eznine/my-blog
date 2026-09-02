@@ -169,6 +169,8 @@ public/uploads/      后台上传的图片
 
 ## 八、生产部署（自建服务器，2026-09 上线）
 
+* **双方案并存（2026-09 定稿）**：**GitHub Pages = A（静态 main 分支）**，**eznine.xyz = C（动态 standalone dynamic 分支，`my-blog-web.service` 端口 3210，Nginx 反代，保存即生效 3s TTL）**。**后台一律走 eznine.xyz/admin**（会连服务器真后台）；GitHub Pages 的后台请求发到访问者本机 127.0.0.1:3001，不是服务器，别在那登。**改文案刷新血泪：客户端组件不能 `import { site }`（构建期快照，改文案前台死也不刷）**——必须走 `SiteProvider`（`components/site-provider.tsx`）+ `useSite()`，layout 用 `getSite()`（`lib/site-server.ts` 导出的**真实对象**，不是 Proxy！Proxy 传给 client 组件 SSR 会崩 `undefined.map`）通过 `<SiteProvider value={site}>` 下发动态文案。现改为动态的组件：site-header / site-footer（server 直接读 site-server）/ site-utilities / hero-scroll / notes-browser（含 ChapterPanel 子组件）/ search-client；admin-app 保留静态 site（后台文案不需动态）。**改 JSON 测试文案必须无 BOM**（PowerShell `Set-Content -Encoding UTF8` 加 BOM → JSON.parse 失败 → 500；用 node 写）
+
 * 服务器：Azure VM Ubuntu 22.04（公网 IP 20.214.241.113），仓库在 `/srv/my-blog`
 
 * 架构：Nginx（80）托管 `out/` 静态站 + `/api/` 反代 127.0.0.1:3001（`proxy_buffering off` 必须，否则 AI 流式断）+ systemd 服务 `my-blog-admin`（开机自启，跑 `node scripts/admin-server.mjs`）

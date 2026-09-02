@@ -68,7 +68,7 @@ let _siteData: SiteConfig | null = null;
 let _siteAt = 0;
 const SITE_TTL = 3000;
 
-function getSite(): SiteConfig {
+export function getSite(): SiteConfig {
   const now = Date.now();
   if (!_siteData || now - _siteAt > SITE_TTL) {
     _siteData = loadSite();
