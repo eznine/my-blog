@@ -13,12 +13,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawn, execSync } from 'node:child_process';
+import AdmZip from 'adm-zip';
 
 const PORT = Number(process.env.ADMIN_PORT || 3001);
 const SERVER_STARTED_AT = Date.now();
 const ROOT = process.cwd();
 const CONTENT = path.join(ROOT, 'content');
 const UPLOADS = path.join(ROOT, 'public', 'uploads');
+const DEMOS = path.join(ROOT, 'public', 'demos');
 const SALT = '::eznine-admin';
 
 let cfg = {};
@@ -641,6 +643,9 @@ function buildFrontmatter(meta) {
   if (meta.status) lines.push(`status: ${yamlStr(meta.status)}`);
   if (Array.isArray(meta.tech) && meta.tech.length) lines.push(`tech: ${JSON.stringify(meta.tech)}`);
   if (meta.demo) lines.push(`demo: ${yamlStr(meta.demo)}`);
+  if (meta.demoLabel) lines.push(`demoLabel: ${yamlStr(meta.demoLabel)}`);
+  if (meta.demoHeight !== undefined && meta.demoHeight !== null && meta.demoHeight !== '')
+    lines.push(`demoHeight: ${Number(meta.demoHeight) || 0}`);
   if (meta.github) lines.push(`github: ${yamlStr(meta.github)}`);
   if (Array.isArray(meta.links) && meta.links.length)
     lines.push(`links: ${JSON.stringify(meta.links.map((l) => ({ label: l.label, url: l.url })))}`);
@@ -1242,6 +1247,80 @@ async function handle(req, res) {
       names = fs.readdirSync(UPLOADS).filter((f) => !f.startsWith('.')).sort().reverse();
     } catch {}
     return json(res, 200, { items: names.map((n) => ({ name: n, url: `/uploads/${n}` })) });
+  }
+
+  /* ---- Demo 上传：.zip（解压）或单 .html → public/demos/<name>/，返回 /demos/<name>/ ---- */
+  if (p === '/api/demo-upload' && req.method === 'POST') {
+    const want = (url.searchParams.get('name') || '').trim().toLowerCase();
+    const fileName = url.searchParams.get('filename') || 'demo';
+    const isZip = /\.zip$/i.test(fileName);
+    const isHtml = /\.html?$/i.test(fileName);
+    if (!isZip && !isHtml) return json(res, 400, { error: '只支持 .zip 或 .html' });
+
+    const buf = await readBody(req);
+    if (!buf.length) return json(res, 400, { error: '空文件' });
+
+    // 目录名：优先用户给定，否则用文件名主干，再兜底随机；只允许小写字母数字连字符
+    let dirName = (want || path.basename(fileName).replace(/\.(zip|html?)$/i, '') || 'demo')
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 40);
+    if (!dirName) dirName = 'demo-' + crypto.randomBytes(2).toString('hex');
+
+    let target = path.join(DEMOS, dirName);
+    // 已存在则加随机后缀，避免覆盖旧 demo
+    let n = 1;
+    while (fs.existsSync(target) && fs.statSync(target).isDirectory() && n < 100) {
+      target = path.join(DEMOS, `${dirName}-${n++}`);
+    }
+    if (fs.existsSync(target)) return json(res, 409, { error: '该目录已存在，请换一个名字' });
+
+    fs.mkdirSync(target, { recursive: true });
+
+    if (isZip) {
+      // 解压 zip → 过滤路径穿越（../）与绝对路径
+      const zip = new AdmZip(buf);
+      const names = zip.getEntries().filter((e) => !e.isDirectory);
+      const safeNames = [];
+      for (const e of names) {
+        const raw = e.entryName.replace(/\\/g, '/');
+        const parts = raw.split('/');
+        if (parts.some((s) => s === '..') || raw.startsWith('/')) continue;
+        safeNames.push(raw);
+      }
+      for (const raw of safeNames) {
+        const dest = path.join(target, raw);
+        if (!dest.startsWith(target)) continue;
+        fs.mkdirSync(path.dirname(dest), { recursive: true });
+        fs.writeFileSync(dest, zip.readFile(zip.getEntry(raw)));
+      }
+      // zip 若是外层包了一级目录（xxx/index.html），把内容上移一层
+      const topLevel = safeNames[0]?.split('/')[0];
+      const nested = topLevel && safeNames.every((s) => s.startsWith(topLevel + '/'));
+      if (nested && fs.existsSync(path.join(target, topLevel, 'index.html'))) {
+        const inner = path.join(target, topLevel);
+        for (const root of fs.readdirSync(inner)) {
+          fs.renameSync(path.join(inner, root), path.join(target, root));
+        }
+        fs.rmdirSync(inner);
+      }
+      // 没有 index.html 的话，取第一个 .html 作为入口
+      const idxH = path.join(target, 'index.html');
+      if (!fs.existsSync(idxH)) {
+        const firstHtml = safeNames.find((s) => /\.html?$/i.test(s));
+        if (!firstHtml) {
+          fs.rmSync(target, { recursive: true, force: true });
+          return json(res, 400, { error: 'zip 里没有 .html 文件' });
+        }
+        fs.renameSync(path.join(target, firstHtml), idxH);
+      }
+    } else {
+      // 单 html：直接写 index.html
+      fs.writeFileSync(path.join(target, 'index.html'), buf);
+    }
+
+    return json(res, 200, { ok: true, url: `/demos/${path.basename(target)}/`, dir: path.basename(target) });
   }
 
   return json(res, 404, { error: '接口不存在' });

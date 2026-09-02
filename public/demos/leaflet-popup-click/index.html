@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>04 · 点击查看详情（Popup/Tooltip）</title>
+    <link rel="stylesheet" href="./lib/leaflet/dist/leaflet.css" />
+    <script src="./lib/leaflet/dist/leaflet.js"></script>
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 16px; }
+      #map { height: 68vh; border: 1px solid #ccc; border-radius: 6px; }
+      #fav-list { margin-top: 12px; font-size: 14px; color: #555; }
+      .my-popup .leaflet-popup-content-wrapper { background: #1d2129; color: #e8eaed; border-radius: 10px; }
+      .my-popup .leaflet-popup-tip { background: #1d2129; }
+      .my-popup button { background: #1677ff; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; }
+      h2 { font-size: 15px; }
+    </style>
+  </head>
+  <body>
+    <h1>04 · 点击查看详情</h1>
+    <!-- 底图：高德瓦片（国内直连快，无需 key；GCJ-02 偏移对本练习无影响）。生产环境用天地图 key 或自建瓦片；OSM 版 URL 见注释下方的 git 历史 -->
+    <p style="color:#999; font-size:13px">悬停看名字（Tooltip）→ 点击看详情（Popup）→ 详情里点"收藏"加入下方列表。</p>
+    <div id="map"></div>
+    <h2>已收藏</h2>
+    <div id="fav-list">（空）</div>
+
+    <script>
+      const map = L.map('map', { center: [31.5, 113.8], zoom: 7 });
+      L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', { attribution: '高德底图·仅练习演示' }).addTo(map);
+
+      const cities = [
+        { id: 'wh', name: '武汉', lat: 30.5929, lng: 114.3052, pop: 1233, intro: '江城，九省通衢' },
+        { id: 'cd', name: '成都', lat: 30.6598, lng: 104.0633, pop: 2094, intro: '天府之国' },
+        { id: 'xa', name: '西安', lat: 34.3412, lng: 108.9398, pop: 1295, intro: '十三朝古都' },
+        { id: 'zz', name: '郑州', lat: 34.7466, lng: 113.6254, pop: 1260, intro: '中原枢纽' },
+        { id: 'cs', name: '长沙', lat: 28.2282, lng: 112.9388, pop: 1042, intro: '娱乐之都' },
+        { id: 'hf', name: '合肥', lat: 31.8206, lng: 117.2272, pop: 963, intro: '科教名城' },
+      ];
+
+      // Popup 内容模板 + 全局函数（Popup 内按钮的标准套路：模块内无框架事件体系）
+      window.favCity = function (id) {
+        const c = cities.find((x) => x.id === id);
+        const list = document.querySelector('#fav-list');
+        if (![...list.children].some((li) => li.dataset.id === id)) {
+          const li = document.createElement('li');
+          li.dataset.id = id;
+          li.textContent = `${c.name}（${c.pop} 万人）`;
+          list.appendChild(li);
+        }
+      };
+
+      cities.forEach((c) => {
+        const m = L.marker([c.lat, c.lng]).addTo(map);
+
+        // Tooltip：是什么（悬停）
+        m.bindTooltip(c.name, { direction: 'top' });
+        // TODO 1：把 direction 依次换成 bottom/left/right 感受定位
+        // TODO 2：加一个 permanent 常显标注（人口数），并设 className 美化
+
+        // Popup：详情与操作（点击）
+        m.bindPopup(
+          `<b>${c.name}</b><br>人口：${c.pop} 万人<br>${c.intro}
+           <br>坐标：${c.lat.toFixed(3)}, ${c.lng.toFixed(3)}
+           <br><button onclick="favCity('${c.id}')">⭐ 收藏</button>`,
+          { maxWidth: 260, className: 'my-popup' },   // TODO 3：自定义暗色弹窗样式已配好，换回默认对比
+        );
+      });
+
+      // TODO 4：地图任意点击弹坐标（L.popup().setLatLng(e.latlng).openOn(map)）
+      // TODO 5：sticky 演示——加载一个中国省界面 GeoJSON 太重，用一个透明 Circle 代替：
+      //   L.circle([31.5, 113.8], { radius: 80000, fillOpacity: 0 })
+      //     .addTo(map).bindTooltip('鼠标在我的任何位置', { sticky: true })
+
+      // TODO 6：autoClose 实验——给一个 marker 设 bindPopup('多选对比', { autoClose: false })，
+      //   同时开多个弹窗观察（再做一次 autoClose: true 的对比）
+    </script>
+  </body>
+</html>

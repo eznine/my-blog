@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>05 · 省界 + 实时地震渲染</title>
+    <link rel="stylesheet" href="./lib/leaflet/dist/leaflet.css" />
+    <script src="./lib/leaflet/dist/leaflet.js"></script>
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 16px; }
+      .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+      select, button { padding: 6px 12px; cursor: pointer; }
+      #status { color: #888; font-size: 13px; margin-bottom: 8px; }
+      #map { height: 76vh; border: 1px solid #ccc; border-radius: 6px; }
+      .info-tip { background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 6px 10px; }
+    </style>
+  </head>
+  <body>
+    <h1>05 · 中国省界 + 全球当日地震</h1>
+    <!-- 底图：高德瓦片（国内直连快，无需 key；GCJ-02 偏移对本练习无影响）。生产环境用天地图 key 或自建瓦片；OSM 版 URL 见注释下方的 git 历史 -->
+    <div class="toolbar">
+      <label>震级筛选：
+        <select id="mag-filter" onchange="reloadQuakes(this.value)">
+          <option value="0">全部</option>
+          <option value="2.5">M2.5+</option>
+          <option value="4.5">M4.5+</option>
+          <option value="5">M5+</option>
+        </select>
+      </label>
+      <button onclick="reloadQuakes(document.querySelector('#mag-filter').value)">重载地震数据</button>
+      <span id="status">加载数据中…</span>
+    </div>
+    <div id="map"></div>
+
+    <script>
+      const map = L.map('map', { center: [33, 108], zoom: 4 });
+      L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', { attribution: '高德底图·仅练习演示' }).addTo(map);
+      const statusEl = document.querySelector('#status');
+
+      // ═══════════ ① 省界：面图层（style + onEachFeature）═══════════
+      const provinceLayer = L.geoJSON(null, {
+        style: () => ({ color: '#8a8a8a', weight: 1, fillColor: '#f0e9d8', fillOpacity: 0.35 }),
+        onEachFeature(feature, layer) {
+          const name = feature.properties.name;
+          layer.bindTooltip(name, { sticky: true, className: 'info-tip' });
+          layer.bindPopup(`<b>${name}</b><br>adcode: ${feature.properties.adcode}`);
+          // 悬停高亮（setStyle 即时生效；恢复时写回原始样式）
+          layer.on('mouseover', () => layer.setStyle({ weight: 3, color: '#1677ff', fillOpacity: 0.15 }));
+          layer.on('mouseout', () => layer.setStyle({ weight: 1, color: '#8a8a8a', fillOpacity: 0.35 }));
+        },
+      }).addTo(map);
+
+      fetch('https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json')
+        .then((r) => r.json())
+        .then((gj) => { provinceLayer.addData(gj); log('省界加载完成'); })
+        .catch(() => log('❌ 省界加载失败（检查网络）'));
+
+      // ═══════════ ② 地震：点图层（pointToLayer + filter 重建）═══════════
+      let quakeLayer = null;   // 保留引用：更新用 clearLayers+addData（不重建交互）
+
+      const magColor = (m) => (m >= 5 ? '#ff4d4f' : m >= 4 ? '#faad14' : '#91caff');
+      function buildQuakeLayer(minMag) {
+        const url = minMag > 0
+          ? `https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/${minMag}_day.geojson`
+          : 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson';
+        statusEl.textContent = '地震数据加载中…';
+        fetch(url)
+          .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then((gj) => {
+            if (!quakeLayer) {
+              quakeLayer = L.geoJSON(null, {
+                // TODO 5：让地震层永远压在省界上（提示：L.geoJSON(null,{pane:...}) +
+                //   map.createPane('quakes'); pane.style.zIndex = 450 —— 第 07 节 pane 概念预告）
+                pointToLayer(feature, latlng) {
+                  const mag = feature.properties.mag ?? 0;
+                  return L.circleMarker(latlng, {
+                    radius: 3 + mag * 1.4, fillColor: magColor(mag),
+                    color: '#fff', weight: 1, fillOpacity: 0.9,
+                  });
+                },
+                onEachFeature(feature, layer) {
+                  const p = feature.properties;
+                  layer.bindPopup(
+                    `<b>${p.place ?? '未知位置'}</b><br>震级 M${p.mag}<br>` +
+                    `${new Date(p.time).toLocaleString('zh-CN')}<br>震源深度 ${feature.geometry.coordinates[2] ?? '?'} km`);
+                },
+              }).addTo(map);
+            } else {
+              quakeLayer.clearLayers().addData(gj);   // 原地更新（保留图层引用）
+            }
+            statusEl.textContent = `当日 M${minMag}+ 地震：${gj.features.length} 条`;
+          })
+          .catch((e) => { statusEl.textContent = '❌ 地震数据加载失败：' + e.message; });
+      }
+      buildQuakeLayer(0);
+      function reloadQuakes(v) { buildQuakeLayer(Number(v)); }
+
+      function log(t) { statusEl.textContent = t; }
+    </script>
+  </body>
+</html>

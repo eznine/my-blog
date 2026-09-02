@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>02 · 多底图对比页</title>
+    <link rel="stylesheet" href="./lib/leaflet/dist/leaflet.css" />
+    <script src="./lib/leaflet/dist/leaflet.js"></script>
+    <script src="./lib/leaflet-providers/leaflet-providers.js"></script>
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 16px; }
+      .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+      button { padding: 6px 14px; cursor: pointer; }
+      button.on { background: #1677ff; color: #fff; border: none; }
+      input[type="range"] { width: 140px; }
+      #map { height: 70vh; border: 1px solid #ccc; border-radius: 6px; }
+      .tip { color: #999; font-size: 13px; margin: 8px 0; }
+      table { font-size: 13px; border-collapse: collapse; margin-top: 12px; }
+      th, td { border: 1px solid #ddd; padding: 6px 10px; }
+    </style>
+  </head>
+  <body>
+    <h1>02 · 多底图对比页</h1>
+    <!-- 底图：高德瓦片（国内直连快，无需 key；GCJ-02 偏移对本练习无影响）。生产环境用天地图 key 或自建瓦片；OSM 版 URL 见注释下方的 git 历史 -->
+    <div class="toolbar">
+      <button id="b-osm" class="on" onclick="switchBase('osm')">高德</button>
+      <button id="b-carto" onclick="switchBase('carto')">Carto 浅色</button>
+      <button id="b-dark" onclick="switchBase('dark')">Carto 暗色</button>
+      <button id="b-esri" onclick="switchBase('esri')">Esri 卫星</button>
+      <button id="b-tdt" onclick="switchBase('tdt')">天地图（需 key）</button>
+      <label>叠加透明度：<input id="opacity" type="range" min="0.1" max="1" step="0.05" value="1"
+              oninput="currentBase.setOpacity(+this.value)" /></label>
+      <label><input id="labels" type="checkbox" checked onchange="toggleLabels(this.checked)" /> 注记层</label>
+    </div>
+    <div class="tip">切换按钮换底图；透明度滑块练习 setOpacity；注记层开关演示"注记可独立存在"。</div>
+    <div id="map"></div>
+
+    <table>
+      <tr><th>源</th><th>级别</th><th>key</th><th>合规场景</th></tr>
+      <tr><td>高德</td><td>0~19</td><td>否（有使用政策）</td><td>演示/学习</td></tr>
+      <tr><td>CartoDB</td><td>0~20</td><td>否（量大收费）</td><td>简约风作品</td></tr>
+      <tr><td>Esri 卫星</td><td>0~19</td><td>否（有条款）</td><td>影像展示</td></tr>
+      <tr><td>天地图</td><td>1~18</td><td>是（免费配额）</td><td>国内生产（合规首选）</td></tr>
+    </table>
+
+    <script>
+      const map = L.map('map', { center: [30.5929, 114.3052], zoom: 10 });
+
+      // ═══════════ 四种底图的定义（用到的才实例化） ═══════════
+      const bases = {
+        osm: L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+               { maxZoom: 19, attribution: '高德底图·仅练习演示' }),
+        carto: L.tileLayer.provider('CartoDB.Positron'),
+        dark: L.tileLayer.provider('CartoDB.DarkMatter'),
+        esri: L.tileLayer.provider('Esri.WorldImagery'),
+        // 天地图：底图 vec_w + 注记 cva_w 两层（TODO 2：填你的 key！）
+        tdt: L.layerGroup([
+          L.tileLayer('https://t{s}.tianditu.gov.cn/vec_w/wmts?layer=vec&style=default&tilematrixset=w&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileRow={y}&TileCol={x}&tk=你的key',
+            { subdomains: ['0','1','2','3','4','5','6','7'], maxZoom: 18 }),
+          L.tileLayer('https://t{s}.tianditu.gov.cn/cva_w/wmts?layer=cva&style=default&tilematrixset=w&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileRow={y}&TileCol={x}&tk=你的key',
+            { subdomains: ['0','1','2','3','4','5','6','7'], maxZoom: 18 }),
+        ]),
+      };
+
+      let currentBase = bases.osm.addTo(map);
+      function switchBase(name) {
+        map.removeLayer(currentBase);        // 旧底图下线
+        currentBase = bases[name].addTo(map); // 新底图上线
+        document.querySelectorAll('.toolbar button').forEach((b) => b.classList.remove('on'));
+        document.querySelector('#b-' + name).classList.add('on');
+      }
+
+      // TODO 2b：注记层独立——把 tdt 的 layerGroup 拆成两个变量，
+      //          toggleLabels(checked) 只控制注记层的显隐（底图保留）
+      function toggleLabels(checked) { console.log('TODO 2b', checked); }
+
+      // TODO 5：subdomains 实验——OSM 换成带 {s} 的写法并配 subdomains:'abc'，
+      //          Network 面板看 a/b/c 三个子域轮换（绕开浏览器 6 连接/域 限制）
+      // TODO 6：暗色滤镜实验——加载 OSM 层并 className:'dark-tiles'，
+      //          CSS 写 .dark-tiles { filter: invert(1) hue-rotate(180deg) brightness(.9) }
+      //          与 providers 的 DarkMatter 对比效果
+      L.marker([30.5929, 114.3052]).addTo(map).bindPopup('换底图时我还在——要素与底图分层');
+    </script>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>07 · 图层开关面板</title>
+    <link rel="stylesheet" href="./lib/leaflet/dist/leaflet.css" />
+    <script src="./lib/leaflet/dist/leaflet.js"></script>
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 16px; }
+      .toolbar { display: flex; gap: 8px; margin-bottom: 10px; }
+      button { padding: 6px 14px; cursor: pointer; }
+      #map { height: 72vh; border: 1px solid #ccc; border-radius: 6px; }
+      .legend { background: #fff; padding: 8px 12px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.3); font-size: 13px; line-height: 1.8; }
+      .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; }
+      .ts { background: #fffc; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>07 · 图层开关面板（Groups + Layers 控件 + Pane + 自定义控件）</h1>
+    <!-- 底图：高德瓦片（国内直连快，无需 key；GCJ-02 偏移对本练习无影响）。生产环境用天地图 key 或自建瓦片；OSM 版 URL 见注释下方的 git 历史 -->
+    <div class="toolbar">
+      <button onclick="map.fitBounds(cityGroup.getBounds())">fitBounds 城市组</button>
+      <button id="toggle-quakes">程序开关：告警层</button>
+      <span style="color:#999; font-size:13px">右上 Layers 控件勾选 = 程序开关双向联动</span>
+    </div>
+    <div id="map"></div>
+
+    <script>
+      const map = L.map('map', { center: [31.5, 112.5], zoom: 6 });
+
+      // ═══════════ 底图两组（Layers 控件里单选）═══════════
+      const osm = L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', { attribution: '高德底图·仅练习演示' });
+      
+      const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution: 'Esri', maxZoom: 18 });
+      osm.addTo(map);
+
+      // ═══════════ 业务图层：各占一个 Group ═══════════
+      // ① 省界面（用简化矩形模拟"面要素"，练习 05 有真实版）
+      const provinceLayer = L.geoJSON({
+        type: 'FeatureCollection',
+        features: [
+          { type: 'Feature', properties: { name: '湖北' },
+            geometry: { type: 'Polygon', coordinates: [[[110, 29.5], [112, 29.5], [112, 33], [110, 33], [110, 29.5]]] } },
+          { type: 'Feature', properties: { name: '湖南' },
+            geometry: { type: 'Polygon', coordinates: [[[110, 27], [112.5, 27], [112.5, 29.5], [110, 29.5], [110, 27]]] } },
+        ],
+      }, { style: () => ({ color: '#8a8a8a', weight: 1, fillColor: '#f0e9d8', fillOpacity: 0.3 }) });
+
+      // ② 城市点（FeatureGroup：组级事件 + fitBounds）
+      const cityGroup = L.featureGroup([
+        L.marker([30.5929, 114.3052]).bindPopup('武汉'),
+        L.marker([28.2282, 112.9388]).bindPopup('长沙'),
+        L.marker([30.6598, 104.0633]).bindPopup('成都'),
+      ]).addTo(map);
+      cityGroup.on('click', (e) => console.log('组事件：点了', e.layer.getPopup().getContent()));
+
+      // ③ 普通"告警点"（markerPane）
+      const normalAlert = L.layerGroup([
+        L.circleMarker([32.5, 111.5], { radius: 8, color: '#ff4d4f', fillOpacity: .8 }).bindPopup('普通告警'),
+      ]).addTo(map);
+
+      // ═══════════ TODO 2：自定义 pane——告警层要压过普通层 ═══════════
+      map.createPane('alerts');
+      map.getPane('alerts').style.zIndex = 620;    // 高于 markerPane(600)，低于 tooltip(650)
+      const alertPaneGroup = L.layerGroup([
+        L.circleMarker([33.5, 113.5], { radius: 10, color: '#722ed1', fillOpacity: .85, pane: 'alerts' })
+          .bindPopup('自定义 pane 的告警（压过普通告警层）'),
+      ]).addTo(map);
+
+      // ═══════════ Layers 控件：底图单选 + 叠加多选 ═══════════
+      const layersControl = L.control.layers(
+        { 'OSM': osm, '卫星影像': satellite },
+        { '省界': provinceLayer, '城市点': cityGroup, '普通告警': normalAlert, '高优告警(alerts pane)': alertPaneGroup },
+        { collapsed: false },
+      ).addTo(map);
+
+      // ═══════════ 自定义控件 ×2 ═══════════
+      const HomeControl = L.Control.extend({
+        options: { position: 'topleft' },
+        onAdd(map) {
+          const div = L.DomUtil.create('div');
+          div.innerHTML = '⌂';
+          div.title = '回到中心';
+          div.style.cssText = 'width:34px;height:34px;background:#fff;border-radius:6px;display:grid;place-items:center;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.3);font-size:18px';
+          L.DomEvent.on(div, 'click', (e) => {
+            L.DomEvent.stopPropagation(e);       // 防点击穿透到地图
+            map.flyTo([31.5, 112.5], 6);
+          });
+          return div;
+        },
+      });
+      new HomeControl().addTo(map);
+
+      // 时间戳控件（大屏标配：数据更新时间）
+      const TimeControl = L.Control.extend({
+        options: { position: 'bottomright' },
+        onAdd() {
+          this.div = L.DomUtil.create('div', 'ts');
+          this.update();
+          return this.div;
+        },
+        update() { this.div.textContent = '数据更新：' + new Date().toLocaleTimeString('zh-CN', { hour12: false }); },
+      });
+      const timeCtl = new TimeControl().addTo(map);
+      setInterval(() => timeCtl.update(), 30000);   // 每 30 秒刷一次
+
+      // 比例尺控件
+      L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
+
+      // ═══════════ 程序开关（与控件联动）═══════════
+      let alertOn = true;
+      document.querySelector('#toggle-quakes').onclick = () => {
+        alertOn = !alertOn;
+        alertOn ? map.addLayer(alertPaneGroup) : map.removeLayer(alertPaneGroup);
+        // 注意：控件的勾选框会跟着同步——Layers 控件与 addLayer/removeLayer 双向绑定
+      };
+
+      // TODO 6：legend 控件——用 divIcon 思路做一个左下图例框（图例=分类色说明，专题图必备）
+    </script>
+  </body>
+</html>

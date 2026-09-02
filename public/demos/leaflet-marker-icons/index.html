@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>03 · 兴趣点标记页（三种图标）</title>
+    <link rel="stylesheet" href="./lib/leaflet/dist/leaflet.css" />
+    <script src="./lib/leaflet/dist/leaflet.js"></script>
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 16px; }
+      .toolbar { display: flex; gap: 8px; margin-bottom: 10px; }
+      button { padding: 6px 14px; cursor: pointer; }
+      #map { height: 72vh; border: 1px solid #ccc; border-radius: 6px; }
+      #picked { color: #1677ff; font-size: 14px; margin-top: 8px; min-height: 20px; }
+
+      /* ═══════════ divIcon 的 CSS ═══════════ */
+      .city-pin {
+        display: grid; place-items: center; width: 40px; height: 40px;
+        border-radius: 50%; background: #1677ff; color: #fff;
+        font-weight: bold; border: 3px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.35);
+      }
+      .alert-pin { background: #ff4d4f; }
+      .pulse { position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+               animation: pulse 1.5s ease-out infinite; }
+      @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255,77,79,.55); }
+        100% { box-shadow: 0 0 0 22px rgba(255,77,79,0); }
+      }
+      .poi-img { border-radius: 50%; border: 3px solid #fff; box-shadow: 0 1px 6px rgba(0,0,0,.35); }
+    </style>
+  </head>
+  <body>
+    <h1>03 · 兴趣点标记页</h1>
+    <!-- 底图：高德瓦片（国内直连快，无需 key；GCJ-02 偏移对本练习无影响）。生产环境用天地图 key 或自建瓦片；OSM 版 URL 见注释下方的 git 历史 -->
+    <div class="toolbar">
+      <button onclick="map.flyTo([30.5929, 114.3052], 11)">回武汉</button>
+    </div>
+    <div id="picked">点击地图任意处动态打点（TODO 6）</div>
+    <div id="map"></div>
+
+    <script>
+      // ── 打包器碎图修复（方案 ①：正式 React/Vite 项目必配，CDN 页可省）──
+      L.Icon.Default.mergeOptions({
+        iconUrl: './lib/leaflet/dist/images/marker-icon.png',
+        iconRetinaUrl: './lib/leaflet/dist/images/marker-icon-2x.png',
+        shadowUrl: './lib/leaflet/dist/images/marker-shadow.png',
+      });
+
+      const map = L.map('map', { center: [30.5929, 114.3052], zoom: 10 });
+      L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+        { attribution: '高德底图·仅练习演示' }).addTo(map);
+
+      // ── ① 默认图标 ──
+      L.marker([30.5929, 114.3052], { title: '默认图标' }).addTo(map)
+        .bindPopup('默认图标（mergeOptions 修复后）');
+
+      // ── ② 图片图标：锚点实验 ──
+      function photoIcon(seed) {
+        return L.icon({
+          iconUrl: `https://picsum.photos/seed/${seed}/48/48`,
+          iconSize: [48, 48],
+          // TODO 2：锚点实验——先 [0,0]（图钉左上角对准坐标），再改 [24,48]（底部中点）对比
+          iconAnchor: [24, 48],
+          popupAnchor: [0, -48],
+          className: 'poi-img',
+        });
+      }
+      L.marker([30.62, 114.28], { icon: photoIcon('poi-a') }).addTo(map)
+        .bindPopup('图片图标：锚点=底部中点');
+      L.marker([30.57, 114.35], { icon: photoIcon('poi-b') }).addTo(map)
+        .bindPopup('再点我试试');
+
+      // ── ③ divIcon：文字城市标记 ──
+      function cityPin(ch) {
+        return L.divIcon({
+          html: `<div class="city-pin">${ch}</div>`,
+          className: '',            // 清空默认类（否则有白底 padding）
+          iconSize: [40, 40],
+          iconAnchor: [20, 20],     // 中心对准
+        });
+      }
+      L.marker([30.55, 114.25], { icon: cityPin('汉') }).addTo(map).bindPopup('divIcon：城市首字');
+      L.marker([30.65, 114.38], { icon: cityPin('光') }).addTo(map).bindPopup('光谷');
+
+      // ── ③b divIcon：脉冲告警标记（红 + CSS 动画）──
+      const alertIcon = L.divIcon({
+        html: `<div class="city-pin alert-pin">警<span class="pulse"></span></div>`,
+        className: '', iconSize: [40, 40], iconAnchor: [20, 20],
+      });
+      L.marker([30.60, 114.42], { icon: alertIcon, zIndexOffset: 1000 }).addTo(map)
+        .bindPopup('告警标记：divIcon + CSS 动画');
+
+      // ── 可拖动标记（点选坐标组件雏形）──
+      const draggable = L.marker([30.52, 114.32], { draggable: true, autoPan: true }).addTo(map)
+        .bindPopup('拖我！松手后坐标显示在页面上方');
+      draggable.on('dragend', function () {
+        const p = this.getLatLng();
+        document.querySelector('#picked').textContent =
+          `拖动后坐标：${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+      });
+
+      // TODO 6：点击地图动态打点——map.on('click', e => e.latlng …)（第 06 节正式学事件）
+      // TODO 7：批量标记——用数组数据循环生成（数据驱动，别复制粘贴 10 个 L.marker）
+    </script>
+  </body>
+</html>

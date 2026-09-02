@@ -47,7 +47,14 @@ export interface BasePost {
   html: string;
 }
 
-export interface Note extends BasePost {}
+export interface Note extends BasePost {
+  /** 演示地址（/demos/xxx/ 或外链）；有值则文章页标题右侧出现 DEMO 按钮 */
+  demo?: string;
+  /** 演示面板标题（默认取文章标题） */
+  demoLabel?: string;
+  /** 演示面板 iframe 高度（px，默认 440） */
+  demoHeight?: number;
+}
 
 export interface Research extends BasePost {
   status?: string;
@@ -57,6 +64,8 @@ export interface Research extends BasePost {
 export interface Project extends BasePost {
   tech?: string[];
   demo?: string;
+  demoLabel?: string;
+  demoHeight?: number;
   github?: string;
 }
 
@@ -73,6 +82,8 @@ interface RawFrontmatter {
   links?: { label: string; url: string }[];
   tech?: string[];
   demo?: string;
+  demoLabel?: string;
+  demoHeight?: number;
   github?: string;
 }
 
@@ -322,7 +333,13 @@ export function getPostText(dir: 'notes' | 'research' | 'projects', slug: string
   return bodyTextIndex.get(`${dir}:${slug}`) ?? '';
 }
 
-export const getNotes = ttl('notes', () => loadDir<Note>('notes', () => ({})));
+export const getNotes = ttl('notes', () =>
+  loadDir<Note>('notes', (fm) => ({
+    demo: fm.demo,
+    demoLabel: fm.demoLabel,
+    demoHeight: fm.demoHeight !== undefined ? Number(fm.demoHeight) || undefined : undefined,
+  }))
+);
 
 export const getResearch = ttl('research', () =>
   loadDir<Research>('research', (fm) => ({

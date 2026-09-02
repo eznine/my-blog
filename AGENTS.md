@@ -69,6 +69,12 @@ public/uploads/      后台上传的图片
 
 * 回到顶部：右下角毛玻璃圆钮，滚动超 480px 出现（全端）
 
+* **笔记 Demo 演示面板（2026-09-02）**：笔记 frontmatter 加 `demo`（路径/外链）+ `demoLabel`（面板标题，默认文章标题）+ `demoHeight`（iframe 高度 px，默认 440）。**桌面端（xl+）是「演示模式」**：标题右侧「运行 DEMO」按钮（accent 实底 CTA + 白色强呼吸圆点，`demo-ping` 1.1s 扩散 2.8 倍）点击后给最外层容器挂 `data-demo="open"`——**左右各半屏**：左侧目录隐藏、正文留出右半（`.demo-panel-row` padding-right 50%）、右侧面板 `position:fixed` 占满右半边屏幕（宽 50% 全高，iframe flex 填满），左边文章独立滚动，可边读边玩；再点「关闭 DEMO」还原。**窄屏（<xl）**按钮在正文上方展开面板、收起即销毁。iframe 首见才挂载 src（隐藏容器不下载）。面板经 `createPortal` 挂两个锚点：`#note-demo-sidebar`（正文行尾部，display 由 CSS 控制）与 `#note-demo-inline`（头部下方，`xl:hidden`）。站内路径自动补 basePath 前缀（GitHub Pages 子路径）**且以 / 结尾自动补 index.html**（Next 静态服务不做目录解析，`/demos/x/` 会 404；GH Pages/Nginx 才自动解析）；外链（https/协议相对/data:）原样。
+
+**后台上传 Demo（2026-09-02）**：编辑器笔记类型 Demo 字段区有「⬆ 上传 .zip / .html」按钮——`POST /api/demo-upload`（admin-server，依赖 adm-zip）：单 html 直接写 `public/demos/<名>/index.html`；zip 解压（过滤 `../` 路径穿越、zip 外层包一级目录自动上移、无 index.html 取首个 html 当入口），目录名取 query `name` 或文件名主干（仅小写字母数字连字符，重名自动加 `-n` 后缀），返回 `/demos/<名>/` 并自动填入 demo 输入框、demoLabel 填文件名。**部署注意（TODO）**：eznine.xyz standalone 运行时上传的 demo 不会出现在构建期复制进 standalone 的 `public/` 里——需仿照 uploads 把 `public/demos` 加进部署脚本符号链接（或 Nginx alias），否则后台上传的 demo 前台 404。
+
+现有 8 个示例（`F:\learn_webgis\05-leaflet\examples` 的 01~08 全部接入）：`leaflet-hello-map`(01 第一张地图)、`leaflet-basemap-switch`(02 底图与瓦片源，依赖 leaflet-providers)、`leaflet-marker-icons`(03 标记与图标)、`leaflet-geojson`(05 GeoJSON 图层)、`leaflet-events`(06 事件与交互，替换了原 04 popup)、`leaflet-layer-controls`(07 图层组织与控件)、`leaflet-plugins`(08 常用插件，依赖 markercluster/heat/minimap/fullscreen 四插件)、`leaflet-popup-click`(04 点击查看详情，已不在笔记挂载但文件保留)。每个 demo 目录只拷依赖的 lib（`lib/leaflet/dist/{leaflet.css,leaflet.js,images/}` + 各插件 dist），不拷整库。
+
 * **桌面端滚动进度条**（xl+，电脑专用）：隐藏原生滚动条，改为屏幕右缘内侧细轨 + **橙色发光圆圈**（位置=阅读进度，滚过 80px 淡入，点击/拖动可跳转）；移动端保持原生滚动条
 
 * 鼠标光效：深浅主题均可用，底部信息区有开关；RSS 订阅链接已删（feed.xml 仍生成）
@@ -144,6 +150,8 @@ public/uploads/      后台上传的图片
 20. **桌面端滚动条个性化（「右侧滑动的条个性化、别贴屏幕、橙色圆圈代表当前进度」——曾误改移动端目录滑轨被纠正「我指的不是目录，是最右侧的滑轨，手机版不用做」）**：① 移动端目录滑轨 `mobile-toc-rail.tsx` 保持原版不动（等长横线、贴边 right-3）；② 桌面端（xl+）**隐藏原生滚动条**（globals.css @media 1280px：webkit width:0 + Firefox scrollbar-width:none）；③ 新建 `components/scroll-progress-dot.tsx` 全站挂 layout——屏幕右缘内侧细轨（right-3、top/bottom 22vh 不贴边不贴底）上悬浮**橙色发光圆圈**，位置 = scrollTop/可滚高度（随滚动移动=进度），滚过 80px 淡入，点击轨道/拖动圆点可跳转；④ 移动端保持原生滚动条。**教训**：用户说「右侧滑动的条」默认指**浏览器滚动条**而非自定义目录组件——先看截图/红框再动手，别凭第一印象改错对象（这是本会话第二次「改错范围、先还原再说」）。
 
 21. **图片断链 + 全站提速（2026-09-02，eznine.xyz 动态分支）**：① 研究页图片 404 双重根因：a) Next standalone 的静态服务**只认服务启动时刻已存在于 `public/` 的文件**——运行时由图片重写机制新复制进 `content-images/` 的图永远 404（实测同一目录里启动前的图 200、启动后的 404）→ 解决：**`/uploads/` 与 `/content-images/` 交给 Nginx `alias` 直连仓库真实目录**（部署脚本以声明式整文件写入 `/etc/nginx/sites-available/my-blog`，含 `nginx -t` + reload，不再手工改）；b) 后台批量修改把文章移进「大类/章节」子目录后，md 里的 `images/...` 相对路径断链 → `copyImageAndRewrite` 改为**从 md 所在目录逐级向上回溯到 `content/` 根**找源图，且文件命名从「路径 md5」改为「**内容 md5**」（构建期/运行期任何 cwd 下文件名一致，预渲染引用与运行时复制永远对得上）。② 卡顿根治：`lib/content.ts` 拆成**列表只解析 frontmatter（html:''）+ 文章页 `getNoteFull/getResearchFull/getProjectFull` 懒渲染**（按「文件 mtime + 3s TTL」缓存），搜索索引改从 md 源码正则提纯文本（`markdownToPlainText`，不再先渲染 HTML）——首页/列表每次访问都全量渲染所有文章的旧行为是 1-2 秒卡顿主因，且列表对象带全文 html 传给客户端组件会把 RSC 载荷撑大。③ 部署脚本新增：`[0/8]` admin 服务 systemd drop-in 强制 `User=eznine`（曾以 root 跑、写出的文件归 root 埋雷）+ chown `site.config.json`；`[6/8]` 写 Nginx 配置；`[8/8]` 部署后预热全部主要页面（消灭首次访问冷启动 1.7s）。**教训**：a) PowerShell 5 `Set-Content -Encoding UTF8` **带 BOM**，会毁掉 bash 脚本首行 shebang——改完脚本必须检查 `ef bb bf`；b) 部署脚本执行到一半会被自己的 `git pull` 更新，**整个脚本体要包进 `{ }` 复合命令**让 bash 先整体解析；c) curl 验证动态页面必须 `-L`（Next 会 308 补尾斜杠）+ `--compressed`（gzip 下 grep 会空）。
+
+22. **笔记 Demo 演示面板定稿 + 浏览器双端实测（2026-09-02）**：① 面板右半屏固定（左侧文章独立滚动、可边读边玩）的实现要点——Demo 栏经 `createPortal` 挂到 `document.body`（避开 page-enter 的 transform 祖先，fixed 才生效）；外层 `#demo-page` 挂 `data-demo="open"`，CSS 据此隐藏目录/正文留右半（`.demo-panel-row` padding-right 50%）；面板 `#note-demo-sidebar` `position:fixed` 桌面右半屏 50%（min-width:768px）/**<768px 全屏**，左侧有自己的标题条（label + 新窗口打开 + 关闭）与 iframe，iframe 首见才挂 src（隐藏不下载）。② 实测验证 ✓：窄窗口 710px——面板宽 \~700px 全屏、fixed、滚动 scrollTo(500) 后 getBoundingClientRect().top 仍为 0；桌面视口 820px——面板 rect {left:405, width:405} 正好右半屏 \~49.4%，左侧文章独立可读，滚动后 top 仍 0，控制台无业务报错。③ 部署注意（待办）：standalone 运行时上传的 demo 不在构建期复制的 `public/demos`——需仿 uploads 把 `public/demos` 加进部署脚本符号链接（或 Nginx alias），否则后台上传的 demo 前台 404。
 
 ## 六、用户的偏好与协作习惯（重要！）
 

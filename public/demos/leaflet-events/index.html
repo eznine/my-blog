@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>06 · 交互 playground</title>
+    <link rel="stylesheet" href="./lib/leaflet/dist/leaflet.css" />
+    <script src="./lib/leaflet/dist/leaflet.js"></script>
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 16px; }
+      .layout { display: flex; gap: 16px; }
+      /* ★ .wrap 必须自己拿到 flex 宽度，否则塌缩成最小内容宽（地图 0 宽的黑条 bug） */
+      .wrap { flex: 1; min-width: 0; position: relative; }
+      #map { width: 100%; height: 78vh; border: 1px solid #ccc; border-radius: 6px; }
+      #log { width: 300px; height: 78vh; overflow-y: auto; background: #0d1117; color: #c9d1d9;
+             font-size: 12px; padding: 10px; border-radius: 8px; white-space: pre-wrap; }
+      #status-bar { position: absolute; bottom: 8px; left: 8px; z-index: 1000;
+                    background: #fffc; padding: 4px 10px; border-radius: 4px; font-size: 13px; }
+      .hint { color: #999; font-size: 13px; margin: 8px 0; }
+      .wrap { position: relative; }
+    </style>
+  </head>
+  <body>
+    <h1>06 · 交互 playground（事件日志场）</h1>
+    <!-- 底图：高德瓦片（国内直连快，无需 key；GCJ-02 偏移对本练习无影响）。生产环境用天地图 key 或自建瓦片；OSM 版 URL 见注释下方的 git 历史 -->
+    <p class="hint">右侧日志打印所有地图事件；单击打点、双击清除打点（注意消解逻辑）、拖动看 moveend。</p>
+    <div class="layout">
+      <div class="wrap">
+        <div id="map"></div>
+        <div id="status-bar">鼠标位置：…</div>
+      </div>
+      <div id="log"></div>
+    </div>
+
+    <script>
+      const map = L.map('map', { center: [30.5929, 114.3052], zoom: 10 });
+      L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', { attribution: '高德底图·仅练习演示' }).addTo(map);
+
+      // 日志面板
+      const logEl = document.querySelector('#log');
+      function log(msg) {
+        const line = document.createElement('div');
+        line.textContent = `[${new Date().toLocaleTimeString('zh-CN', { hour12: false })}] ${msg}`;
+        logEl.prepend(line);
+        while (logEl.children.length > 60) logEl.lastChild.remove();
+      }
+
+      // ═══════════ 1. map 事件全家桶 ═══════════
+      map.on('zoomstart', () => log('zoomstart'));
+      map.on('zoomend', () => log(`zoomend → z=${map.getZoom()}`));
+      map.on('movestart', () => log('movestart'));
+      map.on('moveend', () => {
+        const b = map.getBounds();
+        log(`moveend → bounds [${b.getSouth().toFixed(3)}, ${b.getWest().toFixed(3)}, ${b.getNorth().toFixed(3)}, ${b.getEast().toFixed(3)}]`);
+        loadInView(b);    // TODO 3：视野内数据联动
+      });
+
+      // 节流版 mousemove（状态条实时经纬度）
+      let lastMove = 0;
+      map.on('mousemove', (e) => {
+        const now = Date.now();
+        if (now - lastMove < 100) return;   // 100ms 节流
+        lastMove = now;
+        document.querySelector('#status-bar').textContent =
+          `鼠标位置：${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`;
+      });
+
+      // ═══════════ 2. 点击打点 + 双击冲突消解 ═══════════
+      const markers = L.layerGroup().addTo(map);
+      let clickTimer = null;
+      map.on('click', (e) => {
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          // TODO 1：单击逻辑——在这里打点（保留最近 5 个）
+          const m = L.marker(e.latlng).addTo(markers).bindPopup(e.latlng.toString());
+          const all = markers.getLayers();
+          if (all.length > 5) markers.removeLayer(all[0]);   // 只留最近 5 个
+          log(`click → 打点 ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`);
+        }, 250);
+      });
+      map.on('dblclick', (e) => {
+        clearTimeout(clickTimer);     // 取消"挂起中的单击"
+        markers.clearLayers();        // 双击=清空打点（演示语义）
+        log('dblclick → 清空打点（单击已消解）');
+        L.DomEvent.stopPropagation(e);   // 防止双击缩放的默认行为干扰
+      });
+
+      // ═══════════ 3. 视野内数据（黄金组合模拟）═══════════
+      // 本地数据集模拟"远端数据"：真实项目里这里是 fetch(`/api?bbox=${...}`)
+      const ALL_POIS = Array.from({ length: 200 }, (_, i) => ({
+        lat: 28 + Math.random() * 6, lng: 111 + Math.random() * 7, name: 'POI-' + i,
+      }));
+      const poiLayer = L.layerGroup().addTo(map);
+      function loadInView(bounds) {
+        poiLayer.clearLayers();
+        const inView = ALL_POIS.filter((p) =>
+          bounds.contains([p.lat, p.lng]));
+        inView.slice(0, 100).forEach((p) =>
+          L.circleMarker([p.lat, p.lng], { radius: 4, color: '#1677ff', fillOpacity: .7 }).addTo(poiLayer));
+        log(`视野内 POI：${inView.length}（渲染 ${Math.min(inView.length, 100)}）`);
+      }
+
+      loadInView(map.getBounds());   // 首次加载：先渲染初始视野内的 POI
+
+      // TODO 4：键盘 Escape 关闭所有弹窗——document.on('keydown') → map.closePopup()
+      // TODO 5：把第 03 节的可拖动 marker 搬过来，注册 dragend 事件打日志
+      // TODO 6：图层事件对照——加一个 GeoJSON 面（小矩形），注册 mouseover/mouseout/click，
+      //          体会"图层事件不冒泡到 map"
+    </script>
+  </body>
+</html>

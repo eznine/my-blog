@@ -4,9 +4,13 @@ date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "Leaflet"
 order: 21
-hidden: true
 tags: ["web","leaflet"]
+demo: /demos/leaflet-geojson/
+demoLabel: 省界 + 当日地震 · 面与点
+demoHeight: 560
 ---
+
+
 
 
 

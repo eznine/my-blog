@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>08 · 插件体验页（聚合/热力/鹰眼/全屏）</title>
+    <link rel="stylesheet" href="./lib/leaflet/dist/leaflet.css" />
+    <script src="./lib/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="./lib/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="./lib/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <script src="./lib/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="./lib/leaflet.heat/dist/leaflet-heat.js"></script>
+    <link rel="stylesheet" href="./lib/leaflet-minimap/dist/Control.MiniMap.min.css" />
+    <script src="./lib/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+    <script src="./lib/leaflet-fullscreen/dist/Leaflet.fullscreen.min.js"></script>
+    <link rel="stylesheet" href="./lib/leaflet-fullscreen/dist/leaflet.fullscreen.css" />
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 16px; }
+      .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+      button { padding: 6px 14px; cursor: pointer; }
+      button.on { background: #1677ff; color: #fff; border: none; }
+      #map { height: 74vh; border: 1px solid #ccc; border-radius: 6px; }
+      /* 聚合数字自定义样式（TODO 2） */
+      .my-cluster { background: rgba(22,119,255,.8); color: #fff; font-weight: bold;
+                    border-radius: 50%; text-align: center; line-height: 40px; width: 40px; height: 40px;
+                    box-shadow: 0 0 0 6px rgba(22,119,255,.25); }
+    </style>
+  </head>
+  <body>
+    <h1>08 · 插件体验页</h1>
+    <!-- 底图：高德瓦片（国内直连快，无需 key；GCJ-02 偏移对本练习无影响）。生产环境用天地图 key 或自建瓦片；OSM 版 URL 见注释下方的 git 历史 -->
+    <div class="toolbar">
+      <button id="btn-cluster" class="on" onclick="switchViz('cluster')">聚合视图</button>
+      <button id="btn-heat" onclick="switchViz('heat')">热力视图</button>
+      <label>聚合半径：
+        <select id="radius" onchange="setRadius(this.value)">
+          <option value="40">40px</option><option value="60" selected>60px</option><option value="90">90px</option>
+        </select>
+      </label>
+      <span style="color:#999; font-size:13px">右下鹰眼 · 左上全屏 · 800 随机点</span>
+    </div>
+    <div id="map"></div>
+
+    <script>
+      const map = L.map('map', {
+        center: [31.2, 112.5], zoom: 6,
+        fullscreenControl: true,            // fullscreen 插件：一行加全屏控件
+      });
+      L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', { attribution: '高德底图·仅练习演示' }).addTo(map);
+
+      // 鹰眼图（MiniMap）
+      L.control.minimap(
+        L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', { attribution: '' }),
+        { position: 'bottomright', toggleDisplay: true, zoomLevelOffset: -5,
+          aimingRectOptions: { color: '#ff4d4f' } },
+      ).addTo(map);
+
+      // ═══════════ 数据：800 个随机点（模拟"海量 POI"）═══════════
+      const points = Array.from({ length: 800 }, () => {
+        const lat = 29 + Math.random() * 5, lng = 110 + Math.random() * 6;
+        const w = Math.random();
+        return { lat, lng, weight: w };
+      });
+
+      // ═══════════ ① markercluster 聚合 ═══════════
+      let clusterRadius = 60;
+      function makeCluster() {
+        const g = L.markerClusterGroup({
+          maxClusterRadius: clusterRadius,
+          showCoverageOnHover: false,
+          // TODO 2：iconCreateFunction 自定义聚合样式（数字越大圈越大/换色）：
+          iconCreateFunction: (cluster) => {
+            const n = cluster.getChildCount();
+            const size = n > 100 ? 50 : n > 20 ? 40 : 32;
+            return L.divIcon({
+              html: `<div class="my-cluster" style="width:${size}px;height:${size}px;line-height:${size}px">${n}</div>`,
+              className: '', iconSize: L.point(size, size),
+            });
+          },
+        });
+        points.forEach((p) => g.addLayer(L.marker([p.lat, p.lng]).bindPopup(`${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}`)));
+        return g;
+      }
+
+      // ═══════════ ② heat 热力 ═══════════
+      function makeHeat() {
+        return L.heatLayer(points.map((p) => [p.lat, p.lng, p.weight]), {
+          radius: 24, blur: 16, maxZoom: 11, minOpacity: 0.3,
+          // TODO 3：换一套色带试试（如蓝→青→黄的"冷色系"）
+          gradient: { 0.2: '#1e3a8a', 0.4: '#22c55e', 0.6: '#facc15', 0.8: '#f97316', 1: '#ef4444' },
+        });
+      }
+
+      // ═══════════ 切换两种可视化 ═══════════
+      let clusterLayer = makeCluster().addTo(map);
+      let heatLayer = null;
+      function switchViz(mode) {
+        map.removeLayer(clusterLayer); map.removeLayer(heatLayer ?? new L.LayerGroup());
+        clusterLayer = null; heatLayer = null;
+        if (mode === 'cluster') { clusterLayer = makeCluster().addTo(map); }
+        else { heatLayer = makeHeat().addTo(map); }
+        document.querySelector('#btn-cluster').classList.toggle('on', mode === 'cluster');
+        document.querySelector('#btn-heat').classList.toggle('on', mode === 'heat');
+      }
+      function setRadius(v) {
+        clusterRadius = Number(v);
+        if (clusterLayer) { map.removeLayer(clusterLayer); clusterLayer = makeCluster().addTo(map); }
+      }
+
+      // TODO 5：minimap 换底图源（如 Carto 浅色），对比效果
+      // TODO 6：fullscreen 原生对照——requestFullscreen() 手写版 vs 插件版
+    </script>
+  </body>
+</html>

@@ -717,8 +717,8 @@ export function AdminApp() {
             </div>
             <h1 className="mt-4 text-2xl font-bold text-ink">内容管理登录</h1>
             <p className="mt-3 text-[14px] leading-relaxed text-ink-soft">
-              管理笔记、研究、项目与分类标签。需要本地同时运行站点（npm run dev）与后台服务（npm run
-              admin）。
+              管理笔记、研究、项目与分类标签。
+              <p>修改主题配色、字体大小。</p>
             </p>
             <input
               type="password"
@@ -737,7 +737,6 @@ export function AdminApp() {
               <span style={{ textShadow: 'none' }}>登录</span>
             </button>
             <p className="mt-4 text-center font-mono text-[11px] tracking-[0.14em] text-ink-faint uppercase">
-              密码配置于 site.config.json · adminPassword
             </p>
           </div>
         </form>

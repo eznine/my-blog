@@ -7,6 +7,7 @@ import { setAiContext } from '@/lib/ai-context';
 import {
   api,
   uploadImage,
+  uploadDemo,
   TYPE_LABELS,
   type PostType,
   type Taxonomy,
@@ -30,6 +31,8 @@ interface FormState {
   hidden: boolean;
   tech: string[];
   demo: string;
+  demoLabel: string;
+  demoHeight: string;
   github: string;
   slug: string;
   content: string;
@@ -46,6 +49,8 @@ const EMPTY: FormState = {
   hidden: false,
   tech: [],
   demo: '',
+  demoLabel: '',
+  demoHeight: '',
   github: '',
   slug: '',
   content: '',
@@ -89,6 +94,8 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           hidden: m.hidden === true || String(m.hidden).toLowerCase() === 'true',
           tech: arr(m.tech),
           demo: str(m.demo),
+          demoLabel: str(m.demoLabel),
+          demoHeight: str(m.demoHeight ?? ''),
           github: str(m.github),
           content: prefill.content.replace(/^\n+/, ''),
         });
@@ -112,6 +119,8 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           hidden: meta.hidden === true || String(meta.hidden).toLowerCase() === 'true',
           tech: arr(meta.tech),
           demo: str(meta.demo),
+          demoLabel: str(meta.demoLabel),
+          demoHeight: str(meta.demoHeight ?? ''),
           github: str(meta.github),
           slug,
           content: content.replace(/^\n+/, ''),
@@ -227,6 +236,24 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
     await uploadAndInsert(files);
   };
 
+  /* ---- Demo 上传（.zip 解压 / 单 .html）→ 自动填入 demo 地址 ---- */
+  const onDemoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setUploading(true);
+    setError('');
+    try {
+      const url = await uploadDemo(file);
+      set('demo', url);
+      if (!form.demoLabel) set('demoLabel', file.name.replace(/\.(zip|html?)$/i, ''));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Demo 上传失败');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const onPaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const files = Array.from(e.clipboardData.files || []);
     if (files.length) {
@@ -262,6 +289,8 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
         hidden: form.hidden,
         tech: form.tech,
         demo: form.demo,
+        demoLabel: form.demoLabel.trim(),
+        demoHeight: form.demoHeight.trim(),
         github: form.github,
         content: form.content,
       };
@@ -430,6 +459,48 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
                   <input className={inputCls} value={form.github} onChange={(e) => set('github', e.target.value)} placeholder="https://github.com/…" />
                 </div>
               </>
+            )}
+
+            {type === 'notes' && (
+              <div className="md:col-span-2 lg:col-span-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <label className={labelCls}>演示 Demo（可选）</label>
+                  <label className="cursor-pointer rounded-lg border border-line px-3 py-1.5 font-mono text-[12px] tracking-[0.14em] text-ink-soft transition-colors hover:border-accent/60 hover:text-accent">
+                    {uploading ? '上传中…' : '⬆ 上传 .zip / .html'}
+                    <input
+                      type="file"
+                      accept=".zip,.html,.htm"
+                      className="hidden"
+                      onChange={onDemoFile}
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+                <div className="grid gap-3 md:grid-cols-[1fr_140px]">
+                  <input
+                    className={`${inputCls} font-mono text-[13px]`}
+                    value={form.demo}
+                    onChange={(e) => set('demo', e.target.value)}
+                    placeholder="/demos/leaflet-hello-map/ 或 https:// 外链"
+                  />
+                  <input
+                    type="number"
+                    className={`${inputCls} font-mono text-[13px]`}
+                    value={form.demoHeight}
+                    onChange={(e) => set('demoHeight', e.target.value)}
+                    placeholder="高度 440"
+                  />
+                  <input
+                    className={`${inputCls} md:col-span-2`}
+                    value={form.demoLabel}
+                    onChange={(e) => set('demoLabel', e.target.value)}
+                    placeholder="面板标题（留空用文章标题）"
+                  />
+                </div>
+                <p className="mt-1.5 font-mono text-[11px] text-ink-faint">
+                  填了会在文章标题右侧出现 DEMO 入口，点击展开演示面板；高度单位 px，留空默认 440
+                </p>
+              </div>
             )}
 
             <div className={type === 'notes' ? 'md:col-span-2' : ''}>

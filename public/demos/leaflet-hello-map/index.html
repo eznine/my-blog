@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>01 · hello-map（第一张地图）</title>
+    <link rel="stylesheet" href="./lib/leaflet/dist/leaflet.css" />
+    <script src="./lib/leaflet/dist/leaflet.js"></script>
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 16px; }
+      .toolbar { display: flex; gap: 8px; margin-bottom: 10px; }
+      button { padding: 6px 14px; cursor: pointer; }
+      /* TODO 坑实验：把下面这条 height 注释掉保存——地图消失（容器高度为 0 的经典坑） */
+      #map { height: 78vh; border: 1px solid #ccc; border-radius: 6px; }
+      #info { color: #999; font-size: 13px; margin: 8px 0; }
+    </style>
+  </head>
+  <body>
+    <h1>01 · hello-map</h1>
+    <!-- 底图：高德瓦片（国内直连快，无需 key；GCJ-02 偏移对本练习无影响）。生产环境用天地图 key 或自建瓦片；OSM 版 URL 见注释下方的 git 历史 -->
+    <div class="toolbar">
+      <!-- TODO 2：飞行动画按钮——flyTo([纬度, 经度], 级别, { duration: 秒 }) -->
+      <button onclick="map.flyTo([30.5929, 114.3052], 14, { duration: 1.5 })">飞到武汉</button>
+      <button onclick="map.setView([39.9042, 116.4074], 12)">瞬移北京</button>
+      <button onclick="map.setZoom(map.getZoom() + 1)">放大一级</button>
+      <button onclick="console.log(map.getCenter(), map.getZoom())">打印当前视野</button>
+    </div>
+    <div id="info">F12 → Console 看打印；Network 看瓦片请求（z/x/y 在变）。</div>
+    <!-- ① 容器 -->
+    <div id="map"></div>
+
+    <script>
+      // ② 地图实例
+      const map = L.map('map', {
+        center: [30.5929, 114.3052],   // ⚠️ [纬度, 经度]
+        zoom: 10,
+        // TODO 5：zoomControl: false 关掉左上角默认缩放控件，
+        //          再用 L.control.zoom({ position: 'topright' }).addTo(map) 手动加回去
+      });
+
+      // ③ 底图瓦片层
+      L.tileLayer('https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+        maxZoom: 19,
+        attribution: '高德底图·仅练习演示',
+      }).addTo(map);
+
+      // ④ 要素：标记 + 弹窗
+      const marker = L.marker([30.5929, 114.3052]).addTo(map);
+      marker.bindPopup('你好，WebGIS！<br>这是我的第一张地图。');
+      marker.openPopup();
+
+      // TODO 1：把中心改到你家乡，加一个家乡标记（第 03 节会学自定义图标）
+
+      // TODO 6：再加一个第二底图层（先不显示，第 02 节正式学图层切换）：
+      // const carto = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      //   attribution: '&copy; CARTO' })
+      // carto.addTo(map) 会叠在 OSM 上——把 OSM 层换成 remove() 试试：
+      //   先把 OSM 层存成变量 const osm = L.tileLayer(...).addTo(map)，再 osm.remove()
+    </script>
+  </body>
+</html>

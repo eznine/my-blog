@@ -5,6 +5,7 @@ import { MobileTocRail } from './mobile-toc-rail';
 import { ReadingProgress } from './reading-progress';
 import { TagChip } from './tag-chip';
 import { SparkField } from './spark-field';
+import { NoteDemo, DEMO_PAGE_ID, type DemoSpec } from './note-demo';
 
 export interface AdjacentLink {
   href: string;
@@ -17,6 +18,7 @@ export function ArticleShell({
   dateText,
   tags,
   metaExtra,
+  demo,
   html,
   headings,
   backHref,
@@ -29,6 +31,8 @@ export function ArticleShell({
   dateText: string;
   tags?: string[];
   metaExtra?: React.ReactNode;
+  /** 演示 Demo：有值则标题右侧出现 DEMO 按钮，点击展开演示面板 */
+  demo?: DemoSpec;
   html: string;
   headings: Heading[];
   backHref: string;
@@ -39,7 +43,7 @@ export function ArticleShell({
   return (
     <>
       <ReadingProgress />
-      <div className="mx-auto max-w-6xl px-6 pb-10 pt-10 md:pt-14">
+      <div id={DEMO_PAGE_ID} className="demo-page mx-auto max-w-6xl px-6 pb-10 pt-10 md:pt-14">
         <Link
           href={backHref}
           className="group inline-flex items-center gap-2 font-mono text-[12px] tracking-[0.18em] text-ink-faint uppercase transition-colors hover:text-accent"
@@ -48,21 +52,26 @@ export function ArticleShell({
           {backLabel}
         </Link>
 
-        <div className="mt-8 flex gap-12">
-          {/* 左侧固定目录（xl+） */}
-          <DesktopToc headings={headings} />
+        <div className="demo-panel-row mt-8 flex gap-12">
+          {/* 左侧固定目录（xl+）；演示模式（容器 data-demo=open）时 CSS 隐藏 */}
+          <div className="desktop-toc-col">
+            <DesktopToc headings={headings} />
+          </div>
           {/* 移动端右侧章节滑轨（<xl） */}
           <MobileTocRail headings={headings} />
 
-          <article className="min-w-0 max-w-[45rem] flex-1">
+          <article className="demo-article min-w-0 max-w-[45rem] flex-1">
             <header className="page-enter">
               <div className="mono-label flex items-center gap-2.5 !text-accent">
                 <span className="marker-dot is-live !h-[5px] !w-[5px]" />
                 {kicker}
               </div>
-              <h1 className="mt-4 text-[2rem] leading-tight font-black tracking-tight text-ink md:text-[2.6rem]">
-                {title}
-              </h1>
+              <div className="mt-4 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+                <h1 className="min-w-0 flex-1 text-[2rem] leading-tight font-black tracking-tight text-ink md:text-[2.6rem]">
+                  {title}
+                </h1>
+                {demo && <NoteDemo demo={{ ...demo, label: demo.label ?? title }} />}
+              </div>
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2.5 border-b border-line pb-7 text-[15px] text-ink-soft">
                 <span className="font-mono text-[13px] tracking-[0.08em]">{dateText}</span>
                 {metaExtra}

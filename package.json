@@ -11,6 +11,7 @@
     "admin": "node scripts/admin-server.mjs"
   },
   "dependencies": {
+    "adm-zip": "^0.6.0",
     "gray-matter": "^4.0.3",
     "next": "^15.3.0",
     "next-themes": "^0.4.6",

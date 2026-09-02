@@ -2,7 +2,9 @@
   "categories": {
     "notes": [
       "遥感",
-      "WebGIS 开发"
+      "WebGIS 开发",
+      "GIS",
+      "Python"
     ],
     "research": [
       "生态安全格局",
@@ -24,16 +26,25 @@
   },
   "chapters": {
     "WebGIS 开发": [
+      "Web基础",
+      "React-Next",
       "GIS基础",
       "Leaflet",
-      "OpenLayers",
-      "React-Next",
-      "Web基础"
+      "OpenLayers"
     ],
     "遥感": [
       "SAR",
       "大气",
-      "土地利用"
+      "土地利用",
+      "ENVI",
+      "geemap",
+      "水文",
+      "生态"
+    ],
+    "GIS": [
+      "土地利用",
+      "生态",
+      "空间统计学"
     ]
   },
   "tags": [

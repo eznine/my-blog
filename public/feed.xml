@@ -5,216 +5,216 @@
     <link>https://github.com/eznine/</link>
     <description>地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Wed, 02 Sep 2026 12:23:36 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 02 Sep 2026 16:12:51 GMT</lastBuildDate>
     <atom:link href="https://github.com/eznine/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>气溶胶反演</title>
-      <link>https://github.com/eznine/notes/42/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/42/</guid>
-      <pubDate>Fri, 12 Jun 2026 00:00:00 GMT</pubDate>
+      <title>第 01 节 · 第一张地图</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-01/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-01/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>秸秆焚烧遥感监测</title>
-      <link>https://github.com/eznine/notes/36/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/36/</guid>
-      <pubDate>Tue, 19 May 2026 00:00:00 GMT</pubDate>
+      <title>第 02 节 · 底图与瓦片源</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-02/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-02/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>NumPy</title>
-      <link>https://github.com/eznine/notes/python-numpy/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-numpy/</guid>
-      <pubDate>Wed, 29 Apr 2026 00:00:00 GMT</pubDate>
+      <title>第 03 节 · 标记与图标</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-03/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-03/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>geopandas</title>
-      <link>https://github.com/eznine/notes/python-geopandas/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-geopandas/</guid>
-      <pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate>
+      <title>第 05 节 · GeoJSON 图层（数据上地图）</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-05-geojson/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-05-geojson/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>rasterio</title>
-      <link>https://github.com/eznine/notes/python-rasterio/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-rasterio/</guid>
-      <pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate>
+      <title>第 06 节 · 事件与交互</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-06/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-06/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>SAR</title>
-      <link>https://github.com/eznine/notes/sar-sar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/sar-sar/</guid>
-      <pubDate>Tue, 28 Apr 2026 00:00:00 GMT</pubDate>
+      <title>第 07 节 · 图层组织与控件</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-07/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-07/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>高分辨率影像预处理</title>
-      <link>https://github.com/eznine/notes/envi-41/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/envi-41/</guid>
-      <pubDate>Wed, 11 Mar 2026 00:00:00 GMT</pubDate>
+      <title>第 08 节 · 常用插件</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-08/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-08/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>SBAS-InSAR</title>
-      <link>https://github.com/eznine/notes/sar-sbas-insar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/sar-sbas-insar/</guid>
-      <pubDate>Tue, 03 Mar 2026 00:00:00 GMT</pubDate>
+      <title>第 09 节 · 类体系全景</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-09/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-09/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>DInSAR-形变监测</title>
-      <link>https://github.com/eznine/notes/sar-dinsar/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/sar-dinsar/</guid>
-      <pubDate>Wed, 25 Feb 2026 00:00:00 GMT</pubDate>
+      <title>第 10 节 · CRS 详解</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-10-crs/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-10-crs/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>InSAR-制作DEM</title>
-      <link>https://github.com/eznine/notes/sar-insar-dem/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/sar-insar-dem/</guid>
-      <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+      <title>第 11 节 · 渲染器原理（SVG vs Canvas）</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-11/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-11/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>SAR数据处理</title>
-      <link>https://github.com/eznine/notes/sar-sar-2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/sar-sar-2/</guid>
-      <pubDate>Tue, 24 Feb 2026 00:00:00 GMT</pubDate>
+      <title>第 12 节 · Vector 图层全参数</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-12-vector/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-12-vector/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>(FVC)基于像元二分模型的植被覆盖度反演</title>
-      <link>https://github.com/eznine/notes/fvc/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/fvc/</guid>
-      <pubDate>Sat, 21 Feb 2026 00:00:00 GMT</pubDate>
+      <title>第 13 节 · 控件全解与 API 速查手册（模块 05 收官）</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-13-api/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-13-api/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>可视化</title>
-      <link>https://github.com/eznine/notes/geemap-5-2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-5-2/</guid>
-      <pubDate>Mon, 09 Feb 2026 00:00:00 GMT</pubDate>
+      <title>第 01 节 · 组件与 JSX/TSX</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-01-jsx/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-01-jsx/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>JS代码转成Python</title>
-      <link>https://github.com/eznine/notes/geemap-js-python/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-js-python/</guid>
-      <pubDate>Fri, 06 Feb 2026 00:00:00 GMT</pubDate>
+      <title>第 02 节 · props 与数据流</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-02-props/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-02-props/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>数据导出</title>
-      <link>https://github.com/eznine/notes/geemap-32/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-32/</guid>
-      <pubDate>Fri, 06 Feb 2026 00:00:00 GMT</pubDate>
+      <title>第 03 节 · state 与 useState</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-03-state-usestate/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-03-state-usestate/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>导入数据</title>
-      <link>https://github.com/eznine/notes/geemap-p3/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-p3/</guid>
-      <pubDate>Mon, 02 Feb 2026 00:00:00 GMT</pubDate>
+      <title>第 04 节 · useEffect：副作用与数据加载</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-04-useeffect/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-04-useeffect/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>创建地图</title>
-      <link>https://github.com/eznine/notes/geemap-p2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-p2/</guid>
-      <pubDate>Sat, 31 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 05 节 · 列表渲染与 key</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-05-key/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-05-key/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>基于高分辨率影像城市绿地信息提取</title>
-      <link>https://github.com/eznine/notes/envi-34/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/envi-34/</guid>
-      <pubDate>Fri, 30 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 06 节 · 受控表单</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-06/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-06/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>水质监测（富营养化）</title>
-      <link>https://github.com/eznine/notes/35/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/35/</guid>
-      <pubDate>Fri, 30 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 07 节 · 组件通信</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-07/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-07/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>配置</title>
-      <link>https://github.com/eznine/notes/geemap-33/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/geemap-33/</guid>
-      <pubDate>Thu, 29 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 09 节 · 项目组织</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-09/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-09/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>模块</title>
-      <link>https://github.com/eznine/notes/python-5/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-5/</guid>
-      <pubDate>Sat, 24 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 10 节 · 组件库 Ant Design 上手</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-10-antdesign/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-10-antdesign/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>错误与异常</title>
-      <link>https://github.com/eznine/notes/python-6/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-6/</guid>
-      <pubDate>Tue, 20 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 11 节 · React 生态地图</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-11-react/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-11-react/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>面向对象</title>
-      <link>https://github.com/eznine/notes/python-7/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-7/</guid>
-      <pubDate>Sun, 18 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 12 节 · Hooks 全解（逐参数讲透）</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-12-hooks/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-12-hooks/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>低分辨率影像预处理</title>
-      <link>https://github.com/eznine/notes/envi-modis/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/envi-modis/</guid>
-      <pubDate>Sat, 17 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 13 节 · 渲染机制</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-13/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-13/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>遥感影像处理</title>
-      <link>https://github.com/eznine/notes/envi-40/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/envi-40/</guid>
-      <pubDate>Sat, 17 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 14 节 · 状态管理全景</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-14/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-14/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>数据容器</title>
-      <link>https://github.com/eznine/notes/python-4/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-4/</guid>
-      <pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 15 节 · 性能优化</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-15/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-15/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>软件操作</title>
-      <link>https://github.com/eznine/notes/envi-38/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/envi-38/</guid>
-      <pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 16 节 · React + TS 实战模式</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-16-react-ts/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-16-react-ts/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>软件认识</title>
-      <link>https://github.com/eznine/notes/envi-39/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/envi-39/</guid>
-      <pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 17 节 · Vue 认知：差异地图</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-17-vue/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-17-vue/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>函数</title>
-      <link>https://github.com/eznine/notes/python-2/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-2/</guid>
-      <pubDate>Wed, 14 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 18 节 · 读懂国产 GIS 的 Vue 示例</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-18-gis-vue/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-18-gis-vue/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
     <item>
-      <title>基础语法</title>
-      <link>https://github.com/eznine/notes/python-3/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/python-3/</guid>
-      <pubDate>Sun, 11 Jan 2026 00:00:00 GMT</pubDate>
+      <title>第 19 节 · 为什么有 Next.js</title>
+      <link>https://github.com/eznine/notes/webgis-react-next-19-next-js/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-19-next-js/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
   </channel>
