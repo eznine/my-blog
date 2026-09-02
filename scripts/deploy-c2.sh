@@ -43,10 +43,12 @@ ln -sfn ../../../public/content-images $S/public/content-images
 echo "==> [5/6] 修正属主（web 服务以 eznine 运行）"
 chown -R eznine:eznine .next public/uploads public/content-images 2>/dev/null || true
 
-echo "==> [6/6] 重启 web 服务"
+echo "==> [6/6] 重启 web 服务与后台服务"
 systemctl restart my-blog-web.service
+systemctl restart my-blog-admin.service
 sleep 2
 systemctl is-active my-blog-web.service
+systemctl is-active my-blog-admin.service
 
 echo "=== 验证 ==="
 echo -n "web3210:"; curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3210/
