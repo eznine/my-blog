@@ -1,5 +1,4 @@
-import { getNotes, getResearch, getProjects } from './content';
-import { htmlToPlainText } from './md';
+import { getNotes, getResearch, getProjects, getPostText } from './content';
 import type { SearchItem } from './search-core';
 
 export type { SearchItem, SearchHit } from './search-core';
@@ -8,8 +7,6 @@ const BODY_LIMIT = 6000;
 
 export async function buildSearchIndex(): Promise<SearchItem[]> {
   const [notes, research, projects] = await Promise.all([getNotes(), getResearch(), getProjects()]);
-
-  const toText = (html: string) => htmlToPlainText(html).slice(0, BODY_LIMIT);
 
   return [
     ...notes.map<SearchItem>((n) => ({
@@ -21,7 +18,7 @@ export async function buildSearchIndex(): Promise<SearchItem[]> {
       summary: n.summary,
       category: n.category,
       tags: n.tags,
-      text: toText(n.html),
+      text: getPostText('notes', n.slug).slice(0, BODY_LIMIT),
     })),
     ...research.map<SearchItem>((r) => ({
       type: 'research',
@@ -32,7 +29,7 @@ export async function buildSearchIndex(): Promise<SearchItem[]> {
       summary: r.summary,
       category: r.category,
       tags: r.tags,
-      text: toText(r.html),
+      text: getPostText('research', r.slug).slice(0, BODY_LIMIT),
     })),
     ...projects.map<SearchItem>((p) => ({
       type: 'project',
@@ -43,7 +40,7 @@ export async function buildSearchIndex(): Promise<SearchItem[]> {
       summary: p.summary,
       category: p.category,
       tags: p.tags,
-      text: toText(p.html),
+      text: getPostText('projects', p.slug).slice(0, BODY_LIMIT),
     })),
   ];
 }

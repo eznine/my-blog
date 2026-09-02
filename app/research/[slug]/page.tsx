@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getResearch, formatDate } from '@/lib/content';
+import { getResearch, getResearchFull, formatDate } from '@/lib/content';
 import { extractHeadings } from '@/lib/md';
 import { ArticleShell } from '@/components/article-shell';
 
@@ -20,9 +20,9 @@ export async function generateMetadata({
 
 export default async function ResearchPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const posts = await getResearch();
-  const post = posts.find((r) => r.slug === slug);
-  if (!post) notFound();
+  const meta = (await getResearch()).find((r) => r.slug === slug);
+  if (!meta) notFound();
+  const post = (await getResearchFull(slug)) ?? meta;
 
   return (
     <ArticleShell

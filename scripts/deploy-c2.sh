@@ -11,9 +11,14 @@
 #      root 属主文件——之前 sudo 直接跑导致 .git/.next 归 root，
 #      git pull 失败、运行时写图片 EACCES 500。
 #   3. 启动时自愈：把 .git/.next/content 等属主修正为 eznine。
+#   4. 自愈 systemd：确保 my-blog-admin 以 eznine 运行（曾以 root 跑，
+#      写出的文件归 root，后续 git/运行时写入报权限错误）。
 # =====================================================================
 set -e
 cd /srv/my-blog
+
+{ # ← 整个脚本体包在复合命令里：bash 会先整体解析再执行，
+  #   避免 [1/8] git pull 更新本文件后执行位置错乱
 
 # 以 eznine 身份执行命令（脚本通常被 sudo 调用，避免再写出 root 文件）
 AS_EZNINE() {
@@ -24,28 +29,33 @@ AS_EZNINE() {
   fi
 }
 
-echo "==> [0/6] 自愈：修正历史 sudo 遗留的 root 属主"
+echo "==> [0/8] 自愈：修正历史 sudo 遗留的 root 属主 + admin 服务身份"
 if [ "$(id -u)" = "0" ]; then
   chown -R eznine:eznine .git .next content public 2>/dev/null || true
+  chown eznine:eznine site.config.json 2>/dev/null || true
+  # admin 服务必须以 eznine 运行（drop-in 覆盖，不动原 unit 文件）
+  mkdir -p /etc/systemd/system/my-blog-admin.service.d
+  printf '[Service]\nUser=eznine\nGroup=eznine\n' > /etc/systemd/system/my-blog-admin.service.d/user.conf
+  systemctl daemon-reload
 fi
 
-echo "==> [1/6] git 拉取 dynamic"
+echo "==> [1/8] git 拉取 dynamic"
 AS_EZNINE git checkout -- public/feed.xml public/sitemap.xml 2>/dev/null || true
 AS_EZNINE git checkout dynamic
 AS_EZNINE git pull --ff-only origin dynamic
 
-echo "==> [2/6] 安装依赖（如有变化）"
+echo "==> [2/8] 安装依赖（如有变化）"
 AS_EZNINE npm install --no-audit --no-fund --loglevel=error
 
-echo "==> [3/6] 构建 standalone"
+echo "==> [3/8] 构建 standalone"
 AS_EZNINE env NEXT_PUBLIC_ADMIN_API=/api NODE_OPTIONS='--max-old-space-size=2048' npx next build
 
-echo "==> [4/6] 组装 standalone（静态资源复制 + 内容目录符号链接）"
+echo "==> [4/8] 组装 standalone（静态资源复制 + 内容目录符号链接）"
 S=.next/standalone
 # 静态资源必须复制（带内容哈希，每次构建都变）
 rm -rf $S/.next/static
 cp -r .next/static $S/.next/static
-# public：先整体复制，再把三个"活目录"换成符号链接
+# public：先整体复制，再将三个"活目录"换成符号链接
 rm -rf $S/public
 cp -r public $S/public
 mkdir -p content public/uploads public/content-images
@@ -56,17 +66,67 @@ ln -sfn ../../../public/uploads $S/public/uploads
 rm -rf $S/public/content-images
 ln -sfn ../../../public/content-images $S/public/content-images
 
-echo "==> [5/6] 修正属主（web 服务以 eznine 运行）"
+echo "==> [5/8] 修正属主（web 服务以 eznine 运行）"
 if [ "$(id -u)" = "0" ]; then
   chown -R eznine:eznine .next public/uploads public/content-images 2>/dev/null || true
 fi
 
-echo "==> [6/6] 重启 web 服务与后台服务"
+echo "==> [6/8] 写入 Nginx 站点配置（/uploads/ 与 /content-images/ 由 Nginx 直连仓库目录，"
+echo "          绕开 Next 静态服务——Next 对服务启动后新增的图片文件会 404）"
+if [ "$(id -u)" = "0" ]; then
+  cat > /etc/nginx/sites-available/my-blog <<'NGINX'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+
+    location / {
+        proxy_pass http://127.0.0.1:3210;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 600s;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 600s;
+    }
+
+    location /uploads/ {
+        alias /srv/my-blog/public/uploads/;
+        expires 7d;
+    }
+
+    location /content-images/ {
+        alias /srv/my-blog/public/content-images/;
+        expires 30d;
+    }
+}
+NGINX
+  ln -sfn /etc/nginx/sites-available/my-blog /etc/nginx/sites-enabled/my-blog
+  nginx -t
+fi
+
+echo "==> [7/8] 重启 web 服务与后台服务 + 重载 Nginx"
 systemctl restart my-blog-web.service
 systemctl restart my-blog-admin.service
+[ "$(id -u)" = "0" ] && systemctl reload nginx
 sleep 2
 systemctl is-active my-blog-web.service
 systemctl is-active my-blog-admin.service
+
+echo "==> [8/8] 预热页面（避免访客第一次打开吃冷启动渲染）"
+for pg in / /notes/ /research/ /projects/ /archive/ /search/ /about/; do
+  curl -sL -o /dev/null --max-time 30 "http://127.0.0.1:3210$pg" || true
+done
 
 echo "=== 验证 ==="
 echo -n "web3210:"; curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3210/
@@ -75,3 +135,5 @@ echo
 echo -n "version api: "; curl -s http://127.0.0.1:3001/api/version
 echo
 echo "==> 完成"
+
+} # ← 复合命令结束

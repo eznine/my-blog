@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getProjects, formatDate } from '@/lib/content';
+import { getProjects, getProjectFull, formatDate } from '@/lib/content';
 import { extractHeadings } from '@/lib/md';
 import { ArticleShell } from '@/components/article-shell';
 
@@ -20,8 +20,9 @@ export async function generateMetadata({
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = (await getProjects()).find((p) => p.slug === slug);
-  if (!project) notFound();
+  const meta = (await getProjects()).find((p) => p.slug === slug);
+  if (!meta) notFound();
+  const project = (await getProjectFull(slug)) ?? meta;
 
   return (
     <ArticleShell

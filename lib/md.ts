@@ -48,3 +48,21 @@ export function htmlToPlainText(html: string): string {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+/** 直接从 Markdown 源码提取纯文本（搜索索引用，比先渲染 HTML 再剥标签便宜得多） */
+export function markdownToPlainText(md: string): string {
+  return md
+    .replace(/```[\s\S]*?```/g, ' ') // 代码块
+    .replace(/~~~[\s\S]*?~~~/g, ' ')
+    .replace(/`([^`]*)`/g, '$1') // 行内代码
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ') // 图片
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // 链接保留文字
+    .replace(/<[^>]+>/g, ' ') // HTML 标签
+    .replace(/^#{1,6}\s+/gm, '') // 标题记号
+    .replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, '') // 列表记号
+    .replace(/^\s*>\s?/gm, '') // 引用
+    .replace(/\|/g, ' ') // 表格
+    .replace(/[*_~]{1,3}/g, '') // 强调记号
+    .replace(/\s+/g, ' ')
+    .trim();
+}

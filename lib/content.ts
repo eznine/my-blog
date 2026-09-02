@@ -2,15 +2,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import matter from 'gray-matter';
-import { renderMarkdown } from './md';
+import { renderMarkdown, markdownToPlainText } from './md';
 
 /* ---------------- 模块级 TTL 缓存（dynamic 模式专用） ----------------
- * React cache() 只在单次请求内缓存，跨请求不缓存——dynamic 模式下每次页面访问
- * 都会重新扫描全部 md + 渲染 markdown，2s+ 延迟。这里改为模块级 3 秒 TTL：
- * 3 秒内跨请求复用同一份解析结果（快），3 秒后自动重读（后台保存后最快 3 秒生效）。
+ * 列表接口只解析 frontmatter（便宜）；正文 HTML 在打开文章页时才渲染，
+ * 且按「文件 mtime + 3 秒 TTL」缓存。这样列表/首页/搜索的 SSR 开销极小，
+ * 后台保存后最快 3 秒生效。
  */
 const CONTENT_TTL = 3000;
-const contentCache = new Map<string, { at: number; value: unknown }>();
+const contentCache = new Map<string, { at: number; value: unknown; mtime?: number }>();
 
 function ttl<T>(key: string, loader: () => Promise<T>): () => Promise<T> {
   return async () => {
@@ -166,23 +166,45 @@ function inferTitle(content: string, fallback: string): string {
 const IMG_DIR_NAME = 'content-images';
 const base = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
+function resolveImageSrc(url: string, mdFileDir: string): string | null {
+  // URL 解码 + 剥离 ?query / #hash（Notion 导出常带 ?width=）
+  const decoded = decodeURIComponent(url).split(/[?#]/)[0].trim();
+  if (!decoded) return null;
+  // 从 md 所在目录逐级向上找图片——文章被后台移入「大类/章节」子目录后，
+  // images/ 往往还留在原处，只按 md 同级目录解析会断链。
+  const contentRoot = path.join(process.cwd(), 'content');
+  let dir = mdFileDir;
+  for (;;) {
+    const candidate = path.resolve(dir, decoded);
+    if (fs.existsSync(candidate)) return candidate;
+    if (dir === contentRoot) break;
+    dir = path.dirname(dir);
+  }
+  return null;
+}
+
 function copyImageAndRewrite(url: string, mdFileDir: string): string | null {
   // 跳过外链与 data URI；站内绝对路径（如 /uploads/）补 base 前缀
   if (/^(https?:|data:)/.test(url)) return null;
   if (url.startsWith('/')) return `${base}${url}`;
-  // URL 解码 + 剥离 ?query / #hash（Notion 导出常带 ?width=）
-  const decoded = decodeURIComponent(url).split(/[?#]/)[0].trim();
-  if (!decoded) return null;
-  const srcPath = path.resolve(mdFileDir, decoded);
-  if (!fs.existsSync(srcPath)) return null;
-  const hash = crypto.createHash('md5').update(srcPath).digest('hex').slice(0, 12);
-  const ext = path.extname(srcPath) || '.png';
-  const name = `${hash}${ext}`;
-  const destDir = path.join(process.cwd(), 'public', IMG_DIR_NAME);
-  const destPath = path.join(destDir, name);
-  fs.mkdirSync(destDir, { recursive: true });
-  if (!fs.existsSync(destPath)) fs.copyFileSync(srcPath, destPath);
-  return `${base}/${IMG_DIR_NAME}/${name}`;
+  const srcPath = resolveImageSrc(url, mdFileDir);
+  if (!srcPath) return null;
+  try {
+    // 用【文件内容】哈希命名：构建期与运行期、任何 cwd 下结果一致，
+    // 预渲染 HTML 引用的文件名与运行时复制出来的文件名永远对得上。
+    const data = fs.readFileSync(srcPath);
+    const hash = crypto.createHash('md5').update(data).digest('hex').slice(0, 12);
+    const ext = path.extname(srcPath) || '.png';
+    const name = `${hash}${ext}`;
+    const destDir = path.join(process.cwd(), 'public', IMG_DIR_NAME);
+    const destPath = path.join(destDir, name);
+    fs.mkdirSync(destDir, { recursive: true });
+    if (!fs.existsSync(destPath)) fs.copyFileSync(srcPath, destPath);
+    return `${base}/${IMG_DIR_NAME}/${name}`;
+  } catch (e) {
+    console.error('[content-images] 复制失败:', srcPath, e);
+    return null;
+  }
 }
 
 function rewriteImagePaths(md: string, mdFileDir: string): string {
@@ -214,6 +236,11 @@ function normalizeDate(d: string | Date | undefined): string {
   return '';
 }
 
+/** 文章源文件索引：`${dir}:${slug}` → md 绝对路径（懒渲染用） */
+const srcFileIndex = new Map<string, string>();
+/** 文章正文纯文本：`${dir}:${slug}` → 搜索索引用（不走 markdown 渲染） */
+const bodyTextIndex = new Map<string, string>();
+
 async function loadDir<T extends BasePost>(
   dir: string,
   decorate: (fm: RawFrontmatter) => Partial<T>
@@ -223,42 +250,76 @@ async function loadDir<T extends BasePost>(
   const files = collectMarkdownFiles(abs);
   const taken = new Set<string>();
 
-  const posts = await Promise.all(
-    files.map(async (relPath) => {
-      const absFile = path.join(abs, relPath);
-      const raw = fs.readFileSync(absFile, 'utf-8');
-      const { data, content } = matter(raw);
-      const fm = data as RawFrontmatter;
-      const md = rewriteImagePaths(content, path.dirname(absFile));
-      const html = await renderMarkdown(md);
+  const posts = files.map((relPath) => {
+    const absFile = path.join(abs, relPath);
+    const raw = fs.readFileSync(absFile, 'utf-8');
+    const { data, content } = matter(raw);
+    const fm = data as RawFrontmatter;
 
-      const segments = relPath.split('/');
-      const depth = segments.length - 1; // 目录层级：0=根，1=大类目录，2=大类/章节目录
-      const folder = depth >= 1 ? segments[0] : undefined;
-      const subFolder = depth >= 2 ? segments[1] : undefined;
-      const fileName = segments[segments.length - 1];
-      const date = normalizeDate(fm.date) || fileDate(absFile);
-      const title = fm.title ?? inferTitle(content, fileName.replace(/\.mdx?$/, ''));
+    const segments = relPath.split('/');
+    const depth = segments.length - 1; // 目录层级：0=根，1=大类目录，2=大类/章节目录
+    const folder = depth >= 1 ? segments[0] : undefined;
+    const subFolder = depth >= 2 ? segments[1] : undefined;
+    const fileName = segments[segments.length - 1];
+    const date = normalizeDate(fm.date) || fileDate(absFile);
+    const title = fm.title ?? inferTitle(content, fileName.replace(/\.mdx?$/, ''));
+    const slug = uniqueSlug(slugify(relPath), taken);
 
-      return {
-        slug: uniqueSlug(slugify(relPath), taken),
-        title,
-        date,
-        summary: fm.summary ?? '',
-        category: fm.category ?? (folder ? folderCategory(folder) ?? '未分类' : '未分类'),
-        chapter: fm.chapter ?? (subFolder ? folderChapter(subFolder) : undefined),
-        tags: fm.tags ?? [],
-        order: fm.order !== undefined ? Number(fm.order) || 0 : undefined,
-        hidden: fm.hidden === true || String(fm.hidden).toLowerCase() === 'true' || undefined,
-        html,
-        ...decorate(fm),
-      } as T;
-    })
-  );
+    srcFileIndex.set(`${dir}:${slug}`, absFile);
+    bodyTextIndex.set(`${dir}:${slug}`, markdownToPlainText(content));
+
+    return {
+      slug,
+      title,
+      date,
+      summary: fm.summary ?? '',
+      category: fm.category ?? (folder ? folderCategory(folder) ?? '未分类' : '未分类'),
+      chapter: fm.chapter ?? (subFolder ? folderChapter(subFolder) : undefined),
+      tags: fm.tags ?? [],
+      order: fm.order !== undefined ? Number(fm.order) || 0 : undefined,
+      hidden: fm.hidden === true || String(fm.hidden).toLowerCase() === 'true' || undefined,
+      html: '', // 列表不带正文：SSR 快、RSC 载荷小；文章页用 getXxxFull() 懒渲染
+      ...decorate(fm),
+    } as T;
+  });
 
   return posts
     .filter((p) => !(p.hidden === true || String(p.hidden).toLowerCase() === 'true'))
     .sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title, 'zh'));
+}
+
+/** 渲染单篇文章正文（图片重写 + markdown），按「文件 mtime + 3s TTL」缓存 */
+async function renderPostHtml(absFile: string): Promise<string> {
+  let mtime = 0;
+  try {
+    mtime = fs.statSync(absFile).mtimeMs;
+  } catch {}
+  const key = `html:${absFile}`;
+  const hit = contentCache.get(key);
+  if (hit && hit.mtime === mtime && Date.now() - hit.at < CONTENT_TTL) return hit.value as string;
+  const raw = fs.readFileSync(absFile, 'utf-8');
+  const { content } = matter(raw);
+  const md = rewriteImagePaths(content, path.dirname(absFile));
+  const html = await renderMarkdown(md);
+  contentCache.set(key, { at: Date.now(), value: html, mtime });
+  return html;
+}
+
+async function withHtml<T extends BasePost>(
+  dir: string,
+  list: () => Promise<T[]>,
+  slug: string
+): Promise<T | undefined> {
+  const meta = (await list()).find((p) => p.slug === slug);
+  if (!meta) return undefined;
+  const src = srcFileIndex.get(`${dir}:${slug}`);
+  if (!src) return meta;
+  return { ...meta, html: await renderPostHtml(src) };
+}
+
+/** 搜索索引用的正文纯文本（需先调用过对应的 getXxx 列表） */
+export function getPostText(dir: 'notes' | 'research' | 'projects', slug: string): string {
+  return bodyTextIndex.get(`${dir}:${slug}`) ?? '';
 }
 
 export const getNotes = ttl('notes', () => loadDir<Note>('notes', () => ({})));
@@ -288,6 +349,19 @@ export async function getResearchPost(slug: string): Promise<Research | undefine
 
 export async function getProject(slug: string): Promise<Project | undefined> {
   return (await getProjects()).find((p) => p.slug === slug);
+}
+
+/** 文章详情（元信息 + 渲染后的正文 HTML），文章页专用 */
+export async function getNoteFull(slug: string): Promise<Note | undefined> {
+  return withHtml('notes', getNotes, slug);
+}
+
+export async function getResearchFull(slug: string): Promise<Research | undefined> {
+  return withHtml('research', getResearch, slug);
+}
+
+export async function getProjectFull(slug: string): Promise<Project | undefined> {
+  return withHtml('projects', getProjects, slug);
 }
 
 export interface PageDoc {

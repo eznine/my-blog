@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getNotes, formatDate } from '@/lib/content';
+import { getNotes, getNoteFull, formatDate } from '@/lib/content';
 import { extractHeadings } from '@/lib/md';
 import { ArticleShell } from '@/components/article-shell';
 
@@ -24,7 +24,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
   const idx = notes.findIndex((n) => n.slug === slug);
   if (idx === -1) notFound();
 
-  const note = notes[idx];
+  const note = (await getNoteFull(slug)) ?? notes[idx];
   const headings = extractHeadings(note.html);
 
   /* 相邻文章：同章节（同大类+同章节）优先切换；章节内只有本篇时回退到同大类 */
