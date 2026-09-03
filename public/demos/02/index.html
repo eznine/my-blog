@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>l02 · 图文混排页</title>
+  </head>
+  <body>
+    <!-- ═══════════ 锚点导航：点下面的链接跳到对应区块 ═══════════ -->
+    <nav>
+      <!-- TODO 2：给"表格"和"相关链接"补上两个导航链接（href="#xxx"） -->
+      <a href="#intro">简介</a> |
+      <a href="#gallery">图片区</a> |
+      <a href="#">表格</a> |
+      <a href="#">相关链接</a>
+    </nav>
+    <hr />
+
+    <!-- ═══════════ 简介区 ═══════════ -->
+    <h1 id="intro">中国主要地图底图服务一览</h1>
+    <p>
+      本页汇总常见的网络地图底图来源。
+      <strong>天地图</strong>是国家背景底图，<em>高德与腾讯</em>使用 GCJ-02 坐标系，
+      而 <mark>OpenStreetMap</mark> 是全球志愿者共建的开放地图。
+      代码示例：<code>https://tile.openstreetmap.org/{z}/{x}/{y}.png</code>
+    </p>
+
+    <!-- ═══════════ 图片区 ═══════════ -->
+    <h2 id="gallery">图片区</h2>
+    <p>
+      <!-- 网络占位图：picsum 是免费的随机图片服务（联网可看） -->
+      <img
+        src="https://picsum.photos/seed/webgis/400/200"
+        alt="随机占位图：一张风景照"
+        width="400"
+      />
+    </p>
+    <p>
+      <!-- TODO 3：把上面这张换成一张本地图片：
+           1. 随便找张图放到本文件夹，改名为 my-map.jpg
+           2. 把 src 改成相对路径 ./my-map.jpg
+           3. alt 也要改成图片的真实内容描述 -->
+    </p>
+
+    <!-- ═══════════ 表格区 ═══════════ -->
+    <h2 id="table">底图服务对比</h2>
+    <table border="1">
+      <caption>三大底图来源对比</caption>
+      <thead>
+        <tr>
+          <th>服务</th>
+          <th>坐标系</th>
+          <th>是否免费</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>天地图</td>
+          <td>CGCS2000</td>
+          <td>注册后免费（有配额）</td>
+        </tr>
+        <tr>
+          <td>高德地图</td>
+          <td>GCJ-02</td>
+          <td>有免费额度</td>
+        </tr>
+        <!-- TODO 4：补一行 OpenStreetMap 的数据（坐标系 WGS 84，完全免费） -->
+      </tbody>
+    </table>
+
+    <!-- ═══════════ 相关链接区 ═══════════ -->
+    <h2 id="links">相关链接</h2>
+    <ul>
+      <li>
+        <!-- TODO 1：这个外链要在新标签页打开，请补上 target 和 rel 两个属性 -->
+        <a href="https://www.tianditu.gov.cn/">天地图官网</a>
+      </li>
+      <li><a href="https://www.openstreetmap.org/">OpenStreetMap</a></li>
+      <li><a href="mailto:me@example.com">联系我</a></li>
+    </ul>
+
+    <hr />
+    <footer>
+      <p><a href="#intro">回到顶部</a></p>
+    </footer>
+  </body>
+</html>

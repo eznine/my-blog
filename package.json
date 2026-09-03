@@ -11,6 +11,13 @@
     "admin": "node scripts/admin-server.mjs"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.11.0",
+    "@codemirror/lang-html": "^6.4.12",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/state": "^6.7.2",
+    "@codemirror/view": "^6.43.10",
+    "@lezer/highlight": "^1.2.3",
+    "@uiw/react-codemirror": "^4.25.11",
     "adm-zip": "^0.6.0",
     "gray-matter": "^4.0.3",
     "next": "^15.3.0",

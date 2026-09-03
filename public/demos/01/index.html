@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>l01 · 个人简历骨架</title>
+  </head>
+  <body>
+    <!-- ═══════════ 头部：姓名与一句话介绍 ═══════════ -->
+    <header>
+      <!-- header 是语义标签：表示"页面的头部区域"（第 28 节细讲语义化） -->
+      <h1>张三</h1>
+      <!-- h1：页面最大的标题，一个页面只用一个 -->
+      <p>GIS 专业在读 · 目标成为 WebGIS 开发者</p>
+    </header>
+
+    <hr />
+    <!-- hr：水平分隔线（自闭合），表示主题的分界 -->
+
+    <!-- ═══════════ 基本信息 ═══════════ -->
+    <section>
+      <!-- section：一个主题区块 -->
+      <h2>基本信息</h2>
+      <p>邮箱：zhangsan@example.com</p>
+      <p>坐标（地理意义上的）：武汉</p>
+      <!-- TODO 1：加一行你的 GitHub 或 Gitee 主页（用 a 链接，第 02 节学） -->
+    </section>
+
+    <!-- ═══════════ 教育经历 ═══════════ -->
+    <section>
+      <h2>教育经历</h2>
+      <p><strong>XX 大学 · 地理信息科学专业 · 本科</strong></p>
+      <!-- strong：语义化的"重要"，浏览器默认加粗 -->
+      <p>主修课程：地图学、GIS 原理、遥感、空间数据库</p>
+    </section>
+
+    <!-- ═══════════ 技能 ═══════════ -->
+    <section>
+      <h2>技能清单</h2>
+      <ul>
+        <!-- ul = 无序列表，li = 列表项（第 02 节细讲） -->
+        <li>ArcGIS / QGIS 基础操作</li>
+        <li>了解坐标系统与地图投影</li>
+        <!-- TODO 2：加 2 条你自己的技能 -->
+      </ul>
+    </section>
+
+    <!-- ═══════════ 时间线 ═══════════ -->
+    <section>
+      <h2>经历时间线</h2>
+      <ol>
+        <!-- ol = 有序列表（带编号） -->
+        <li>2022 入学</li>
+        <li>2024 开始自学 Web 开发</li>
+        <!-- TODO 3：补一条未来目标 -->
+      </ol>
+    </section>
+
+    <footer>
+      <!-- footer：页面底部区域 -->
+      <p>© 2026 张三 · 用 HTML 手写，没有借助任何框架</p>
+    </footer>
+  </body>
+</html>

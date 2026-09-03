@@ -780,7 +780,7 @@ iframe {
 /* 演示模式（容器 data-demo="open"）：右侧 demo 固定贴屏幕右侧，永不跟随滚动；正文留出右半 */
 .demo-page { transition: max-width 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
 .demo-page[data-demo='open'] { max-width: none; }
-.demo-page[data-demo='open'] .demo-panel-row { padding-right: 50%; }
+.demo-page[data-demo='open'] .demo-panel-row { padding-right: var(--demo-split, 50%); }
 .demo-page[data-demo='open'] .desktop-toc-col { display: none; }
 /* 演示模式在手机（<768px）上 demo 占满全屏，正文不额外留白（被盖住即可） */
 @media (max-width: 767.98px) {
@@ -798,7 +798,7 @@ iframe {
   border-left: 1px solid var(--line);
 }
 @media (min-width: 768px) {
-  #note-demo-sidebar { width: 50%; }
+  #note-demo-sidebar { width: var(--demo-split, 50%); } /* 左右分栏宽度由 --demo-split 驱动，可拖动 */
 }
 #note-demo-sidebar.demo-frame-wrap {
   display: flex;
@@ -873,4 +873,178 @@ iframe {
   0% { opacity: 0.95; transform: scale(0.4); }
   75% { opacity: 0; transform: scale(2.8); }
   100% { opacity: 0; transform: scale(2.8); }
+}
+
+/* 代码编辑区（练习）：改源码 → 运行，仅当场生效不落盘；暗底跟随代码块（深浅主题同为暗色） */
+#note-demo-sidebar .demo-code-editor {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  height: 15rem; /* 默认高度；拖动下方分隔条可调 */
+  min-height: 0;
+  overflow: hidden;
+  border-bottom: 0;
+  background: var(--code-bg);
+}
+#note-demo-sidebar .demo-code-editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.42rem 0.9rem;
+}
+#note-demo-sidebar .demo-code-editor-tag {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--hl-func, #b5d0a8);
+  white-space: nowrap;
+}
+#note-demo-sidebar .demo-code-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+#note-demo-sidebar .demo-code-error {
+  padding: 0.35rem 0.9rem 0;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, monospace);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--hl-keyword, #ff8a70);
+}
+/* 编辑区按钮在暗底上重配色（全局 .demo-frame-bar-btn 是墨字，暗底上不可读） */
+#note-demo-sidebar .demo-code-editor .demo-frame-bar-btn {
+  border-color: rgba(232, 224, 204, 0.28);
+  color: var(--code-ink);
+  background: transparent;
+}
+#note-demo-sidebar .demo-code-editor .demo-frame-bar-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px -4px var(--accent-glow);
+}
+#note-demo-sidebar .demo-code-editor .demo-code-run {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+#note-demo-sidebar .demo-code-editor .demo-code-run:hover {
+  color: #fff;
+}
+#note-demo-sidebar .demo-code-editor .demo-frame-bar-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+#note-demo-sidebar .demo-code-cm {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+/* 绝对定位填满容器：保证 .cm-editor 高度被约束，内部 .cm-scroller 才能滚动（auto-height 会被 overflow 裁掉导致滚不动） */
+#note-demo-sidebar .demo-code-cm .cm-theme,
+#note-demo-sidebar .demo-code-cm .cm-editor {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+#note-demo-sidebar .demo-code-cm .cm-scroller {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+#note-demo-sidebar .demo-code-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, monospace);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--code-ink);
+  opacity: 0.6;
+}
+/* 上下拖动分隔条：调节「代码区 / 下方展示区」比例（拖拽实时跟手，范围 90px ~ 留足 iframe） */
+#note-demo-sidebar.demo-dragging iframe {
+  pointer-events: none; /* 拖拽期间禁止 iframe 抢指针事件，保证 setPointerCapture 之后依然跟手 */
+}
+/* 左右分栏拖动条：左侧文章 | 右侧演示面板（贴面板左缘，hover/拖拽橙色竖线；移动端整屏隐藏） */
+#note-demo-sidebar .demo-colsplit-resizer {
+  position: absolute;
+  left: -8px;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  z-index: 6;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+#note-demo-sidebar .demo-colsplit-resizer::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 3px;
+  background: transparent;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+#note-demo-sidebar .demo-colsplit-resizer:hover::after,
+#note-demo-sidebar .demo-colsplit-resizer.is-dragging::after {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+@media (max-width: 767.98px) {
+  #note-demo-sidebar .demo-colsplit-resizer { display: none; }
+}
+#note-demo-sidebar .demo-code-resizer {
+  position: relative;
+  flex: none;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: row-resize;
+  touch-action: none;
+  user-select: none;
+  background: var(--panel-solid);
+  border-bottom: 1px solid var(--line-strong);
+}
+#note-demo-sidebar .demo-code-resizer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  transition: background 0.15s;
+}
+#note-demo-sidebar .demo-code-resizer:hover::before,
+#note-demo-sidebar .demo-code-resizer.is-dragging::before {
+  background: var(--accent-glow);
+}
+#note-demo-sidebar .demo-code-resizer-grip {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+#note-demo-sidebar .demo-code-resizer-grip::before,
+#note-demo-sidebar .demo-code-resizer-grip::after {
+  content: "";
+  width: 26px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--line-strong);
+  transition: background 0.15s;
+}
+#note-demo-sidebar .demo-code-resizer:hover .demo-code-resizer-grip::before,
+#note-demo-sidebar .demo-code-resizer:hover .demo-code-resizer-grip::after,
+#note-demo-sidebar .demo-code-resizer.is-dragging .demo-code-resizer-grip::before,
+#note-demo-sidebar .demo-code-resizer.is-dragging .demo-code-resizer-grip::after {
+  background: var(--accent);
 }

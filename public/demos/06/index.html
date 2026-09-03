@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>06 · 导航栏与多列卡片（Flex 实战）</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: "Microsoft YaHei", sans-serif; }
+
+      /* ═══════════ 任务一：导航栏 ═══════════ */
+      .navbar {
+        background: #001529;
+        color: #fff;
+        padding: 0 24px;
+        height: 56px;
+        /* TODO 1：开启 Flex */
+        /* TODO 2：logo 居左、菜单居右（提示：justify-content: space-between） */
+        /* TODO 3：内部全部垂直居中（提示：align-items） */
+      }
+      .navbar .logo { font-size: 18px; font-weight: bold; }
+      .navbar .menu { display: flex; gap: 24px; }
+      .navbar .menu a { color: #fff; text-decoration: none; }
+
+      /* ═══════════ 任务二：卡片墙 ═══════════ */
+      .cards {
+        padding: 24px;
+        /* TODO 4：开启 Flex 并允许换行 */
+        /* TODO 5：子项间距统一 16px（提示：gap） */
+      }
+      .card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        padding: 16px;
+        /* TODO 6：三列等宽（提示：flex: 0 0 calc(33.33% - 11px)） */
+      }
+      .card img { width: 100%; border-radius: 6px; }
+      .card h3 { margin: 10px 0 6px; }
+      .card p { margin: 0; color: #666; font-size: 14px; }
+      /* TODO 7：让同一行的卡片"等高"（提示：cards 容器加 align-items: stretch，
+         这是默认值——但如果卡片没被拉伸，检查是不是哪里写成了 flex-start） */
+
+      /* ═══════════ 任务三：WebGIS 雏形布局（侧栏 + 主区） ═══════════ */
+      .app {
+        height: 320px;
+        margin: 24px;
+        border: 1px solid #ddd;
+        /* TODO 8：开启 Flex（横排） */
+      }
+      .sidebar {
+        background: #e6f4ff;
+        padding: 16px;
+        /* TODO 9：固定 240px 宽，不许放大不许缩小（提示：flex: 0 0 240px） */
+      }
+      .map-area {
+        background: #adf;  /* 假装这是地图（第 05 模块它会变成真地图） */
+        display: flex; justify-content: center; align-items: center;
+        color: #003a8c; font-size: 20px;
+        /* TODO 10：吃掉剩余全部空间（提示：flex: 1） */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 任务一：导航栏 -->
+    <nav class="navbar">
+      <div class="logo">GeoLearn</div>
+      <div class="menu">
+        <a href="#">地图</a><a href="#">数据</a><a href="#">分析</a><a href="#">关于</a>
+      </div>
+    </nav>
+
+    <!-- 任务二：卡片墙 -->
+    <div class="cards">
+      <div class="card">
+        <img src="https://picsum.photos/seed/a1/600/280" alt="城市A" />
+        <h3>北京</h3><p>39.90N, 116.40E · 缩放级别演示城市</p>
+      </div>
+      <div class="card">
+        <img src="https://picsum.photos/seed/b2/600/280" alt="城市B" />
+        <h3>上海</h3><p>31.23N, 121.47E · 长江入海口</p>
+      </div>
+      <div class="card">
+        <img src="https://picsum.photos/seed/c3/600/280" alt="城市C" />
+        <h3>广州</h3><p>23.13N, 113.26E · 珠江三角洲核心</p>
+      </div>
+      <div class="card">
+        <img src="https://picsum.photos/seed/d4/600/280" alt="城市D" />
+        <h3>成都</h3><p>30.66N, 104.07E · 天府之国</p>
+      </div>
+      <div class="card">
+        <img src="https://picsum.photos/seed/e5/600/280" alt="城市E" />
+        <h3>拉萨</h3><p>29.65N, 91.14E · 高原之城（注意不同高度图片的等高效果）</p>
+      </div>
+      <div class="card">
+        <img src="https://picsum.photos/seed/f6/600/280" alt="城市F" />
+        <h3>乌鲁木齐</h3><p>43.83N, 87.62E · 亚洲大陆地理中心附近</p>
+      </div>
+    </div>
+
+    <!-- 任务三：WebGIS 雏形（侧栏 + 地图区） -->
+    <div class="app">
+      <div class="sidebar">
+        <strong>图层树（占位）</strong>
+        <p>第 05 模块这里会变成真的图层开关</p>
+      </div>
+      <div class="map-area">地图区（flex: 1 的舞台）</div>
+    </div>
+  </body>
+</html>

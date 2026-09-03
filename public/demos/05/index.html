@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>05 · 卡片布局（盒模型实战）</title>
+    <style>
+      /* TODO 1：全站换 border-box（三行，直接抄文档第五节） */
+
+      body {
+        font-family: "Microsoft YaHei", sans-serif;
+        background: #f0f2f5;
+        padding: 24px;
+      }
+
+      /* 卡片：当前素坯——拥挤、无间距、宽度失控 */
+      .card {
+        width: 300px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        /* TODO 2：加内边距 padding: 16px，让文字不贴边 */
+
+        /* TODO 3：加外边距 margin-bottom: 16px，卡片之间拉开 */
+      }
+
+      .card img {
+        width: 100%;
+        border-radius: 6px;
+        /* TODO 6：给图片下方留白 margin-bottom: 12px */
+      }
+
+      .card h3 { margin: 0 0 8px; }
+      .card p { margin: 0; color: #666; font-size: 14px; }
+
+      /* TODO 4：让整个卡片堆在页面中间（宽度 300 + 水平 margin auto 的容器思路）
+         提示：给 .card 加 margin-left: auto; margin-right: auto; */
+
+      /* TODO 5：观察第一张卡片标题的 margin-top 会"穿透"卡片顶端
+         （h3 默认 margin-top 顶开卡片与上一张的间距）
+         修法：.card 里第一个标题 margin-top: 0（本文件已写 margin: 0 0 8px），
+         思考：为什么置 0 后卡片不再被顶开？ */
+    </style>
+  </head>
+  <body>
+    <h1>城市卡片（盒模型实战）</h1>
+
+    <div class="card">
+      <img src="https://picsum.photos/seed/wuhan/600/300" alt="武汉城市风光" />
+      <h3>武汉</h3>
+      <p>长江与汉江交汇处，GPS 坐标约 30.59N, 114.30E</p>
+    </div>
+
+    <div class="card">
+      <img src="https://picsum.photos/seed/xian/600/300" alt="西安城市风光" />
+      <h3>西安</h3>
+      <p>古丝绸之路起点，GPS 坐标约 34.34N, 108.94E</p>
+    </div>
+
+    <div class="card">
+      <img src="https://picsum.photos/seed/chengdu/600/300" alt="成都城市风光" />
+      <h3>成都</h3>
+      <p>天府之国，GPS 坐标约 30.66N, 104.07E</p>
+    </div>
+  </body>
+</html>

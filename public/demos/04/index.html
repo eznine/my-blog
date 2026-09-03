@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>04 · 选择器练习页（10 个靶子）</title>
+    <style>
+      body { font-family: "Microsoft YaHei", sans-serif; margin: 24px; line-height: 1.7; }
+      .task { border-left: 4px solid #1677ff; padding: 8px 12px; margin: 18px 0; background: #f6f8fa; }
+      code { background: #eee; padding: 2px 6px; border-radius: 4px; }
+      .demo-box { padding: 8px 14px; margin: 6px 0; border: 1px dashed #bbb; }
+      button { padding: 6px 16px; margin: 4px; cursor: pointer; }
+
+      /* ══════════════════════════════════════════════
+         在下面写你的答案（每条我都留了注释空位）
+         写一条 → 保存 → 看浏览器效果
+         ══════════════════════════════════════════════ */
+
+      /* 靶子 1：让 class="target" 的元素文字变红
+         提示：类选择器，10 分 */
+
+      /* 靶子 2：让 id="special" 的元素背景变黄
+         提示：ID 选择器，100 分 */
+
+      /* 靶子 3：让 .list 里的所有 li 文字变蓝（后代选择器） */
+
+      /* 靶子 4：只让 .list 的"直接子级" li 加粗（子选择器 >） */
+
+      /* 靶子 5：让同时拥有 .box 和 .active 两个类的元素变绿 */
+
+      /* 靶子 6：用属性选择器选中所有文本输入框，加蓝色边框 */
+
+      /* 靶子 7：鼠标悬停 .btn 按钮时背景变橙（:hover） */
+
+      /* 靶子 8：选中 .list 里第偶数个 li，背景变灰（:nth-child） */
+
+      /* 靶子 9：选中 .list 中"没有" .done 类的 li，前面加"未完成"感觉的样式
+         提示：:not(.done)，颜色用 #d48806 */
+
+      /* 靶子 10：一箭三雕：让 h2、h3、.task 都加上左边距 12px（群组选择器） */
+    </style>
+  </head>
+  <body>
+    <h1>选择器打靶练习</h1>
+    <p>在上方 &lt;style&gt; 区写 CSS，让每个靶子按题目要求变化。写一条保存一次。</p>
+
+    <div class="task">靶 1+2：下面两个盒子，一个用类选中，一个用 ID 选中</div>
+    <div class="demo-box target">我是 .target，请让我文字变红</div>
+    <div class="demo-box" id="special">我是 #special，请让我背景变黄</div>
+
+    <div class="task">靶 3+4：后代选择器 vs 子选择器（注意嵌套的第二层 ul）</div>
+    <ul class="list">
+      <li>第一层 A</li>
+      <li>第一层 B
+        <ul>
+          <li>第二层 B-1（后代选择器会选到我，子选择器不会）</li>
+        </ul>
+      </li>
+      <li class="done">第一层 C（已完成）</li>
+      <li>第一层 D</li>
+    </ul>
+
+    <div class="task">靶 5：类叠加</div>
+    <div class="demo-box box">只有 .box，别选我</div>
+    <div class="demo-box box active">我有 .box 和 .active，选我变绿</div>
+
+    <div class="task">靶 6：属性选择器</div>
+    <input type="text" placeholder="我是 text 框，给我蓝边" />
+    <input type="password" placeholder="我是 password 框，别动我" />
+
+    <div class="task">靶 7：伪类 :hover</div>
+    <button class="btn">悬停我变橙</button>
+    <button>我不是 .btn，不用管</button>
+
+    <div class="task">靶 8+9：结构伪类与 :not（作用在 .list 上）</div>
+  </body>
+</html>

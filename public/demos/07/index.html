@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>07 · 定位与层叠（假地图实战）</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: "Microsoft YaHei", sans-serif; }
+
+      /* TODO 3：固定顶栏（top:0 + z-index:100 + 三向定位），并给 body 补 padding-top:56px */
+      .topbar {
+        height: 56px;
+        background: #001529;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+      }
+
+      .page { padding: 20px; }
+
+      /* 假地图：一个大 div 扮演地图（第 05 模块换成真地图后，下面的定位照用不误） */
+      .map {
+        position: relative;            /* TODO 1：这行就是"子绝父相"的"父相"！ */
+        height: 420px;
+        background: #e8f0e0;           /* 模拟地表 */
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      /* 模拟瓦片网格，便于观察 */
+      .map::before {
+        content: "";
+        position: absolute; inset: 0;
+        background-image:
+          linear-gradient(#d5e3cc 1px, transparent 1px),
+          linear-gradient(90deg, #d5e3cc 1px, transparent 1px);
+        background-size: 64px 64px;
+      }
+
+      /* TODO 2：缩放控件组——贴着地图右上角 12px（不是页面右上角！） */
+      .zoom-tools { width: 36px; border: 1px solid #bbb; background: #fff; text-align: center; }
+      .zoom-tools button { display: block; width: 100%; border: none; background: none; font-size: 20px; cursor: pointer; }
+
+      /* TODO 4：比例尺——贴着地图左下角 12px */
+      .scalebar { background: rgba(255,255,255,.85); font-size: 12px; padding: 2px 8px; border: 1px solid #999; }
+
+      /* TODO 5：消息角标——子绝父相：让数字小圆点挂在按钮右上角 */
+      .locate-btn { position: relative; margin-left: 12px; padding: 6px 10px; }
+      .badge {
+        /* 定位到按钮右上角 -4px；红色圆形；白字 12px */
+      }
+
+      /* TODO 6：弹窗（模拟"要素信息窗"）——绝对定位在地图中央，
+         并用 z-index 分层：地图 1 < 控件 10 < 弹窗 1000 */
+      .feature-popup {
+        width: 240px; background: #fff; border: 1px solid #ddd;
+        box-shadow: 0 4px 16px rgba(0,0,0,.2); padding: 14px;
+      }
+
+      /* 长内容：用来测试固定顶栏与吸顶 */
+      .table-wrap { height: 240px; overflow: auto; margin-top: 20px; border: 1px solid #ddd; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
+      /* TODO 7：让表头吸顶（sticky + top:0 + 背景，不加背景会透出内容） */
+    </style>
+  </head>
+  <body>
+    <div class="topbar">GeoLearn · 固定顶栏（滚动页面时我应该钉住）</div>
+
+    <div class="page">
+      <div class="map">
+        <!-- TODO 2 的控件组放这里：包含两个按钮 + 和 − -->
+        <div class="zoom-tools">
+          <button>+</button>
+          <button>−</button>
+        </div>
+
+        <!-- TODO 4 的比例尺放这里：文本 "0 ── 2 km" -->
+
+        <!-- TODO 6 的弹窗放这里：标题"武汉站"，内容"坐标 30.59N, 114.30E"，
+             用 top/left 50% + transform: translate(-50%,-50%) 居中（常见套路） -->
+
+        <span style="position:absolute; bottom:12px; right:12px; color:#888;">模拟瓦片网格</span>
+      </div>
+
+      <p>
+        <button class="locate-btn">
+          定位到我
+          <!-- TODO 5 的角标放这里：数字 3 -->
+        </button>
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>城市</th><th>纬度</th><th>经度</th><th>人口(万)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>北京</td><td>39.90</td><td>116.40</td><td>2189</td></tr>
+            <tr><td>上海</td><td>31.23</td><td>121.47</td><td>2487</td></tr>
+            <tr><td>广州</td><td>23.13</td><td>113.26</td><td>1868</td></tr>
+            <tr><td>深圳</td><td>22.54</td><td>114.06</td><td>1749</td></tr>
+            <tr><td>成都</td><td>30.66</td><td>104.07</td><td>2094</td></tr>
+            <tr><td>武汉</td><td>30.59</td><td>114.30</td><td>1233</td></tr>
+            <tr><td>西安</td><td>34.34</td><td>108.94</td><td>1295</td></tr>
+            <tr><td>拉萨</td><td>29.65</td><td>91.14</td><td>86</td></tr>
+            <tr><td>乌鲁木齐</td><td>43.83</td><td>87.62</td><td>405</td></tr>
+            <tr><td>哈尔滨</td><td>45.80</td><td>126.53</td><td>1009</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

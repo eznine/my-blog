@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>03 · 登录与注册表单</title>
+    <style>
+      /* 先给一点点样式让表单能看（第 04 节起正式学 CSS） */
+      body { font-family: "Microsoft YaHei", sans-serif; max-width: 420px; margin: 30px auto; }
+      fieldset { margin-bottom: 24px; padding: 16px; }
+      label { display: inline-block; width: 80px; }
+      input, select { margin: 6px 0; padding: 6px; width: 220px; }
+      button { padding: 8px 20px; cursor: pointer; }
+      .row { margin-bottom: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>表单练习</h1>
+
+    <!-- ═══════════ 登录表单 ═══════════ -->
+    <fieldset>
+      <legend>登录</legend>
+      <form action="/api/login" method="post">
+        <div class="row">
+          <label for="login-name">用户名</label>
+          <input type="text" id="login-name" name="username" required minlength="2" />
+        </div>
+        <div class="row">
+          <label for="login-pass">密码</label>
+          <input type="password" id="login-pass" name="password" required minlength="6" />
+        </div>
+        <div class="row">
+          <!-- TODO A：加一个"记住我"复选框。
+               要求：label 正确绑定（for/id 成对）、name 记为 remember、默认不勾选 -->
+        </div>
+        <button type="submit">登录</button>
+        <button type="reset">清空</button>
+      </form>
+    </fieldset>
+
+    <!-- ═══════════ 注册表单 ═══════════ -->
+    <fieldset>
+      <legend>注册</legend>
+      <form action="/api/register" method="post">
+        <div class="row">
+          <label for="reg-name">用户名</label>
+          <input type="text" id="reg-name" name="username" required minlength="2" maxlength="20" />
+        </div>
+        <div class="row">
+          <label for="reg-email">邮箱</label>
+          <!-- TODO B：把 type 改成自带校验的邮箱类型 -->
+          <input type="text" id="reg-email" name="email" required />
+        </div>
+        <div class="row">
+          <label for="reg-pass">密码</label>
+          <input type="password" id="reg-pass" name="password" required minlength="6" />
+        </div>
+        <div class="row">
+          <!-- TODO C：加"确认密码"输入框（type 同密码，name 为 confirm）。
+               思考：HTML 能校验"两次密码一致"吗？为什么这项校验必须靠 JS/后端？ -->
+          <label for="reg-pass2">确认密码</label>
+        </div>
+        <div class="row">
+          <label for="reg-role">身份</label>
+          <select id="reg-role" name="role">
+            <option value="student" selected>学生</option>
+            <option value="dev">开发者</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        <button type="submit">注册</button>
+      </form>
+    </fieldset>
+
+    <!-- ═══════════ 底图选择（单选框分组练习，未来地图应用的雏形） ═══════════ -->
+    <fieldset>
+      <legend>底图偏好（单选框分组）</legend>
+      <form action="/api/pref" method="post">
+        <input type="radio" id="base-osm" name="basemap" value="osm" checked />
+        <label for="base-osm">OpenStreetMap</label>
+        <input type="radio" id="base-tdt" name="basemap" value="tianditu" />
+        <label for="base-tdt">天地图</label>
+        <input type="radio" id="base-gaode" name="basemap" value="gaode" />
+        <label for="base-gaode">高德</label>
+
+        <!-- 两个单选框组互不干扰：注意 name 不同 -->
+        <div class="row" style="margin-top: 12px">
+          <input type="radio" id="theme-dark" name="theme" value="dark" />
+          <label for="theme-dark">深色主题</label>
+          <input type="radio" id="theme-light" name="theme" value="light" checked />
+          <label for="theme-light">浅色主题</label>
+        </div>
+        <button type="button">保存偏好（普通按钮，不会提交）</button>
+      </form>
+    </fieldset>
+  </body>
+</html>
