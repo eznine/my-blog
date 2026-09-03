@@ -27,7 +27,7 @@ export default async function ResearchPage() {
           <p className="mono-label mt-4">{site.pages.research.count.replace('{n}', String(research.length))}</p>
         </PageHeader>
       </Reveal>
-      <div className="grid gap-4 pt-8 md:grid-cols-2">
+      <div className="flex flex-col gap-5 pt-8">
         {research.length === 0 ? (
           <p className="py-12 text-sm text-ink-faint">{site.pages.research.empty}</p>
         ) : (

@@ -28,6 +28,8 @@ interface FormState {
   chapter: string;
   tags: string[];
   status: string;
+  /** 封面图（研究专用：/uploads/xxx.jpg 或相对路径，后台可传可填） */
+  cover: string;
   hidden: boolean;
   tech: string[];
   demo: string;
@@ -46,6 +48,7 @@ const EMPTY: FormState = {
   chapter: '',
   tags: [],
   status: '',
+  cover: '',
   hidden: false,
   tech: [],
   demo: '',
@@ -72,6 +75,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
   const [uploading, setUploading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const coverRef = useRef<HTMLInputElement>(null);
   const previewTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const isEdit = !!slug;
@@ -91,6 +95,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           chapter: str(m.chapter),
           tags: arr(m.tags),
           status: str(m.status),
+          cover: str(m.cover),
           hidden: m.hidden === true || String(m.hidden).toLowerCase() === 'true',
           tech: arr(m.tech),
           demo: str(m.demo),
@@ -116,6 +121,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           chapter: str(meta.chapter),
           tags: arr(meta.tags),
           status: str(meta.status),
+          cover: str(meta.cover),
           hidden: meta.hidden === true || String(meta.hidden).toLowerCase() === 'true',
           tech: arr(meta.tech),
           demo: str(meta.demo),
@@ -286,6 +292,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
         chapter: form.category.trim() ? form.chapter.trim() : '',
         tags: form.tags,
         status: form.status,
+        cover: form.cover,
         hidden: form.hidden,
         tech: form.tech,
         demo: form.demo,
@@ -412,6 +419,70 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
                   options={['进行中', '已完成', '已发表']}
                   placeholder="进行中 / 已完成 / 已发表"
                 />
+              </div>
+            )}
+
+            {type === 'research' && (
+              <div className="md:col-span-2 lg:col-span-4">
+                <label className={labelCls}>封面 Cover（研究卡片左侧图）</label>
+                <div className="flex flex-wrap items-center gap-3">
+                  {form.cover && (
+                    <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border border-line">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={form.cover}
+                        alt="封面预览"
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.opacity = '0.2';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <input
+                    className={`${inputCls} flex-1`}
+                    value={form.cover}
+                    onChange={(e) => set('cover', e.target.value)}
+                    placeholder="/uploads/xxx.jpg 或外链 URL（可上传后自动填入）"
+                  />
+                  <button
+                    type="button"
+                    disabled={uploading}
+                    onClick={() => coverRef.current?.click()}
+                    className="shrink-0 rounded-xl border border-line px-4 py-2.5 text-[14px] font-medium text-ink transition-colors hover:border-accent/60 hover:text-accent disabled:opacity-50"
+                  >
+                    {uploading ? '上传中…' : '⬆ 上传封面'}
+                  </button>
+                  {form.cover && (
+                    <button
+                      type="button"
+                      onClick={() => set('cover', '')}
+                      className="shrink-0 px-2 text-[14px] text-ink-faint transition-colors hover:text-accent"
+                    >
+                      清除
+                    </button>
+                  )}
+                  <input
+                    ref={coverRef}
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = '';
+                      if (!file || uploading) return;
+                      setUploading(true);
+                      try {
+                        const url = await uploadImage(file);
+                        set('cover', url);
+                      } catch (err) {
+                        setError(err instanceof Error ? err.message : '封面上传失败');
+                      } finally {
+                        setUploading(false);
+                      }
+                    }}
+                  />
+                </div>
               </div>
             )}
 

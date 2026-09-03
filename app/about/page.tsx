@@ -1,4 +1,4 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { site } from '@/lib/site-server';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
@@ -14,17 +14,15 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = 'force-dynamic';
 
 export default async function AboutPage() {
+  const essay = site.essay;
+  const lastChapter = essay.chapters[essay.chapters.length - 1];
+  // 末章最后两个短句作为「强调收束」，其余按普通段落渲染
+  const tailIdx = Math.max(0, lastChapter.paragraphs.length - 2);
+
   return (
     <div className="mx-auto max-w-3xl px-5 pb-10 pt-10 md:pt-14">
       <Reveal>
         <PageHeader code={site.pages.about.code} en={site.pages.about.en} title={site.pages.about.title.replace('{name}', site.name)}>
-          <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-soft">
-            <span>{site.pages.about.identity}</span>
-            <span className="text-ink-faint">/</span>
-            <span>{site.pages.about.affiliation}</span>
-            <span className="text-ink-faint">/</span>
-            <span className="font-mono text-[12px] tracking-wider">{site.pages.about.coords}</span>
-          </div>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
             <a href={site.pages.about.github} target="_blank" rel="noreferrer" className="text-accent hover:text-accent-2">
               GitHub ↗
@@ -36,51 +34,61 @@ export default async function AboutPage() {
         </PageHeader>
       </Reveal>
 
-      <Reveal>
-        <div className="mt-10 md-body page-enter">
-          <p className="text-[17px] leading-relaxed">{site.story.intro}</p>
+      {/* ==================== 散文 ==================== */}
+      <div className="mt-12 page-enter">
+        {/* 开篇引语：大字 + 光效 + 坐标注记 */}
+        <Reveal variant="blur">
+          <p className="grad-text glow-text text-[26px] font-black leading-snug tracking-tight md:text-[32px]">
+            {essay.epigraph}
+          </p>
+          <p className="mono-label mt-4 !text-accent">37.74°N · 112.66°E · STARTING POINT</p>
+        </Reveal>
 
-          {site.story.sections.map((section) => (
-            <section key={section.title} className="mt-10">
-              <h2 className="mb-4 text-[22px] font-bold text-ink">{section.title}</h2>
-
-              {section.type === 'list' && (
-                <ul className="space-y-3">
-                  {section.items?.map((item) => (
-                    <li key={item.label} className="text-[16px] leading-relaxed text-ink">
-                      <span className="font-semibold text-ink">{item.label}</span>
-                      <span className="text-ink-soft">：{item.desc}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              {section.type === 'text' && (
-                <p className="text-[16px] leading-relaxed text-ink">{section.text}</p>
-              )}
-
-              {section.type === 'links' && (
-                <ul className="space-y-3">
-                  {section.links?.map((link) => (
-                    <li key={link.label} className="text-[16px] leading-relaxed">
-                      <a href={link.href} target="_blank" rel="noreferrer" className="text-accent hover:text-accent-2">
-                        {link.label}
-                      </a>
-                      {link.text && <span className="text-ink-soft">：{link.text}</span>}
-                    </li>
-                  ))}
-                </ul>
-              )}
+        {/* 章节 */}
+        {essay.chapters.map((ch, ci) => {
+          const isTail = ci === essay.chapters.length - 1;
+          return (
+            <section key={ch.code} className="mt-14">
+              <Reveal variant="left">
+                <div className="mono-label flex items-center gap-3 !text-accent">
+                  <span className="marker-dot is-live" />
+                  {ch.code}
+                </div>
+                <h2 className="mt-2 text-[20px] font-bold text-ink">{ch.title}</h2>
+              </Reveal>
+              <div className="mt-5 space-y-5">
+                {ch.paragraphs.map((para, pi) => {
+                  const isEmphasis = isTail && pi >= tailIdx;
+                  if (isEmphasis) {
+                    return (
+                      <Reveal key={pi} variant="up" delay={(pi - tailIdx) * 130}>
+                        <p
+                          className="grad-text glow-text text-[24px] leading-snug font-black tracking-tight md:text-[28px]"
+                          style={{ textShadow: 'none' }}
+                        >
+                          {para}
+                        </p>
+                      </Reveal>
+                    );
+                  }
+                  return (
+                    <Reveal key={pi} variant="up" delay={Math.min(pi, 3) * 90}>
+                      <p className="text-[16px] leading-[1.9] text-ink">{para}</p>
+                    </Reveal>
+                  );
+                })}
+              </div>
             </section>
-          ))}
+          );
+        })}
 
-          {site.story.quote && (
-            <blockquote className="mt-12 border-l-4 border-accent pl-5 text-[17px] italic text-ink-soft">
-              {site.story.quote}
-            </blockquote>
-          )}
-        </div>
-      </Reveal>
+        {/* 收束注记 */}
+        <Reveal variant="blur">
+          <div className="mt-14 border-t border-line pt-6 text-center">
+            <p className="font-mono text-[11px] tracking-[0.22em] text-ink-faint uppercase">END OF SURVEY · 未完待续</p>
+          </div>
+        </Reveal>
+      </div>
 
       <Reveal>
         <section className="mt-14 border-t border-line pt-8">
@@ -114,30 +122,8 @@ export default async function AboutPage() {
       </Reveal>
 
       <Reveal>
-        <section className="mt-12 border-t border-line pt-8">
-          <div className="mono-label">{site.pages.about.skills}</div>
-          <div className="mt-5 space-y-5">
-            {site.skills.map((g) => (
-              <div key={g.group} className="flex flex-col gap-2 sm:flex-row sm:gap-6">
-                <span className="w-32 shrink-0 text-[16px] font-semibold text-ink">{g.group}</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {g.items.map((item) => (
-                    <span key={item} className="rounded-sm border border-line px-2 py-[3px] font-mono text-[11px] text-ink-soft">
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </Reveal>
-
-      <Reveal>
-        <footer className="mt-14 border-t border-line pt-6 text-center">
-          <p className="font-mono text-[11px] tracking-[0.18em] text-ink-faint uppercase">
-            {site.pages.about.footer.replace('{coords}', site.pages.about.coords)}
-          </p>
+        <footer className="mt-16 border-t border-line pt-8 text-center">
+          <p className="mono-label !text-ink-faint">{site.pages.about.footer.replace('{coords}', site.pages.about.coords)}</p>
         </footer>
       </Reveal>
     </div>

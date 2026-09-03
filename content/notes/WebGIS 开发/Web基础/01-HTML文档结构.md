@@ -8,6 +8,8 @@ demo: "/demos/01/"
 demoLabel: "01-简历骨架"
 ---
 
+
+
 # 第 01 节 · HTML 文档结构
 
 > 📌 **版本信息**：基于 HTML Living Standard（WHATWG 标准，HTML 无版本号概念、持续演化；2026-08-29 核对）

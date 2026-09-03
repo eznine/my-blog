@@ -1,10 +1,9 @@
 {
-  "_说明": "关于页文案：从上到下依次是页头标题、页头注记（identity 身份 / affiliation 单位 / coords 坐标 / github / email——全部在本页可独立改）、正文故事（一句话/我在学什么/为什么做这个网站/找到我/尾声引文）、教育经历、研究兴趣、技能栈、页脚注记。title 里的 {name} 会用 00-站点信息.json 的姓名替换；footer 里的 {coords} 用本页 coords 替换。story 里 link 的 label 是展示文字，href 是跳转地址。",
-
+  "_说明": "关于页文案：从上到下依次是页头标题、页头注记（identity 身份 / affiliation 单位 / coords 坐标 / github / email——全部在本页可独立改）、正文散文（essay 四章：epigraph 开篇引语 + chapters 章节数组，每章 code 英文注记 + title 中文章题 + paragraphs 段落数组，末章结尾两句会被强调展示）、教育经历、研究兴趣、技能栈、页脚注记。title 里的 {name} 会用 00-站点信息.json 的姓名替换；footer 里的 {coords} 用本页 coords 替换。",
   "page": {
     "code": "05",
     "en": "ABOUT",
-    "title": "关于 · {name}",
+    "title": "关于",
     "identity": "山西师范大学",
     "affiliation": "地理信息科学",
     "coords": "37.74°N · 112.66°E",
@@ -13,54 +12,58 @@
     "education": "EDUCATION · 教育经历",
     "interests": "INTERESTS · 研究兴趣",
     "skills": "SKILLS · 技能栈",
-    "footer": "{coords} · DATUM WGS 84 · END OF SHEET"
+    "footer": "{coords} · END OF SHEET"
   },
-
-  "story": {
-    "intro": "我是张鹏，地理信息科学方向的硕士生。日常三件事：反演生态参数、用 InSAR 追矿区的地面沉降、把分析结果做成能交互的地图。这个网站是我的测量手簿——外业记数据，内业记想法，每弄明白一处，就打一个桩。",
-    "sections": [
+  "essay": {
+    "epigraph": "我与地图相遇于一处坐标。",
+    "chapters": [
       {
-        "title": "我在学什么",
-        "type": "list",
-        "items": [
-          { "label": "遥感与生态参数", "desc": "从辐射定标、参数反演到生态安全格局，一条链路完整走下来" },
-          { "label": "InSAR 形变监测", "desc": "SBAS 时序分析，盯住矿区地面塌陷的毫米级下沉" },
-          { "label": "WebGIS 与可视化", "desc": "MapLibre / Cesium / Leaflet，让结论不止是图，还能交互" },
-          { "label": "可解释机器学习", "desc": "XGBoost-SHAP，把黑箱模型翻译成地理机制" }
+        "code": "ORIGIN",
+        "title": "一张地图，一种认识世界的方式",
+        "paragraphs": [
+          "一张地图、一景影像、一份数据，或者一段代码，都可能成为探索的起点。我开始慢慢理解，地图并不只是描述世界，也是一种认识世界的方式。",
+          "土地从来不是一块静止的底图。植被在生长，城市在扩张，环境也随之发生变化。自然过程与人类活动交织在同一片空间里，留下可以被影像记录、被数据描述的痕迹。地图所呈现的，便不只是一个地方在哪里，也可以是它正在经历什么。"
         ]
       },
       {
-        "title": "为什么叫「未完成的地图」",
-        "type": "text",
-        "text": "地形图从付印那一刻就开始过时——植被在长，城市在摊，矿区的地面还在一毫米一毫米地下沉。测量员的地图永远缺下一张，我的理解也永远差一步。给网站取这个名字，就是想诚实承认这种进行时：笔记会改，结论会被推翻，但每一条都写下当时的坐标。科研做得再好，讲不出来等于没做——把模糊的理解逼成清晰的文字，是我对抗「差不多懂了」的办法。"
+        "code": "QUESTIONS",
+        "title": "地图上的每一处变化，都值得追问",
+        "paragraphs": [
+          "为什么这里会发生变化，什么又在影响着它；不同的地方为何呈现出不同的面貌，它们之间又存在怎样的联系。这些问题，也让我逐渐走进 GIS 与遥感。地表变化能够被记录，空间关系能够被分析，而数据则让这一切有了进一步探索的空间。"
+        ]
       },
       {
-        "title": "找到我",
-        "type": "links",
-        "links": [
-          { "label": "GitHub", "href": "https://github.com/eznine" },
-          { "label": "邮箱", "href": "mailto:ezninfl@gmail.com", "text": "ezninfl@gmail.com" }
+        "code": "ROUTE",
+        "title": "通往终点的路线，从来不止一条",
+        "paragraphs": [
+          "这一路并不总是清晰的。就像地图上的终点可以明确，而通往它的路线却从来不止一条。不同的方向彼此连接，在某些地方汇合，又在另一些地方分开。真正走过之后，才会发现，有些路会带来意料之外的收获，有些却需要在不断修正中重新寻找方向；有些最终抵达了预想的地方，有些则停在了半途，至今仍没有答案。也正因为如此，我想有这样一个地方，把那些走过的路、得到的答案，以及那些没有答案的部分，一并留下。",
+          "这里有我一路积累的笔记，也有学习过程中写下的 Demo，有经过长时间沉淀的研究，也有从一闪而过的念头到最终实现的项目，以及为了让事情变得更简单，而开发的实用工具。它们记录着不同阶段的学习、思考与实践，也构成了这个网站最主要的内容。"
+        ]
+      },
+      {
+        "code": "FUTURE",
+        "title": "一张未完成的地图",
+        "paragraphs": [
+          "这张地图已经有了些许轮廓。",
+          "可前方仍有许多未知的区域，以及没有走完的路。但也许，地图真正的意义，从来不是抵达终点。",
+          "而是当我回头时，能够知道自己曾经从哪里出发，又沿着怎样的路走来。",
+          "这是一张属于我的地图，",
+          "一张未完成的地图。"
         ]
       }
-    ],
-    "quote": "「地图是对世界最诚实的简化。」"
+    ]
   },
-
   "education": [
-    { "period": "2024 — 至今", "school": "山西师范大学", "detail": "地理信息科学" }
+    {
+      "period": "2024 — 至今",
+      "school": "山西师范大学",
+      "detail": "地理信息科学"
+    }
   ],
-
   "researchInterests": [
     "生态安全格局与生态网络",
     "InSAR 地表形变监测（地面塌陷）",
     "遥感生态参数反演与土地利用变化",
     "机器学习在地理问题中的应用"
-  ],
-
-  "skills": [
-    { "group": "GIS 与遥感", "items": ["ArcGIS Pro", "QGIS", "ENVI", "GEE", "SNAP / StaMPS"] },
-    { "group": "空间分析", "items": ["MSPA", "MCR", "InVEST", "Circuitscape", "Moran's I / GWR"] },
-    { "group": "WebGIS 与前端", "items": ["MapLibre GL", "Cesium", "Leaflet", "OpenLayers", "React / Next.js", "D3.js"] },
-    { "group": "编程与数据", "items": ["Python", "JavaScript / TypeScript", "PostGIS", "XGBoost / SHAP"] }
   ]
 }

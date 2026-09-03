@@ -51,7 +51,7 @@ function loadSite(): SiteConfig {
     education: ab.education,
     researchInterests: ab.researchInterests,
     skills: ab.skills,
-    story: ab.story,
+    essay: ab.essay,
     pages: {
       notes: n.page,
       research: r.page,

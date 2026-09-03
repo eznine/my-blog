@@ -13,6 +13,8 @@ tags: ["web"]
 
 
 
+
+
 # 第 23 节 · TS 在 Vite 项目中
 
 > 📌 **版本信息**：Vite 8.2.2 / TypeScript 5.x / create-vite vanilla-ts 模板（2026-08-29 核对）

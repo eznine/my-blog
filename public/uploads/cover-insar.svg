@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">
+  <rect width="480" height="270" fill="#211c13"/>
+  <g stroke="#ff8a70" stroke-width="1" fill="none" opacity="0.85">
+    <ellipse cx="240" cy="150" rx="150" ry="58"/>
+    <ellipse cx="240" cy="150" rx="115" ry="44"/>
+    <ellipse cx="240" cy="150" rx="82" ry="31"/>
+    <ellipse cx="240" cy="150" rx="50" ry="19"/>
+    <ellipse cx="240" cy="150" rx="20" ry="8"/>
+  </g>
+  <g stroke="#b5d0a8" stroke-width="1" fill="none" opacity="0.5">
+    <path d="M0 60 Q 120 40 240 62 T 480 58"/>
+    <path d="M0 100 Q 120 82 240 104 T 480 100"/>
+    <path d="M0 210 Q 120 228 240 208 T 480 212"/>
+  </g>
+  <circle cx="240" cy="150" r="5" fill="#ff4b33"/>
+  <text x="20" y="35" fill="#d8c07a" font-family="monospace" font-size="15" letter-spacing="2">SBAS-InSAR</text>
+  <text x="20" y="55" fill="#8a8270" font-family="monospace" font-size="11" letter-spacing="1">SUBSIDENCE · DEFORMATION</text>
+  <text x="460" y="250" fill="#8a8270" font-family="monospace" font-size="11" text-anchor="end">MM/YR</text>
+</svg>

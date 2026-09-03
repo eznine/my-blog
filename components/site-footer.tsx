@@ -17,9 +17,9 @@ export function SiteFooter() {
             <BrandLogo className="h-9" />
             <p className="mt-4 flex items-center gap-2.5 text-[15px] text-ink-soft">
               <span className="marker-dot is-live" />
-              {site.name} · {site.role}
+              {site.role}
             </p>
-            <p className="mono-label mt-6">{site.coords} · WGS 84</p>
+            <p className="mono-label mt-6">{site.coords}</p>
           </div>
 
           <nav className="grid grid-cols-2 gap-x-14 gap-y-3 text-[15px]">

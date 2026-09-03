@@ -13,6 +13,8 @@ tags: ["web"]
 
 
 
+
+
 # 第 17 节 · async/await 与 fetch
 
 > 📌 **版本信息**：基于 ECMAScript 2025 与 Fetch API 现行标准（2026-08-29 核对）

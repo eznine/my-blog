@@ -19,12 +19,13 @@ import {
 import { PostEditor } from './post-editor';
 import { TaxonomyManager } from './taxonomy-manager';
 import { AppearanceManager } from './appearance-manager';
+import { ToolsManager } from './tools-manager';
 import { TaxonomySelect } from './taxonomy-select';
 import { ListPreview } from './list-preview';
 import { AiAssistant } from './ai-assistant';
 import { setAiContext, onAiDataChanged } from '@/lib/ai-context';
 
-type View = 'login' | 'list' | 'editor' | 'taxonomy' | 'appearance';
+type View = 'login' | 'list' | 'editor' | 'taxonomy' | 'appearance' | 'tools';
 
 interface BulkResult {
   imported: number;
@@ -779,6 +780,16 @@ export function AdminApp() {
     );
   }
 
+  if (view === 'tools') {
+    return renderView(
+      <ToolsManager
+        onBack={() => {
+          navList();
+        }}
+      />
+    );
+  }
+
   /* ================= 文章列表 ================= */
   return renderView(
     <div className="mx-auto max-w-6xl px-6 pb-24 pt-10 md:pt-14">
@@ -838,6 +849,16 @@ export function AdminApp() {
             className="rounded-xl border border-line px-5 py-2.5 text-[15px] font-medium text-ink transition-colors hover:border-accent/60 hover:text-accent"
           >
             外观设置
+          </Link>
+          <Link
+            href="/admin"
+            onClick={(e) => {
+              e.preventDefault();
+              navView('tools');
+            }}
+            className="rounded-xl border border-line px-5 py-2.5 text-[15px] font-medium text-ink transition-colors hover:border-accent/60 hover:text-accent"
+          >
+            工具设置
           </Link>
           <button onClick={logout} className="px-3 py-2.5 text-[14px] text-ink-faint transition-colors hover:text-accent">
             退出

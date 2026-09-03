@@ -1,5 +1,5 @@
 {
-  "_说明": "首页文案：从上到下依次是开场大屏（徽章/大字/按钮/数据条）、『我在做什么』方向卡、三个内容区块（最近的笔记/研究/项目）、页尾结束语。注意：开场大字三行（hero.titleLines）和简介（hero.bio）是首页独立文案，改这里只影响首页，不会动到关于页/页脚（那些在 00-站点信息.json）。",
+  "_说明": "首页文案：从上到下依次是开场大屏（徽章/大字/按钮/数据条）、『我在做什么』方向卡、三个内容区块（最近的笔记/研究/项目）、页尾结束语。注意：开场大字三行（hero.titleLines）和简介（hero.bio）是首页独立文案，改这里只影响首页，不会动到关于页/页脚（那些在 00-站点信息.json）。hero.route 是开场右侧背景上的「勘测路线」（仅电脑宽屏、随下滑与文字一起浮现）：每篇文章一个点、线随滚动向下延伸，点击可跳转。",
 
   "hero": {
     "badge": "STILL EXPLORING",
@@ -15,7 +15,17 @@
       { "label": "项目 PROJECTS", "href": "/projects" }
     ],
     "scrollHint": "向下滑动",
-    "scrollHintEn": "SCROLL TO EXPLORE"
+    "scrollHintEn": "SCROLL TO EXPLORE",
+    "route": {
+      "start": "2024",
+      "tail": "未完待续 TO BE CONTINUED",
+      "legend": {
+        "note": "笔记",
+        "research": "研究",
+        "tool": "工具",
+        "project": "项目"
+      }
+    }
   },
 
   "focusAreas": [

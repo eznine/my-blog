@@ -33,20 +33,6 @@ export interface EducationItem {
   detail: string;
 }
 
-export interface StoryLink {
-  label: string;
-  href: string;
-  text?: string;
-}
-
-export interface StorySection {
-  title: string;
-  type: 'list' | 'text' | 'links';
-  items?: { label: string; desc: string }[];
-  text?: string;
-  links?: StoryLink[];
-}
-
 export interface SiteConfig {
   name: string;
   siteName: string;
@@ -79,6 +65,12 @@ export interface SiteConfig {
     stats: { label: string; href: string }[];
     scrollHint: string;
     scrollHintEn: string;
+    /** 封面右侧「勘测路线」（仅桌面 xl+ 显示；删掉整个 route 段即隐藏） */
+    route: {
+      start: string;
+      tail: string;
+      legend: { note: string; research: string; tool: string; project: string };
+    };
   };
   home: {
     sections: { code: string; en: string; title: string; href?: string; link?: string }[];
@@ -132,6 +124,34 @@ export interface SiteConfig {
     };
     tools: {
       page: { code: string; en: string; title: string; desc: string; count: string };
+      converter: {
+        title: string;
+        en: string;
+        desc: string;
+        importEn: string;
+        drop: string;
+        browse: string;
+        importFormats: string;
+        parsing: string;
+        parseError: string;
+        overview: string;
+        crsSource: string;
+        crsTarget: string;
+        transform: string;
+        target: string;
+        convert: string;
+        reset: string;
+        download: string;
+        downloading: string;
+        map: string;
+        table: string;
+        stats: string;
+        basemap: string;
+        basemapAmap: string;
+        basemapEsri: string;
+        gcjTip: string;
+        srcEnabled: string;
+      };
       dem: {
         title: string;
         en: string;
@@ -143,15 +163,29 @@ export interface SiteConfig {
         checking: string;
         retry: string;
       };
+      gee: {
+        title: string;
+        en: string;
+        status: string;
+        desc: string;
+        open: string;
+        expand: string;
+        hint: string;
+      };
       future: {
         title: string;
         en: string;
         hint: string;
         items: { name: string; desc: string; status: string }[];
       };
+      /** 工具点时间：首页勘测路线上的工具标记日期（后台「工具设置」可改） */
+      date: string;
     };
   };
-  story: { intro: string; sections: StorySection[]; quote: string };
+  essay: {
+    epigraph: string;
+    chapters: { code: string; title: string; paragraphs: string[] }[];
+  };
   notesBrowser: {
     placeholder: string;
     cat: string;
@@ -201,7 +235,7 @@ export const site = {
   education: ab.education,
   researchInterests: ab.researchInterests,
   skills: ab.skills,
-  story: ab.story,
+  essay: ab.essay,
   pages: {
     notes: n.page,
     research: r.page,

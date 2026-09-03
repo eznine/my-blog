@@ -58,6 +58,8 @@ export interface Note extends BasePost {
 
 export interface Research extends BasePost {
   status?: string;
+  /** 封面图（/uploads/xxx.jpg 或相对路径；后台「封面」字段可传/可填） */
+  cover?: string;
   links?: { label: string; url: string }[];
 }
 
@@ -77,6 +79,7 @@ interface RawFrontmatter {
   chapter?: string;
   tags?: string[];
   status?: string;
+  cover?: string;
   order?: number;
   hidden?: boolean;
   links?: { label: string; url: string }[];
@@ -254,7 +257,7 @@ const bodyTextIndex = new Map<string, string>();
 
 async function loadDir<T extends BasePost>(
   dir: string,
-  decorate: (fm: RawFrontmatter) => Partial<T>
+  decorate: (fm: RawFrontmatter, ctx: { absFile: string }) => Partial<T>
 ): Promise<T[]> {
   const abs = path.join(process.cwd(), 'content', dir);
   if (!fs.existsSync(abs)) return [];
@@ -290,7 +293,7 @@ async function loadDir<T extends BasePost>(
       order: fm.order !== undefined ? Number(fm.order) || 0 : undefined,
       hidden: fm.hidden === true || String(fm.hidden).toLowerCase() === 'true' || undefined,
       html: '', // 列表不带正文：SSR 快、RSC 载荷小；文章页用 getXxxFull() 懒渲染
-      ...decorate(fm),
+      ...decorate(fm, { absFile }),
     } as T;
   });
 
@@ -342,8 +345,11 @@ export const getNotes = ttl('notes', () =>
 );
 
 export const getResearch = ttl('research', () =>
-  loadDir<Research>('research', (fm) => ({
+  loadDir<Research>('research', (fm, { absFile }) => ({
     status: fm.status,
+    cover: fm.cover
+      ? copyImageAndRewrite(String(fm.cover), path.dirname(absFile)) || String(fm.cover)
+      : undefined,
     links: fm.links,
   }))
 );

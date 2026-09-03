@@ -13,6 +13,8 @@ tags: ["web"]
 
 
 
+
+
 # 第 21 节 · interface 与 type
 
 > 📌 **版本信息**：基于 TypeScript 5.x（2026-08-29 核对）

@@ -641,6 +641,7 @@ function buildFrontmatter(meta) {
   if (meta.hidden === true || meta.hidden === 'true') lines.push('hidden: true');
   if (Array.isArray(meta.tags) && meta.tags.length) lines.push(`tags: ${JSON.stringify(meta.tags)}`);
   if (meta.status) lines.push(`status: ${yamlStr(meta.status)}`);
+  if (meta.cover) lines.push(`cover: ${yamlStr(meta.cover)}`);
   if (Array.isArray(meta.tech) && meta.tech.length) lines.push(`tech: ${JSON.stringify(meta.tech)}`);
   if (meta.demo) lines.push(`demo: ${yamlStr(meta.demo)}`);
   if (meta.demoLabel) lines.push(`demoLabel: ${yamlStr(meta.demoLabel)}`);
@@ -1164,6 +1165,34 @@ async function handle(req, res) {
     fs.writeFileSync(taxFile, JSON.stringify(tax, null, 2) + '\n', 'utf-8');
     scheduleRebuild();
     return json(res, 200, { ok: true, updated });
+  }
+
+  /* ---- 工具页文案：content/copy/09-工具页.json（page/converter/dem/gee/future + 工具点日期）。
+        保留 "_说明" 注释字段不展示不覆盖；PUT 只更新传入的顶层区块，未传区块保持不变。 ---- */
+  if (p === '/api/copy/tools' && (req.method === 'GET' || req.method === 'PUT')) {
+    const file = path.join(CONTENT, 'copy', '09-工具页.json');
+    const EMPTY = { page: {}, converter: {}, dem: {}, gee: {}, future: {}, date: '2026-09-03' };
+    if (req.method === 'GET') {
+      let base = {};
+      try {
+        base = JSON.parse(fs.readFileSync(file, 'utf-8'));
+      } catch {}
+      const out = { ...EMPTY };
+      for (const k of Object.keys(EMPTY)) if (base[k] !== undefined) out[k] = base[k];
+      return json(res, 200, out);
+    }
+    const body = JSON.parse((await readBody(req)).toString('utf-8') || '{}');
+    let base = {};
+    try {
+      base = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    } catch {}
+    const next = { ...base };
+    for (const k of Object.keys(EMPTY)) {
+      if (body[k] !== undefined) next[k] = body[k];
+    }
+    fs.writeFileSync(file, JSON.stringify(next, null, 2) + '\n', 'utf-8');
+    scheduleRebuild();
+    return json(res, 200, { ok: true });
   }
 
   /* ---- AI 代理：/api/ai/chat（OpenAI 兼容 /chat/completions，仅本地后台使用）

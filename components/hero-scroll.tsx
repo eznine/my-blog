@@ -10,6 +10,7 @@ import { MapParticleField } from './map-particle-field';
 import { SparkField } from './spark-field';
 import { Crosshair } from './crosshair';
 import { Counter } from './counter';
+import { HeroRouteMap, applyRouteProgress, type RoutePoint } from './hero-route-map';
 
 /**
  * 滚动驱动的开场舞台：section 高 260vh，内部 sticky 全屏。
@@ -36,6 +37,7 @@ export function HeroScroll({
   hero,
   coords,
   github,
+  routePoints,
 }: {
   notes: number;
   research: number;
@@ -43,6 +45,7 @@ export function HeroScroll({
   hero?: SiteConfig['hero'];
   coords?: string;
   github?: string;
+  routePoints?: RoutePoint[];
 }) {
   const site = useSite();
   const stageRef = useRef<HTMLElement>(null);
@@ -92,6 +95,9 @@ export function HeroScroll({
       const total = Math.max(1, stage.offsetHeight - vh);
       const p = clamp01(-rect.top / total);
 
+      // 勘测路线：与 data-hs 文字同帧驱动（DOM 直写，双向可逆）
+      applyRouteProgress(stage, p);
+
       const eased = easeOut(p);
       topoState.zoom = 0.42 + 0.58 * eased;
       topoState.boost = 0.35 + 0.65 * eased;
@@ -135,6 +141,9 @@ export function HeroScroll({
 
         <div className="map-grid map-grid-fade absolute inset-0 opacity-70" aria-hidden="true" />
         <Crosshair baseLat={lat} baseLon={lon} />
+
+        {/* 勘测路线：随开场文字一起浮现、随滚动向下延伸（仅桌面 xl+，CSS 控制显隐） */}
+        {routePoints && routePoints.length > 0 && <HeroRouteMap points={routePoints} copy={heroCfg.route} />}
 
         {/* 文字区暗色纱罩：随文字浮现淡入，把等高线从文字后面压下去 */}
         <div

@@ -7,6 +7,7 @@ import { SparkField } from '@/components/spark-field';
 import { NoteCard } from '@/components/note-card';
 import { ProjectCard } from '@/components/project-card';
 import { ResearchItem } from '@/components/research-item';
+import type { RoutePoint } from '@/components/hero-route-map';
 
 // 动态模式：每次请求实时读取内容，后台保存后无需构建即可看到最新
 export const dynamic = 'force-dynamic';
@@ -60,6 +61,14 @@ function SectionHeading({
 export default async function HomePage() {
   const [notes, research, projects] = await Promise.all([getNotes(), getResearch(), getProjects()]);
 
+  // 封面右侧「勘测路线」：每篇文章一个点，笔记全量、研究/项目全量、工具页一个点
+  const routePoints: RoutePoint[] = [
+    ...notes.map((n) => ({ kind: 'note' as const, title: n.title, date: n.date, href: `/notes/${n.slug}`, category: n.category })),
+    ...research.map((r) => ({ kind: 'research' as const, title: r.title, date: r.date, href: `/research/${r.slug}` })),
+    { kind: 'tool' as const, title: site.pages.tools.page.title, date: site.pages.tools.date || '2026-09-03', href: '/tools' },
+    ...projects.map((p) => ({ kind: 'project' as const, title: p.title, date: p.date, href: `/projects/${p.slug}` })),
+  ];
+
   return (
     <div>
       {/* ================= HERO：滚动驱动的开场（等高线放大 + 文字浮现） ================= */}
@@ -70,6 +79,7 @@ export default async function HomePage() {
         hero={site.hero}
         coords={site.coords}
         github={site.github}
+        routePoints={routePoints}
       />
 
       <div className="mx-auto max-w-6xl px-6">
@@ -141,7 +151,7 @@ export default async function HomePage() {
           />
           {research.length > 0 ? (
             <Reveal variant="up">
-              <div className="rounded-2xl border border-line glass p-3">
+              <div className="flex flex-col gap-5">
                 {research.slice(0, 2).map((r) => (
                   <ResearchItem key={r.slug} research={r} />
                 ))}

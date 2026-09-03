@@ -13,6 +13,8 @@ tags: ["web"]
 
 
 
+
+
 # 第 01 节 · 组件与 JSX/TSX
 
 > 📌 **版本信息**：React 19.x（2026-08-29 核对；本模块组件 API 多年稳定，React 19 主要新特性在 Server Components/Actions，第 19 节起涉及） ｜ Vite 8.2.2

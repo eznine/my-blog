@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">
+  <rect width="480" height="270" fill="#1a1813"/>
+  <g stroke="#8a8270" stroke-width="1" opacity="0.6">
+    <path d="M90 60 L210 120 L330 70 L410 150 L300 210 L150 200 L70 120 Z"/>
+    <path d="M210 120 L150 200 M330 70 L300 210 M90 60 L70 120 M410 150 L330 70"/>
+  </g>
+  <g fill="#b5d0a8">
+    <circle cx="90" cy="60" r="7"/><circle cx="210" cy="120" r="9"/><circle cx="330" cy="70" r="7"/>
+    <circle cx="410" cy="150" r="6"/><circle cx="300" cy="210" r="8"/><circle cx="150" cy="200" r="6"/>
+    <circle cx="70" cy="120" r="5"/>
+  </g>
+  <g fill="#ff4b33"><circle cx="210" cy="120" r="3.5"/><circle cx="300" cy="210" r="3"/></g>
+  <text x="20" y="35" fill="#d8c07a" font-family="monospace" font-size="15" letter-spacing="2">ECOLOGICAL NETWORK</text>
+  <text x="20" y="55" fill="#8a8270" font-family="monospace" font-size="11" letter-spacing="1">RESILIENCE · CORRIDOR</text>
+</svg>

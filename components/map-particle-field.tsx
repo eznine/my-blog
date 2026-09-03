@@ -76,7 +76,7 @@ export function MapParticleField({ className }: { className?: string }) {
       }));
       landmarks = [
         { x: w * 0.16, y: h * 0.68, phase: 0, label: 'PT·01' },
-        { x: w * 0.82, y: h * 0.3, phase: 1.4, label: 'PT·02' },
+        { x: w * 0.06, y: h * 0.1, phase: 1.4, label: 'PT·02' },
         { x: w * 0.63, y: h * 0.78, phase: 2.7, label: 'PT·03' },
         { x: w * 0.3, y: h * 0.24, phase: 3.9, label: 'PT·04' },
       ];

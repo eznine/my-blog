@@ -5,10 +5,12 @@ category: "WebGIS 开发"
 chapter: "Leaflet"
 order: 21
 tags: ["web","leaflet"]
-demo: /demos/leaflet-geojson/
-demoLabel: 省界 + 当日地震 · 面与点
+demo: "/demos/leaflet-geojson/"
+demoLabel: "省界 + 当日地震 · 面与点"
 demoHeight: 560
 ---
+
+
 
 
 

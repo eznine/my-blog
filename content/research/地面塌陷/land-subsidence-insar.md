@@ -1,10 +1,11 @@
 ---
 title: "基于 SBAS-InSAR 和多模型机器学习的地面塌陷易发性评价"
-date: 2026-08-17
-category: 地面塌陷
-tags: [SBAS-InSAR, 机器学习, XGBoost, SHAP, 易发性评价]
-status: 已发表
+date: "2026-08-17"
 summary: "以阳泉市郊区采煤塌陷区为研究区，用 24 景 Sentinel-1A 影像反演时序形变，与 12 个评价因子一起训练基础/增强两组共 8 个机器学习模型，定量证明 InSAR 形变信息对塌陷易发性识别的增益作用。"
+category: "地面塌陷"
+tags: ["SBAS-InSAR","机器学习","XGBoost","SHAP","易发性评价"]
+status: "已完成"
+cover: "/uploads/20260903-9ae356.png"
 ---
 
 ## 研究背景

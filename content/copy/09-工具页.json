@@ -1,14 +1,41 @@
 {
-  "_说明": "工具页文案：① page——顶部标题区；② dem——DEM 下载器区块（本工具为本地服务，需先启动再嵌入）；③ future——更多工具占位区（只留位置与说明，具体工具后补）。字段顺序 = 页面从上到下。",
-
+  "_说明": "工具页文案：① page——顶部标题区；② converter——矢量格式转换工具箱（纯前端，支持互转/重投影/底图预览，底图优先高德+Esri）；③ gee——GEE Playground（在线）；④ dem——DEM 下载器（本地服务）；⑤ future——更多工具占位区。字段顺序 = 页面从上到下。",
   "page": {
     "code": "09",
     "en": "TOOLS",
     "title": "工具 · 工具箱",
     "desc": "GIS 实用小工具集合——在线即可用的 Web 工具与本地运行的工具，随用随取。工具有限，正在持续打磨。",
-    "count": "DEM 下载器 · 更多规划中"
+    "count": "格式转换 · GEE Playground · DEM 下载器 · 更多规划中"
   },
-
+  "date": "2026-09-03",
+  "converter": {
+    "title": "矢量格式转换",
+    "en": "FORMAT CONVERTER",
+    "desc": "GeoJSON / Shapefile / TopoJSON / KML / GPX / WKT / CSV 互通。支持坐标重投影（WGS84 / CGCS2000 / Web Mercator / UTM）、属性表查看、TopoJSON 智能压缩与底图联动预览。全程浏览器本地计算，数据不上传。",
+    "importEn": "STEP 1 · 导入数据",
+    "drop": "拖拽文件到这里，或点击选择",
+    "browse": "选择文件",
+    "importFormats": "支持 .geojson / .json / .zip（Shapefile）/ .shp+.dbf+.prj / .topojson / .kml / .gpx / .wkt / .csv · 可多选",
+    "parsing": "正在解析…",
+    "parseError": "解析失败",
+    "overview": "概览",
+    "crsSource": "源坐标系（Source CRS）",
+    "crsTarget": "目标坐标系（Target CRS）",
+    "transform": "启用坐标重投影",
+    "target": "STEP 2 · 选择导出格式",
+    "convert": "转换 · 生成",
+    "reset": "重置",
+    "download": "下载",
+    "downloading": "处理中…",
+    "map": "地图",
+    "table": "属性表",
+    "stats": "统计",
+    "basemap": "底图",
+    "basemapAmap": "高德",
+    "basemapEsri": "Esri",
+    "gcjTip": "提示：高德底图为 GCJ-02 加密坐标，WGS84 数据叠加会有数百米偏移；Esri 卫星底图为 WGS84，若需严格对齐请选 Esri。",
+    "srcEnabled": "已启用重投影"
+  },
   "dem": {
     "title": "DEM 下载器",
     "en": "DEM DOWNLOADER",
@@ -20,16 +47,35 @@
     "checking": "正在检测本地服务…",
     "retry": "重新检测"
   },
-
+  "gee": {
+    "title": "GEE Playground · 地球引擎代码台",
+    "en": "GEE PLAYGROUND",
+    "status": "可用 · 在线",
+    "desc": "浏览器里的 Google Earth Engine 代码编辑器：用自己的 GEE 账号登录，写 JavaScript 调用行星级地理数据，结果实时叠加到地图，控制台输出数据，一键提交到 Google Drive 的导出任务。",
+    "open": "新窗口打开 ↗",
+    "expand": "展开运行",
+    "hint": "首次使用需在 Google Cloud Console 创建 OAuth 客户端 ID（Web 应用）并填入工具内设置，还需可访问 Google 的网络环境（大陆网络需科学上网）。同时该 Google 账号需已注册过 Earth Engine。"
+  },
   "future": {
     "title": "更多工具 · 规划中",
     "en": "MORE TOOLS",
     "hint": "陆续打磨，敬请期待",
     "items": [
-      { "name": "矢量数据格式转换", "desc": "Shapefile / GeoJSON / KML / GPKG 等格式互转与坐标重投影", "status": "规划中" },
-      { "name": "坐标系转换", "desc": "WGS84 / CGCS2000 / 投影坐标批量互转与参数查询", "status": "规划中" },
-      { "name": "栅格裁剪合并", "desc": "大影像的按范围裁剪、拼接与金字塔构建", "status": "规划中" },
-      { "name": "瓦片下载", "desc": "按范围批量下载 XYZ 瓦片底图，本地离线缓存", "status": "规划中" }
+      {
+        "name": "坐标系转换",
+        "desc": "WGS84 / CGCS2000 / 投影坐标批量互转与参数查询",
+        "status": "规划中"
+      },
+      {
+        "name": "栅格裁剪合并",
+        "desc": "大影像的按范围裁剪、拼接与金字塔构建",
+        "status": "规划中"
+      },
+      {
+        "name": "瓦片下载",
+        "desc": "按范围批量下载 XYZ 瓦片底图，本地离线缓存",
+        "status": "规划中"
+      }
     ]
   }
 }

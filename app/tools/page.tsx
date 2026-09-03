@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
 import { DemDownloader } from '@/components/tools/dem-downloader';
+import { GeePlayground } from '@/components/tools/gee-playground';
+import { FormatConverter } from '@/components/tools/format-converter';
 import { site } from '@/lib/site-server';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,6 +28,20 @@ export default async function ToolsPage() {
           <p className="mono-label mt-4">{tools.page.count}</p>
         </PageHeader>
       </Reveal>
+
+      {/* 矢量格式转换（纯前端，随时可用） */}
+      <div className="pt-8">
+        <Reveal>
+          <FormatConverter copy={tools.converter} />
+        </Reveal>
+      </div>
+
+      {/* GEE Playground（在线工具） */}
+      <div className="pt-8">
+        <Reveal>
+          <GeePlayground copy={tools.gee} />
+        </Reveal>
+      </div>
 
       {/* DEM 下载器（可用工具） */}
       <div className="pt-8">
