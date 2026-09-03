@@ -92,128 +92,13 @@ fi
 
 echo "==> [6/8] 写入 Nginx 站点配置（/uploads/ 与 /content-images/ 由 Nginx 直连仓库目录，"
 echo "          绕开 Next 静态服务——Next 对服务启动后新增的图片文件会 404）"
-echo "          HTTPS：443 带 Let's Encrypt 证书（eznine.xyz），证书续期由 certbot 自动完成，"
-echo "          本脚本只引用证书路径 /etc/letsencrypt/live/eznine.xyz/ 不干预续期。"
-echo "          80 保留给 ACME 验证（/.well-known/acme-challenge/）与 IP 直连，不强制跳 443。"
+echo "          配置来源：scripts/nginx-my-blog.conf（独立文件，不内嵌在脚本里）——"
+echo "          【血泪】若内嵌 heredoc，脚本自更新 + { } 复合命令会让 bash 执行旧内存版，"
+echo "          git pull 拉新脚本后本轮仍写旧配置，HTTPS(443) 会被抹掉。配置抽独立文件后"
+echo "          [6/8] 直接 cp，与脚本版本脱钩。"
 if [ "$(id -u)" = "0" ]; then
-  cat > /etc/nginx/sites-available/my-blog <<'NGINX'
-# ---- HTTP（80）：ACME 验证 + IP 直连 + 非 443 兜底 ----
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    server_name _;
-
-    # 批量导入/上传图片允许大 body（默认 1m 会直接 413 拒掉带图 md 导入）
-    client_max_body_size 64m;
-
-    # Let's Encrypt 证书续期验证路径（webroot，静态喂给 ACME，不走代理）
-    location /.well-known/acme-challenge/ {
-        root /var/www/html;
-    }
-
-    location / {
-        proxy_pass http://127.0.0.1:3210;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_buffering off;
-        proxy_read_timeout 600s;
-    }
-
-    location /api/ {
-        proxy_pass http://127.0.0.1:3001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_buffering off;
-        proxy_read_timeout 600s;
-    }
-
-    # DEM 下载器（独立 Python 服务 127.0.0.1:8081，相对路径前端）
-    # 无尾斜杠的 /dem 重定向补斜杠，避免相对路径解析错乱
-    location = /dem { return 308 /dem/; }
-
-    location /dem/ {
-        proxy_pass http://127.0.0.1:8081/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_buffering off;
-        proxy_read_timeout 600s;
-    }
-
-    location /uploads/ {
-        alias /srv/my-blog/public/uploads/;
-        expires 7d;
-    }
-
-    location /content-images/ {
-        alias /srv/my-blog/public/content-images/;
-        expires 30d;
-    }
-}
-
-# ---- HTTPS（443）：eznine.xyz TLS ----
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name eznine.xyz;
-
-    ssl_certificate     /etc/letsencrypt/live/eznine.xyz/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/eznine.xyz/privkey.pem;
-    ssl_protocols       TLSv1.2 TLSv1.3;
-
-    client_max_body_size 64m;
-
-    # 端口已走 443，服务端返回的绝对/相对链接由 Host 头决定，无需额外处理
-
-    location / {
-        proxy_pass http://127.0.0.1:3210;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_buffering off;
-        proxy_read_timeout 600s;
-    }
-
-    location /api/ {
-        proxy_pass http://127.0.0.1:3001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_buffering off;
-        proxy_read_timeout 600s;
-    }
-
-    # DEM 下载器（独立 Python 服务 127.0.0.1:8081，相对路径前端）
-    location = /dem { return 308 /dem/; }
-
-    location /dem/ {
-        proxy_pass http://127.0.0.1:8081/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_http_version 1.1;
-        proxy_set_header Connection "";
-        proxy_buffering off;
-        proxy_read_timeout 600s;
-    }
-
-    location /uploads/ {
-        alias /srv/my-blog/public/uploads/;
-        expires 7d;
-    }
-
-    location /content-images/ {
-        alias /srv/my-blog/public/content-images/;
-        expires 30d;
-    }
-}
-NGINX
+  [ -f scripts/nginx-my-blog.conf ] || { echo "  缺少 scripts/nginx-my-blog.conf，中止"; exit 1; }
+  cp scripts/nginx-my-blog.conf /etc/nginx/sites-available/my-blog
   ln -sfn /etc/nginx/sites-available/my-blog /etc/nginx/sites-enabled/my-blog
   nginx -t
 fi
