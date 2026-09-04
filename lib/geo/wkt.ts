@@ -96,15 +96,32 @@ export function wktToGeometry(wkt: string): GjGeometry | null {
 
 export function wktToFC(wkt: string): { fc: GjFeatureCollection; warnings: string[] } {
   const warnings: string[] = [];
-  const geom = wktToGeometry(wkt);
-  if (!geom) throw new Error('无法解析 WKT —— 请确认是标准 WKT 一行文本。');
-  // GeometryCollection 拆成多要素，其余单要素
-  if (geom.type === 'GeometryCollection') {
-    const geoms = (geom.geometries as GjGeometry[]) || [];
-    const features = geoms.map((g) => ({ type: 'Feature' as const, properties: {}, geometry: g }));
-    return { fc: { type: 'FeatureCollection', features }, warnings };
+  const text = wkt.replace(/\r/g, '');
+  const geoms: GjGeometry[] = [];
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+
+  if (lines.length > 1) {
+    // 多行 WKT：每行一个几何，逐行解析为多要素
+    for (const line of lines) {
+      const g = wktToGeometry(line);
+      if (!g) throw new Error(`无法解析 WKT 行：「${line.slice(0, 40)}${line.length > 40 ? '…' : ''}」`);
+      pushGeom(g);
+    }
+  } else {
+    const g = wktToGeometry(text);
+    if (!g) throw new Error('无法解析 WKT —— 请确认是标准 WKT 文本（支持每行一个几何）。');
+    pushGeom(g);
   }
-  return { fc: { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: geom }] }, warnings };
+
+  function pushGeom(g: GjGeometry) {
+    // GeometryCollection 拆成多要素
+    if (g.type === 'GeometryCollection') {
+      for (const s of (g.geometries as GjGeometry[]) || []) geoms.push(s);
+    } else geoms.push(g);
+  }
+
+  const features = geoms.map((g) => ({ type: 'Feature' as const, properties: {}, geometry: g }));
+  return { fc: { type: 'FeatureCollection', features }, warnings };
 }
 
 const num = (c: number[]) => c.map((v) => (typeof v === 'number' ? String(Math.round(v * 1e7) / 1e7) : String(v))).join(' ');
@@ -132,10 +149,16 @@ export function geometryToWKT(g: GjGeometry): string {
 }
 
 export function fcToWKT(fc: GjFeatureCollection): string {
-  // 多要素导出为 GEOMETRYCOLLECTION（WKT 单值）
-  if (fc.features.length === 1 && fc.features[0].geometry) {
-    return geometryToWKT(fc.features[0].geometry);
+  // 逐要素一行输出（通用 WKT 文本），兼容性远好于 GEOMETRYCOLLECTION 单值——
+  // 很多软件（ArcGIS/QGIS/GDAL 文本导入）按行读取 WKT，单几何直接可用。
+  // GeometryCollection 要素也拆开逐行输出。
+  const lines: string[] = [];
+  for (const f of fc.features) {
+    const g = f.geometry;
+    if (!g) continue;
+    if (g.type === 'GeometryCollection') {
+      for (const s of (g.geometries as GjGeometry[]) || []) lines.push(geometryToWKT(s));
+    } else lines.push(geometryToWKT(g));
   }
-  const geoms = fc.features.map((f) => f.geometry).filter(Boolean) as GjGeometry[];
-  return `GEOMETRYCOLLECTION (${geoms.map(geometryToWKT).join(', ')})`;
+  return lines.join('\n');
 }

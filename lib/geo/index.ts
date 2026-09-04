@@ -135,7 +135,7 @@ export type { InputFormat, ParseResult, SourceFile, ExportResult, GjFeatureColle
 export { fcToTopoJSON, topoJSONToFC } from './topojson';
 export { fcToKML, fcToCSV } from './writers';
 export { geometryToWKT, fcToWKT, wktToFC } from './wkt';
-export { writeShapefilePackage, inferDbfFields, prjFor } from './shapefile-write';
+export { writeShapefilePackage, writeShapefileZip, writeShp, writeShx, writeDbf, inferDbfFields, prjFor } from './shapefile-write';
 export { reprojectFC, crsLabel, registerCrs, utmEpsg } from './reproject';
 export { crsFromPrj } from './shp-read';
 export { bboxOf, eachCoord, mapCoords } from './util';

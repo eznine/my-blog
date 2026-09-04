@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { PageHeader } from '@/components/page-header';
 import { Reveal } from '@/components/reveal';
 import { DemDownloader } from '@/components/tools/dem-downloader';
-import { GeePlayground } from '@/components/tools/gee-playground';
 import { FormatConverter } from '@/components/tools/format-converter';
 import { site } from '@/lib/site-server';
 
@@ -33,13 +32,6 @@ export default async function ToolsPage() {
       <div className="pt-8">
         <Reveal>
           <FormatConverter copy={tools.converter} />
-        </Reveal>
-      </div>
-
-      {/* GEE Playground（在线工具） */}
-      <div className="pt-8">
-        <Reveal>
-          <GeePlayground copy={tools.gee} />
         </Reveal>
       </div>
 

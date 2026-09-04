@@ -574,10 +574,36 @@ iframe {
   will-change: transform;
 }
 
+.explore-card.glow-card {
+  overflow: visible;
+}
+
 .explore-card:hover {
   border-color: var(--line-strong);
   box-shadow: 0 0 0 1px var(--accent-glow), var(--shadow);
   transform: translateY(-4px);
+}
+
+/* 邻近卡片轮廓光：鼠标靠近哪一端，哪一端边界向外亮起（伪元素外扩，靠 mask 只留环形） */
+.explore-card.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--glow-intensity, 0);
+  padding: 8px;
+  background: radial-gradient(
+    circle var(--glow-radius, 320px) at var(--glow-x, 50%) var(--glow-y, 50%),
+    color-mix(in srgb, var(--accent) 84%, transparent),
+    transparent 70%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  transition: opacity 0.16s linear;
 }
 
 /* 卡片右上角红色角标 */
@@ -621,6 +647,42 @@ iframe {
 
 .explore-card:hover .sparks {
   opacity: 1;
+}
+
+/* ============ 笔记图集：点线目录 + 视图切换 ============ */
+.leader-dots {
+  flex: 1;
+  min-width: 2rem;
+  height: 1px;
+  margin: 0 0.5rem;
+  background-image: radial-gradient(circle, var(--line-strong) 1px, transparent 1.6px);
+  background-size: 8px 3px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+@keyframes view-swap-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+}
+
+.view-swap > * {
+  animation: view-swap-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-swap > * {
+    animation: none !important;
+  }
+}
+
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .explore-card.glow-card::before {
+    display: none;
+  }
 }
 
 /* ============ 幽灵大数字 ============ */
@@ -1246,4 +1308,14 @@ iframe {
 #note-demo-sidebar .demo-code-resizer.is-dragging .demo-code-resizer-grip::before,
 #note-demo-sidebar .demo-code-resizer.is-dragging .demo-code-resizer-grip::after {
   background: var(--accent);
+}
+
+/* 转换完成弹出下载按钮：一次性弹跳 + 光圈脉冲（落定后保持常亮投影） */
+@keyframes pulseOnce {
+  0% { transform: scale(0.82); opacity: 0.4; }
+  55% { transform: scale(1.07); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-pulse-once {
+  animation: pulseOnce 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

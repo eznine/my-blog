@@ -5,7 +5,7 @@ import { api } from './api';
 
 /**
  * 工具页设置：编辑 content/copy/09-工具页.json 的文案
- * （page 标题区 / converter / dem / gee / future 各区块介绍 + 首页勘测路线的工具点时间）。
+ * （page 标题区 / converter / dem / future 各区块介绍 + 首页勘测路线的工具点时间）。
  * GET/PUT /api/copy/tools；"_说明" 注释字段后台不展示、保存时保留。
  */
 
@@ -13,7 +13,6 @@ interface ToolsCopy {
   page: { code: string; en: string; title: string; desc: string; count: string };
   converter: Record<string, string>;
   dem: Record<string, string>;
-  gee: Record<string, string>;
   future: { title: string; en: string; hint: string; items: { name: string; desc: string; status: string }[] };
   date: string;
 }
@@ -22,7 +21,6 @@ const EMPTY: ToolsCopy = {
   page: { code: '09', en: 'TOOLS', title: '', desc: '', count: '' },
   converter: {},
   dem: {},
-  gee: {},
   future: { title: '', en: '', hint: '', items: [] },
   date: '',
 };
@@ -32,7 +30,7 @@ const inputCls =
 const labelCls = 'mb-1.5 block font-mono text-[11px] tracking-[0.16em] text-ink-faint uppercase';
 
 /** 单行文本字段定义：区块 key → 字段 key → 中文标签 */
-const SECTIONS: { key: 'page' | 'converter' | 'dem' | 'gee'; title: string; en: string; fields: { key: string; label: string; multi?: boolean }[] }[] = [
+const SECTIONS: { key: 'page' | 'converter' | 'dem'; title: string; en: string; fields: { key: string; label: string; multi?: boolean }[] }[] = [
   {
     key: 'page',
     title: '页面标题区',
@@ -83,20 +81,6 @@ const SECTIONS: { key: 'page' | 'converter' | 'dem' | 'gee'; title: string; en: 
       { key: 'retry', label: '重试按钮' },
     ],
   },
-  {
-    key: 'gee',
-    title: 'GEE Playground',
-    en: 'GEE PLAYGROUND',
-    fields: [
-      { key: 'title', label: '标题' },
-      { key: 'en', label: '英文 EN' },
-      { key: 'status', label: '状态徽标' },
-      { key: 'desc', label: '介绍', multi: true },
-      { key: 'open', label: '新窗口按钮' },
-      { key: 'expand', label: '展开按钮' },
-      { key: 'hint', label: '使用提示', multi: true },
-    ],
-  },
 ];
 
 function clone(c: ToolsCopy): ToolsCopy {
@@ -117,7 +101,6 @@ export function ToolsManager({ onBack }: { onBack: () => void }) {
           page: { ...EMPTY.page, ...r.page },
           converter: { ...EMPTY.converter, ...r.converter },
           dem: { ...EMPTY.dem, ...r.dem },
-          gee: { ...EMPTY.gee, ...r.gee },
           future: {
             title: r.future?.title ?? '',
             en: r.future?.en ?? '',

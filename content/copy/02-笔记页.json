@@ -6,11 +6,21 @@
     "en": "NOTES",
     "title": "笔记 · 知识库",
     "desc": "GIS、遥感、空间分析、WebGIS、编程与相关软件的学习记录——每个方向下的知识点、技术与实践案例，随学习不断扩展。",
-    "count": "共 {n} 篇 · 支持按分类 / 标签 / 关键词筛选"
+    "count": "共 {n} 篇 · {c} 个分类 · {ch} 个章节 · 最近更新 {d}"
   },
 
   "browser": {
     "placeholder": "搜索笔记标题、摘要或标签…",
+    "viewAtlas": "图集",
+    "viewTimeline": "时间线",
+    "backToAtlas": "← 返回图集总览",
+    "sheet": "SHEET",
+    "notesUnit": "篇",
+    "chaptersUnit": "个章节",
+    "moreChapters": "+{n} 章节",
+    "noChapter": "未分章节",
+    "uncategorized": "未分类",
+    "lastUpdated": "最近更新",
     "cat": "分类",
     "tag": "标签",
     "chap": "章节",

@@ -197,10 +197,6 @@ export default async function HomePage() {
                 全部内容收录于{' '}
                 <Link href="/archive" className="text-accent transition-colors hover:text-accent-strong">
                   {site.home.endnoteArchive}
-                </Link>{' '}
-                ·{' '}
-                <Link href="/about" className="text-accent transition-colors hover:text-accent-strong">
-                  {site.home.endnoteAbout}
                 </Link>
               </p>
             </div>

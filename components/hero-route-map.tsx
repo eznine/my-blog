@@ -188,7 +188,9 @@ export function HeroRouteMap({ points, copy }: { points: RoutePoint[]; copy?: Ro
     const midX = (box?.w ?? 600) / 2;
     let lastYear = '';
     sorted.forEach((p, i) => {
-      const t = sorted.length === 1 ? 0.5 : 0.05 + (i * 0.9) / (sorted.length - 1);
+      // 首点只留 2% 空段（约 0.04~0.06 画布高度）：起点稍后一点直接是第一个内容；
+      // 终点贴到 95%，尾部虚线再向外延伸
+      const t = sorted.length === 1 ? 0.5 : 0.02 + (i * 0.93) / (sorted.length - 1);
       const pt = path.getPointAtLength(t * total);
       const year = p.date.slice(0, 4);
       const showYear = year !== lastYear; // 年份变化才标，每年只留一个

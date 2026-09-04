@@ -79,7 +79,6 @@ export interface SiteConfig {
     emptyProjects: string;
     endnote: string;
     endnoteArchive: string;
-    endnoteAbout: string;
   };
   pages: {
     notes: { code: string; en: string; title: string; desc: string; count: string };
@@ -163,15 +162,6 @@ export interface SiteConfig {
         checking: string;
         retry: string;
       };
-      gee: {
-        title: string;
-        en: string;
-        status: string;
-        desc: string;
-        open: string;
-        expand: string;
-        hint: string;
-      };
       future: {
         title: string;
         en: string;
@@ -188,6 +178,16 @@ export interface SiteConfig {
   };
   notesBrowser: {
     placeholder: string;
+    viewAtlas: string;
+    viewTimeline: string;
+    backToAtlas: string;
+    sheet: string;
+    notesUnit: string;
+    chaptersUnit: string;
+    moreChapters: string;
+    noChapter: string;
+    uncategorized: string;
+    lastUpdated: string;
     cat: string;
     tag: string;
     chap: string;

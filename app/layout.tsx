@@ -4,6 +4,7 @@ import { TopoShaderField } from '@/components/topo-shader-field';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { CursorGlow } from '@/components/cursor-glow';
+import { CardProximityGlow } from '@/components/card-proximity-glow';
 import { ScrollProgressDot } from '@/components/scroll-progress-dot';
 import { SiteProvider } from '@/components/site-provider';
 import { getSite } from '@/lib/site-server';
@@ -42,6 +43,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <SiteProvider value={site}>
           <CursorGlow />
+          <CardProximityGlow />
           {/* 桌面端右侧滚动进度（细轨 + 橙色圆圈），仅 xl+ 显示 */}
           <ScrollProgressDot />
           {/* 全站固定等高线背景：所有页面、任意滚动位置可见，支持鼠标扰动 */}

@@ -51,6 +51,18 @@ export default async function NotesPage() {
     order: n.order,
   }));
 
+  // 页头知识库状态条：篇数 · 分类数 · 章节数 · 最近更新
+  const catCount = new Set(notes.map((n) => n.category)).size;
+  const chapterCount = new Set(
+    notes.filter((n) => n.chapter).map((n) => `${n.category}/${n.chapter}`),
+  ).size;
+  const lastDate = notes.map((n) => n.date).sort().pop()?.slice(5) ?? '';
+  const statsLine = site.pages.notes.count
+    .replace('{n}', String(notes.length))
+    .replace('{c}', String(catCount))
+    .replace('{ch}', String(chapterCount))
+    .replace('{d}', lastDate);
+
   return (
     <div className="mx-auto max-w-6xl px-6 pb-12 pt-10 md:pt-16">
       <Reveal>
@@ -60,7 +72,7 @@ export default async function NotesPage() {
           title={site.pages.notes.title}
           desc={site.pages.notes.desc}
         >
-          <p className="mono-label mt-4">{site.pages.notes.count.replace('{n}', String(notes.length))}</p>
+          <p className="mono-label mt-4">{statsLine}</p>
         </PageHeader>
       </Reveal>
       <div className="pt-8">

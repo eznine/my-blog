@@ -1167,11 +1167,11 @@ async function handle(req, res) {
     return json(res, 200, { ok: true, updated });
   }
 
-  /* ---- 工具页文案：content/copy/09-工具页.json（page/converter/dem/gee/future + 工具点日期）。
+  /* ---- 工具页文案：content/copy/09-工具页.json（page/converter/dem/future + 工具点日期）。
         保留 "_说明" 注释字段不展示不覆盖；PUT 只更新传入的顶层区块，未传区块保持不变。 ---- */
   if (p === '/api/copy/tools' && (req.method === 'GET' || req.method === 'PUT')) {
     const file = path.join(CONTENT, 'copy', '09-工具页.json');
-    const EMPTY = { page: {}, converter: {}, dem: {}, gee: {}, future: {}, date: '2026-09-03' };
+    const EMPTY = { page: {}, converter: {}, dem: {}, future: {}, date: '2026-09-03' };
     if (req.method === 'GET') {
       let base = {};
       try {

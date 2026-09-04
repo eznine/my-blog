@@ -161,7 +161,7 @@ export function HeroScroll({
         <div className="relative mx-auto w-full max-w-6xl px-6">
           <div data-hs="0.05,0.22" className="mono-label flex flex-wrap items-center gap-4" style={{ opacity: 0 }}>
             <span className="flex items-center gap-2.5 rounded-full border border-accent/50 px-3.5 py-1.5 !text-accent">
-              <span className="marker-dot is-live !h-[6px] !w-[6px]" />
+              <span className="marker-dot is-live translate-y-[5px] !h-[6px] !w-[6px]" />
               {heroCfg.badge}
             </span>
             <span className="hidden h-px w-20 bg-line md:block" />

@@ -1,11 +1,11 @@
 {
-  "_说明": "工具页文案：① page——顶部标题区；② converter——矢量格式转换工具箱（纯前端，支持互转/重投影/底图预览，底图优先高德+Esri）；③ gee——GEE Playground（在线）；④ dem——DEM 下载器（本地服务）；⑤ future——更多工具占位区。字段顺序 = 页面从上到下。",
+  "_说明": "工具页文案：① page——顶部标题区；② converter——矢量格式转换工具箱（纯前端，支持互转/重投影/底图预览，底图优先高德+Esri）；③ dem——DEM 下载器（本地服务）；④ future——更多工具占位区。字段顺序 = 页面从上到下。",
   "page": {
     "code": "09",
     "en": "TOOLS",
     "title": "工具 · 工具箱",
     "desc": "GIS 实用小工具集合——在线即可用的 Web 工具与本地运行的工具，随用随取。工具有限，正在持续打磨。",
-    "count": "格式转换 · GEE Playground · DEM 下载器 · 更多规划中"
+    "count": "格式转换 · DEM 下载器 · 更多规划中"
   },
   "date": "2026-09-03",
   "converter": {
@@ -40,21 +40,12 @@
     "title": "DEM 下载器",
     "en": "DEM DOWNLOADER",
     "status": "可用 · 本地服务",
-    "desc": "从 OpenTopography 获取全球 DEM 数据：地图框选 / 行政区划 / 文件导入三种选区域方式，自动分割与 GDAL 合并，多底图、地形分析与图层导出。",
+    "desc": "从 OpenTopography 获取全球 DEM 数据：地图框选 / 行政区划 / 文件导入三种选区域方式，自动分割与 GDAL 合并；可计算坡度（°）、坡向（°）、地形起伏度（TRI）、山体阴影四种地形分析，地图即时预览，每种结果都可单独导出 GeoTIFF，也可打包为 ZIP。",
     "open": "新窗口打开 ↗",
     "hint": "DEM 下载器是本地工具，使用前请先启动服务：双击 F:\\TOOLS\\DEM_DOWN\\启动DEM下载器.bat（或手动运行 web_app\\web_server.py，默认 127.0.0.1:8080）。",
     "offline": "本地服务未启动 —— DEM 下载器需要你电脑上的后台服务支撑。请先运行「启动DEM下载器.bat」，再点击重新检测。",
     "checking": "正在检测本地服务…",
     "retry": "重新检测"
-  },
-  "gee": {
-    "title": "GEE Playground · 地球引擎代码台",
-    "en": "GEE PLAYGROUND",
-    "status": "可用 · 在线",
-    "desc": "浏览器里的 Google Earth Engine 代码编辑器：用自己的 GEE 账号登录，写 JavaScript 调用行星级地理数据，结果实时叠加到地图，控制台输出数据，一键提交到 Google Drive 的导出任务。",
-    "open": "新窗口打开 ↗",
-    "expand": "展开运行",
-    "hint": "首次使用需在 Google Cloud Console 创建 OAuth 客户端 ID（Web 应用）并填入工具内设置，还需可访问 Google 的网络环境（大陆网络需科学上网）。同时该 Google 账号需已注册过 Earth Engine。"
   },
   "future": {
     "title": "更多工具 · 规划中",

@@ -1,9 +1,11 @@
 import type { GjFeatureCollection, GjGeometry } from './types';
+import { zipFiles } from './zip-write';
 
 /**
- * Shapefile 写出：生成 .shp + .dbf + .prj 三件套。
+ * Shapefile 写出：生成 .shp + .shx + .dbf + .prj + .cpg 五件套。
  *
  * .shp —— 标准二进制（文件头 100B 大端长度 + 记录头 8B + 几何小端）。
+ * .shx —— 空间索引（规范必需，缺失时 ArcGIS/QGIS 报「shx 无效/缺失」）。
  * .dbf —— dBASE III（GBK 编码，中文属性安全）。
  * .prj —— ESRI WKT（按目标 CRS 预置模板）。
  *
@@ -107,9 +109,13 @@ function writePartsGeom(w: ByteWriter, type: number, parts: number[][][]): void 
   pts.forEach((c) => { w.pushF64le(c[0]); w.pushF64le(c[1]); });
 }
 
-/** 几何 → 记录内容字节（不含记录头）。 */
-function geomToContent(g: GjGeometry, shapeType: number): Uint8Array {
+/** 几何 → 记录内容字节（不含记录头）。无几何时返回 Null Shape（type 0）4 字节，保持 shp/shx/dbf 记录数一致。 */
+function geomToContent(g: GjGeometry | null, shapeType: number): Uint8Array {
   const w = new ByteWriter();
+  if (!g) {
+    w.pushI32le(0); // Null Shape
+    return w.toU8();
+  }
   switch (shapeType) {
     case SHAPE_POINT: {
       const pts = allPoints(g);
@@ -160,31 +166,38 @@ function ringParts(g: GjGeometry): number[][][] {
   }
 }
 
-/** 生成 .shp 完整文件。长度单位：16-bit words（规范，shpjs 的 <<1 即字节数）。 */
-export function writeShp(fc: GjFeatureCollection): Uint8Array {
-  const shapeType = shapeTypeOf(fc);
-  // 收集每条记录的内容字节（4 字节对齐——几何结构天然如此）
-  const contents: Uint8Array[] = [];
-  const allBBoxes: number[][] = [];
-  for (const f of fc.features) {
-    if (!f.geometry) continue;
-    const content = geomToContent(f.geometry, shapeType);
-    contents.push(content);
-    allBBoxes.push(...allPoints(f.geometry));
-  }
-  const bb = bboxOf(allBBoxes);
-
-  // 文件头 100 字节
+/** 100 字节文件头（.shp 与 .shx 共用，仅 fileLenWords 不同）。 */
+function fileHeader(shapeType: number, bb: [number, number, number, number], fileLenWords: number): Uint8Array {
   const head = new ByteWriter();
   head.pushI32be(9994);                    // file code
   for (let i = 0; i < 5; i++) head.pushI32be(0);
-  const fileLenWords = 50 + contents.reduce((s, c) => s + 4 + c.length / 2, 0);
   head.pushI32be(fileLenWords);            // 大端！文件总字长（单位 16-bit word）
   head.pushI32le(1000);                    // version
   head.pushI32le(shapeType);               // shape type
   head.pushF64le(bb[0]); head.pushF64le(bb[1]); head.pushF64le(bb[2]); head.pushF64le(bb[3]);
   head.pushF64le(0); head.pushF64le(0);    // Z range
   head.pushF64le(0); head.pushF64le(0);    // M range
+  return head.toU8();
+}
+
+/** 逐条记录的内容字节（含无几何要素的 Null Shape，保证与 .dbf 记录数一致）。 */
+function shapeContents(fc: GjFeatureCollection, shapeType: number): Uint8Array[] {
+  const contents: Uint8Array[] = [];
+  for (const f of fc.features) contents.push(geomToContent(f.geometry, shapeType));
+  return contents;
+}
+
+/** 生成 .shp 完整文件。长度单位：16-bit words（规范，shpjs 的 <<1 即字节数）。 */
+export function writeShp(fc: GjFeatureCollection): Uint8Array {
+  const shapeType = shapeTypeOf(fc);
+  const contents = shapeContents(fc, shapeType);
+  // bbox 只统计有几何的要素（Null 记录不贡献坐标）
+  const allBBoxes: number[][] = [];
+  for (const f of fc.features) if (f.geometry) allBBoxes.push(...allPoints(f.geometry));
+  const bb = bboxOf(allBBoxes);
+
+  const fileLenWords = 50 + contents.reduce((s, c) => s + 4 + c.length / 2, 0);
+  const head = fileHeader(shapeType, bb, fileLenWords);
 
   // 记录：8 字节头（记录号 + content length，均大端，单位 word=2字节）+ 几何内容
   const recs = new ByteWriter();
@@ -195,8 +208,37 @@ export function writeShp(fc: GjFeatureCollection): Uint8Array {
   });
 
   const out = new Uint8Array(head.length + recs.length);
-  out.set(head.toU8(), 0);
+  out.set(head, 0);
   out.set(recs.toU8(), head.length);
+  return out;
+}
+
+/**
+ * 生成 .shx 空间索引（ESRI 规范必需——缺 shx 时 ArcGIS/QGIS 会报
+ * 「.shx 文件缺失或无效」，且部分软件直接拒绝打开）。
+ * 结构：100 字节文件头 + 每条记录 8 字节（记录在 .shp 中的字偏移、内容字长，均大端，单位 word）。
+ */
+export function writeShx(fc: GjFeatureCollection): Uint8Array {
+  const shapeType = shapeTypeOf(fc);
+  const contents = shapeContents(fc, shapeType);
+  const allBBoxes: number[][] = [];
+  for (const f of fc.features) if (f.geometry) allBBoxes.push(...allPoints(f.geometry));
+  const bb = bboxOf(allBBoxes);
+
+  const fileLenWords = 50 + contents.length * 4;
+  const head = fileHeader(shapeType, bb, fileLenWords);
+
+  const idx = new ByteWriter();
+  let offsetWords = 50; // 记录偏移从数据区（100B = 50 words）起算
+  contents.forEach((content) => {
+    idx.pushI32be(offsetWords);          // 记录头在 .shp 中的偏移（word）
+    idx.pushI32be(content.length / 2);   // 记录内容长度（word）
+    offsetWords += 4 + content.length / 2;
+  });
+
+  const out = new Uint8Array(head.length + idx.length);
+  out.set(head, 0);
+  out.set(idx.toU8(), head.length);
   return out;
 }
 
@@ -374,7 +416,7 @@ export function prjFor(crs: string): string {
   return map['EPSG:4326'];
 }
 
-/** 完整导出：返回三个文件与建议主文件名。 */
+/** 完整导出：返回 shp/shx/dbf/prj/cpg 五个文件。 */
 export function writeShapefilePackage(
   fc: GjFeatureCollection,
   crs: string,
@@ -384,9 +426,20 @@ export function writeShapefilePackage(
   return {
     files: [
       { fileName: `${stem}.shp`, content: writeShp(fc) },
+      { fileName: `${stem}.shx`, content: writeShx(fc) },
       { fileName: `${stem}.dbf`, content: writeDbf(fc, fields) },
       { fileName: `${stem}.prj`, content: new TextEncoder().encode(prjFor(crs)) },
       { fileName: `${stem}.cpg`, content: new TextEncoder().encode('UTF-8') },
     ],
   };
+}
+
+/** 打包为单个 .zip（shp 五件套一起带走，其他软件解压即用）。 */
+export function writeShapefileZip(
+  fc: GjFeatureCollection,
+  crs: string,
+  stem: string
+): { fileName: string; content: Uint8Array } {
+  const pkg = writeShapefilePackage(fc, crs, stem);
+  return { fileName: `${stem}_shp.zip`, content: zipFiles(pkg.files) };
 }

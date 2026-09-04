@@ -85,7 +85,7 @@ export default async function AboutPage() {
         {/* 收束注记 */}
         <Reveal variant="blur">
           <div className="mt-14 border-t border-line pt-6 text-center">
-            <p className="font-mono text-[11px] tracking-[0.22em] text-ink-faint uppercase">END OF SURVEY · 未完待续</p>
+            <p className="font-mono text-[11px] tracking-[0.22em] text-ink-faint uppercase">NEVER END · 未完待续</p>
           </div>
         </Reveal>
       </div>

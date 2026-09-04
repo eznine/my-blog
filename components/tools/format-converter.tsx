@@ -68,7 +68,7 @@ const FORMAT_LABEL: Record<InputFormat, string> = {
 
 const OUTPUT_FORMATS: { value: string; label: string }[] = [
   { value: 'geojson', label: 'GeoJSON (.geojson)' },
-  { value: 'shapefile', label: 'Shapefile (.shp + .dbf + .prj)' },
+  { value: 'shapefile', label: 'Shapefile (.zip 打包)' },
   { value: 'topojson', label: 'TopoJSON (.topojson)' },
   { value: 'kml', label: 'KML (.kml)' },
   { value: 'wkt', label: 'WKT (.wkt)' },
@@ -191,14 +191,13 @@ export function FormatConverter({ copy }: { copy: ConverterCopy }) {
           break;
         }
         case 'shapefile': {
-          const pkg = geo.writeShapefilePackage(fc, outCrs === 'utm' ? 'EPSG:4326' : outCrs, stem);
-          const main = pkg.files[0];
+          // 打包为单个 .zip（.shp/.shx/.dbf/.prj/.cpg 五件套），其他软件解压即用
+          const zip = geo.writeShapefileZip(fc, outCrs === 'utm' ? 'EPSG:4326' : outCrs, stem);
           result = {
-            content: main.content.slice().buffer,
-            fileName: main.fileName,
-            mime: 'application/octet-stream',
-            sidecars: pkg.files.slice(1).map((f) => ({ fileName: f.fileName, content: f.content, mime: 'application/octet-stream' })),
-            note: `Shapefile 需 4 个文件一起保存（已打包逐个下载）`,
+            content: zip.content.slice().buffer,
+            fileName: zip.fileName,
+            mime: 'application/zip',
+            note: '内含 .shp / .shx / .dbf / .prj / .cpg 五件套，解压后可直接导入 ArcGIS / QGIS',
           };
           break;
         }
@@ -214,7 +213,12 @@ export function FormatConverter({ copy }: { copy: ConverterCopy }) {
         }
         case 'wkt': {
           const text = geo.fcToWKT(fc);
-          result = { content: new TextEncoder().encode(text).buffer, fileName: `${stem}.wkt`, mime: 'text/plain' };
+          result = {
+            content: new TextEncoder().encode(text).buffer,
+            fileName: `${stem}.wkt`,
+            mime: 'text/plain',
+            note: fc.features.length > 1 ? '多要素按行输出（每行一个几何），各软件文本导入通用' : undefined,
+          };
           break;
         }
         case 'csv': {
@@ -236,8 +240,7 @@ export function FormatConverter({ copy }: { copy: ConverterCopy }) {
 
   const downloadAll = useCallback(() => {
     if (!converted) return;
-    saveBytes(converted);
-    converted.sidecars?.forEach(saveBytes);
+    saveBytes(converted); // 单个文件（SHP 为 zip 包）
   }, [converted]);
 
   return (
@@ -386,6 +389,16 @@ export function FormatConverter({ copy }: { copy: ConverterCopy }) {
                   >
                     {copy.reset}
                   </button>
+                  {/* 下载按钮：位于「转换 / 重置」右侧，转换完成后弹出 */}
+                  {converted && (
+                    <button
+                      type="button"
+                      onClick={downloadAll}
+                      className="animate-pulse-once cursor-pointer rounded-lg bg-accent px-5 py-2.5 text-[14px] font-semibold text-white shadow-[0_0_24px_var(--accent-glow)] ring-2 ring-accent/40 transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent-strong"
+                    >
+                      {copy.download} ↓
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -428,16 +441,9 @@ export function FormatConverter({ copy }: { copy: ConverterCopy }) {
               {converted && (
                 <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-accent/40 bg-accent/5 px-4 py-3">
                   <span className="text-[13.5px] text-ink">
-                    {converted.fileName} · {fmtBytes(converted.content.byteLength)}
+                    ✓ {converted.fileName} · {fmtBytes(converted.content.byteLength)}
                   </span>
                   {converted.note && <span className="text-[12.5px] text-ink-faint">{converted.note}</span>}
-                  <button
-                    type="button"
-                    onClick={downloadAll}
-                    className="ml-auto cursor-pointer rounded-lg bg-accent px-5 py-2 text-[14px] font-semibold text-white transition-colors hover:bg-accent-strong"
-                  >
-                    {copy.download} ↓
-                  </button>
                 </div>
               )}
             </div>
@@ -509,22 +515,44 @@ function makeTileLayers(L: typeof LeafletNS) {
   return { amap, esri };
 }
 
-function geometryLayerFor(L: typeof LeafletNS, fc: GjFeatureCollection, onSelect: (f: any) => void): LeafletNS.LayerGroup {
-  const group = L.layerGroup();
+/* ── 图层管理：点 / 线 / 面三类独立图层（显隐、颜色、缩放） ── */
+
+type LayerClass = 'point' | 'line' | 'polygon';
+
+const LAYER_META: { key: LayerClass; name: string }[] = [
+  { key: 'point', name: '点' },
+  { key: 'line', name: '线' },
+  { key: 'polygon', name: '面' },
+];
+
+const DEFAULT_COLORS: Record<LayerClass, string> = {
+  point: '#ff7a45',
+  line: '#3b82f6',
+  polygon: '#22c55e',
+};
+
+type LayerState = Record<LayerClass, { visible: boolean; color: string }>;
+
+const DEFAULT_LAYER_STATE: LayerState = {
+  point: { visible: true, color: DEFAULT_COLORS.point },
+  line: { visible: true, color: DEFAULT_COLORS.line },
+  polygon: { visible: true, color: DEFAULT_COLORS.polygon },
+};
+
+/** 按几何类别把要素分到三个 Leaflet 图层（点/线/面），使用传入颜色。 */
+function geometryLayersFor(
+  L: typeof LeafletNS,
+  fc: GjFeatureCollection,
+  onSelect: (f: any) => void,
+  colors: Record<LayerClass, string>
+): Record<LayerClass, LeafletNS.FeatureGroup> {
   const pointLayer = L.featureGroup();
   const lineLayer = L.featureGroup();
   const faceLayer = L.featureGroup();
+  const groups: Record<LayerClass, LeafletNS.FeatureGroup> = { point: pointLayer, line: lineLayer, polygon: faceLayer };
 
   const onClick = (e: LeafletNS.LeafletMouseEvent, f: any) => {
-    const p = f?.properties || {};
-    onSelect({ props: p, latlng: e.latlng });
-  };
-  const style = (f: any) => {
-    const p = f?.properties || {};
-    const v = (p['值'] ?? p['value'] ?? p[pickPrimaryKey(p)]);
-    let color = 'var(--accent)';
-    if (v !== undefined && v !== null) color = valueColor(Number(v));
-    return { color, weight: 2, opacity: 0.9, fillOpacity: 0.28 };
+    onSelect({ props: f?.properties || {}, latlng: e.latlng });
   };
 
   fc.features.forEach((f) => {
@@ -532,50 +560,53 @@ function geometryLayerFor(L: typeof LeafletNS, fc: GjFeatureCollection, onSelect
     if (!g) return;
     if (g.type === 'Point') {
       L.circleMarker(g.coordinates.slice(0, 2) as [number, number], {
-        radius: 5, color: 'var(--accent)', weight: 1.5, fillOpacity: 0.85,
+        radius: 5, color: colors.point, weight: 1.5, fillOpacity: 0.85,
       }).addTo(pointLayer).on('click', (e) => onClick(e, f));
     } else if (g.type === 'MultiPoint') {
       (g.coordinates as number[][]).forEach((c) => {
         L.circleMarker(c.slice(0, 2) as [number, number], {
-          radius: 5, color: 'var(--accent)', weight: 1.5, fillOpacity: 0.85,
+          radius: 5, color: colors.point, weight: 1.5, fillOpacity: 0.85,
         }).addTo(pointLayer).on('click', (e) => onClick(e, f));
       });
     } else if (g.type === 'LineString' || g.type === 'MultiLineString') {
-      L.geoJSON({ type: 'Feature', properties: f.properties, geometry: g } as any, { style, onEachFeature: (_ff, layer) => layer.on('click', (e) => onClick(e, f)) })
-        .addTo(lineLayer);
-    } else if (g.type === 'Polygon' || g.type === 'MultiPolygon') {
-      L.geoJSON({ type: 'Feature', properties: f.properties, geometry: g } as any, { style, onEachFeature: (_ff, layer) => layer.on('click', (e) => onClick(e, f)) })
-        .addTo(faceLayer);
-    } else if (g.type === 'GeometryCollection') {
-      L.geoJSON({ type: 'Feature', properties: f.properties, geometry: g } as any, { style, onEachFeature: (_ff, layer) => layer.on('click', (e) => onClick(e, f)) })
-        .addTo(faceLayer);
+      L.geoJSON({ type: 'Feature', properties: f.properties, geometry: g } as any, {
+        style: { color: colors.line, weight: 2, opacity: 0.9 },
+        onEachFeature: (_ff, layer) => layer.on('click', (e) => onClick(e, f)),
+      }).addTo(lineLayer);
+    } else {
+      // Polygon / MultiPolygon / GeometryCollection → 面图层
+      L.geoJSON({ type: 'Feature', properties: f.properties, geometry: g } as any, {
+        style: { color: colors.polygon, weight: 2, opacity: 0.9, fillOpacity: 0.28 },
+        onEachFeature: (_ff, layer) => layer.on('click', (e) => onClick(e, f)),
+      }).addTo(faceLayer);
     }
   });
 
-  pointLayer.addTo(group);
-  lineLayer.addTo(group);
-  faceLayer.addTo(group);
-  return group;
+  return groups;
 }
 
-function pickPrimaryKey(props: Record<string, unknown>): string {
-  const cands = ['名称', 'name', 'id', '类型', 'type', '值', 'value'];
-  for (const c of cands) if (c in props) return c;
-  return Object.keys(props)[0] || '';
-}
-
-/** 用数值映射一个醒目色（总部色条）。 */
-function valueColor(v: number): string {
-  const hue = 0 - ((v % 100) / 100) * 120;
-  return `hsl(${((hue % 360) + 360) % 360}, 70%, 50%)`;
+/** 统计三类图层的要素数（与渲染分桶一致：GeometryCollection 计入面）。 */
+function countLayers(fc: GjFeatureCollection): Record<LayerClass, number> {
+  const c: Record<LayerClass, number> = { point: 0, line: 0, polygon: 0 };
+  for (const f of fc.features) {
+    const g = f.geometry;
+    if (!g) continue;
+    if (g.type === 'Point' || g.type === 'MultiPoint') c.point++;
+    else if (g.type === 'LineString' || g.type === 'MultiLineString') c.line++;
+    else c.polygon++;
+  }
+  return c;
 }
 
 function MapPreviewView({ fc, copy }: { fc: GjFeatureCollection; copy: ConverterCopy }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletNS.Map | null>(null);
-  const layerRef = useRef<LeafletNS.FeatureGroup | null>(null);
+  const groupsRef = useRef<Record<LayerClass, LeafletNS.FeatureGroup> | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [layerState, setLayerState] = useState<LayerState>(DEFAULT_LAYER_STATE);
   const [clicked, setClicked] = useState<{ props: Record<string, unknown>; latlng: LeafletNS.LatLng } | null>(null);
+
+  const counts = useMemo(() => countLayers(fc), [fc]);
 
   // 初始建图（一次）：Leaflet 动态加载只在浏览器发生。
   // 建图是异步的，统一用 mapReady 状态通知数据 effect「地图已可用」，避免异步竞态丢渲染。
@@ -591,7 +622,7 @@ function MapPreviewView({ fc, copy }: { fc: GjFeatureCollection; copy: Converter
       layers.amap.addTo(map);
       map.setView([30.5929, 114.3052], 4);
       mapRef.current = map;
-      layerRef.current = L.featureGroup().addTo(map);
+      groupsRef.current = { point: L.featureGroup(), line: L.featureGroup(), polygon: L.featureGroup() };
       L.control.attribution({ prefix: false }).addAttribution('高德 | Esri').addTo(map);
 
       // 底图切换
@@ -609,32 +640,124 @@ function MapPreviewView({ fc, copy }: { fc: GjFeatureCollection; copy: Converter
       off?.();
       mapRef.current?.remove();
       mapRef.current = null;
-      layerRef.current = null;
+      groupsRef.current = null;
     };
   }, []);
 
-  // 数据变化 → 重绘图层 + 自适应视域。依赖 mapReady：地图就绪后一旦有数据立即画。
+  // 数据变化 → 重建点/线/面三类图层，按当前开关显隐，并自动缩放至图层整体范围。
   useEffect(() => {
     if (!mapReady) return;
     (async () => {
-      const map = mapRef.current, group = layerRef.current;
-      if (!map || !group) return;
+      const map = mapRef.current, prev = groupsRef.current;
+      if (!map || !prev) return;
       const L = await loadLeaflet();
-      group.clearLayers();
-      if (fc.features.length === 0) return; // 数据清空：不画，保持底图
-      const newLayer = geometryLayerFor(L, fc, (sel) => setClicked(sel));
-      newLayer.addTo(group);
-      try {
-        map.fitBounds(group.getBounds(), { maxZoom: 14, padding: [20, 20] });
-      } catch { /* 无界 */ }
+      for (const { key } of LAYER_META) {
+        if (map.hasLayer(prev[key])) map.removeLayer(prev[key]);
+      }
+      if (fc.features.length === 0) {
+        groupsRef.current = { point: L.featureGroup(), line: L.featureGroup(), polygon: L.featureGroup() };
+        return; // 数据清空：不画，保持底图
+      }
+      const groups = geometryLayersFor(L, fc, (sel) => setClicked(sel), {
+        point: layerState.point.color,
+        line: layerState.line.color,
+        polygon: layerState.polygon.color,
+      });
+      groupsRef.current = groups;
+      for (const { key } of LAYER_META) {
+        if (layerState[key].visible) groups[key].addTo(map);
+      }
+      // 自动缩放至图层（导入 / 切回地图视图时触发）
+      let bounds: LeafletNS.LatLngBounds | null = null;
+      for (const { key } of LAYER_META) {
+        const b = groups[key].getBounds();
+        if (b.isValid()) bounds = bounds ? bounds.extend(b) : b;
+      }
+      if (bounds) {
+        try {
+          map.fitBounds(bounds, { maxZoom: 14, padding: [20, 20] });
+        } catch { /* 无界 */ }
+      }
     })();
+    // layerState 刻意不在依赖里：颜色/显隐由下面两个 effect 增量处理，避免整组重建。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fc, mapReady]);
+
+  // 颜色修改 → setStyle 原地更新，不重建图层（拖动取色器也能流畅跟随）。
+  useEffect(() => {
+    if (!mapReady) return;
+    const groups = groupsRef.current;
+    if (!groups) return;
+    groups.point.setStyle({ color: layerState.point.color });
+    groups.line.setStyle({ color: layerState.line.color });
+    groups.polygon.setStyle({ color: layerState.polygon.color });
+  }, [mapReady, layerState.point.color, layerState.line.color, layerState.polygon.color]);
+
+  // 显隐开关 → 整组 add / remove。
+  useEffect(() => {
+    if (!mapReady) return;
+    const map = mapRef.current, groups = groupsRef.current;
+    if (!map || !groups) return;
+    for (const { key } of LAYER_META) {
+      if (layerState[key].visible) {
+        if (!map.hasLayer(groups[key])) groups[key].addTo(map);
+      } else if (map.hasLayer(groups[key])) {
+        map.removeLayer(groups[key]);
+      }
+    }
+  }, [mapReady, layerState.point.visible, layerState.line.visible, layerState.polygon.visible]);
+
+  const zoomToLayer = (key: LayerClass) => {
+    const map = mapRef.current, groups = groupsRef.current;
+    if (!map || !groups) return;
+    const b = groups[key].getBounds();
+    if (b.isValid()) map.fitBounds(b, { maxZoom: 14, padding: [20, 20] });
+  };
 
   const isWgs84 = fc.features.length === 0; // 简化；实际判断在 stats/view 里做
 
   return (
     <div>
       <div ref={containerRef} className="h-[52vh] min-h-[320px] w-full rounded-lg border border-line bg-[#dcded6]" />
+      {/* 图层管理：显隐 / 要素数 / 颜色 / 定位 */}
+      <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-lg border border-line bg-panel-solid px-4 py-2.5">
+        <span className="mono-label">图层</span>
+        {LAYER_META.map(({ key, name }) => {
+          const st = layerState[key];
+          const has = counts[key] > 0;
+          return (
+            <div key={key} className={`flex items-center gap-2 text-[13px] ${has ? 'text-ink' : 'text-ink-faint opacity-50'}`}>
+              <input
+                type="checkbox"
+                checked={st.visible}
+                disabled={!has}
+                title={`显示/隐藏「${name}」图层`}
+                onChange={() => setLayerState((s) => ({ ...s, [key]: { ...s[key], visible: !s[key].visible } }))}
+                className="h-3.5 w-3.5 cursor-pointer accent-[var(--accent)] disabled:cursor-not-allowed"
+              />
+              <span>{name}</span>
+              <span className="font-mono text-[12px] text-ink-faint">{counts[key]}</span>
+              <input
+                type="color"
+                value={st.color}
+                disabled={!has}
+                title={`修改「${name}」图层颜色`}
+                onChange={(e) => setLayerState((s) => ({ ...s, [key]: { ...s[key], color: e.target.value } }))}
+                className="h-5 w-6 cursor-pointer rounded border border-line bg-transparent p-0 disabled:cursor-not-allowed"
+              />
+              <button
+                type="button"
+                disabled={!has}
+                onClick={() => zoomToLayer(key)}
+                title={`缩放至「${name}」图层`}
+                className="cursor-pointer rounded px-1 py-0.5 text-[12px] text-ink-soft transition-colors hover:text-accent disabled:cursor-not-allowed disabled:hover:text-ink-soft"
+              >
+                定位
+              </button>
+            </div>
+          );
+        })}
+      </div>
       {clicked && (
         <div className="mt-3 rounded-lg border border-line bg-panel-solid p-3">
           <div className="mono-label mb-1.5">
