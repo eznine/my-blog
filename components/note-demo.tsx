@@ -40,7 +40,7 @@ const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), {
 });
 
 /** 主题跟随全站代码块配色（CSS 变量，深浅主题即时生效）——VSCode 式语法高亮 */
-const demoTheme = EditorView.theme(
+export const demoTheme = EditorView.theme(
   {
     '&': { backgroundColor: 'var(--code-bg)', color: 'var(--code-ink)', fontSize: '12px' },
     '.cm-scroller': {
@@ -66,7 +66,7 @@ const demoTheme = EditorView.theme(
 );
 
 /** 高亮配色复用全站代码高亮变量：关键字橙红 / 字符串米金 / 注释灰 / 数字浅橙 / 属性浅米 / 函数绿 */
-const demoHighlight = HighlightStyle.define([
+export const demoHighlight = HighlightStyle.define([
   { tag: tags.keyword, color: 'var(--hl-keyword)' },
   { tag: tags.string, color: 'var(--hl-string)' },
   { tag: tags.comment, color: 'var(--hl-comment)', fontStyle: 'italic' },

@@ -41,6 +41,7 @@ lib/site.ts          读取 content/copy/
 lib/appearance.ts    读取 appearance.json 生成 CSS 变量
 scripts/             dev.mjs / admin-server.mjs / feed.mjs
 public/uploads/      后台上传的图片
+public/code/         后台上传的代码文件（.py/.sh/...）
 ```
 
 **文案系统（用户明确要求的结构）**：`content/copy/` 按页面拆分、按编号排序，文件内字段顺序 = 页面从上到下顺序：
@@ -75,7 +76,9 @@ public/uploads/      后台上传的图片
 
 **Demo 代码编辑（练习模式，2026-09-03）**：控制栏新增「编辑代码」按钮（同源 demo 才显示，外链/跨域无此按钮）→ 控制栏下方展开暗色编辑区（`demo-code-editor`，底色跟随 `--code-bg` 代码块暗底，按钮在暗底上重配色）。首次展开 `fetch(demo.src)` 读源码进 **CodeMirror 6**（`@uiw/react-codemirror` 懒加载 dynamic + `@codemirror/lang-html`，VSCode 式语法高亮：`demoTheme`/`demoHighlight` 全部复用 `--hl-*`/`--code-*` CSS 变量，深浅主题即时变色；行号、Tab 缩进（`indentWithTab`）、Ctrl/⌘+Enter 运行）；点「运行 ▸」把编辑后的源码 `withBase` 注入 `<base href="<demo目录>/">`（srcdoc 无真实 URL，相对 `lib/...` 路径靠它解析）后经 `srcDoc` 当场刷新 iframe，地图/瓦片即时生效；「重置」还原原始源码并重新渲染。**编辑区与下方 iframe 之间是拖动分隔条**（`.demo-code-resizer`，pointer 事件 + window 监听，范围 90px ~ 留足 iframe 120px，高度存 `edHRef` 会话内收起/展开后保持）；**左侧文章与右侧演示面板也有竖向拖动条**（`.demo-colsplit-resizer`，贴面板左缘 16px 宽、hover/拖拽橙线，`--demo-split` 打 `<html>` 上同源驱动 `#note-demo-sidebar` 宽度与 `.demo-panel-row` padding-right，320px ~ 视口宽-360px（文章最小留白）、`setPointerCapture` + 拖拽中 iframe `pointer-events:none`，移动端 <768px 整屏隐藏；比例存 `splitWRef` 会话内保持）；**全程只改内存、不写文件**，关掉「关闭 DEMO」即彻底丢弃。
 
-**后台上传 Demo（2026-09-02）**：编辑器笔记类型 Demo 字段区有「⬆ 上传 .zip / .html」按钮——`POST /api/demo-upload`（admin-server，依赖 adm-zip）：单 html 直接写 `public/demos/<名>/index.html`；zip 解压（过滤 `../` 路径穿越、zip 外层包一级目录自动上移、无 index.html 取首个 html 当入口），目录名取 query `name` 或文件名主干（仅小写字母数字连字符，重名自动加 `-n` 后缀），返回 `/demos/<名>/` 并自动填入 demo 输入框、demoLabel 填文件名。**部署注意（TODO）**：eznine.xyz standalone 运行时上传的 demo 不会出现在构建期复制进 standalone 的 `public/` 里——需仿照 uploads 把 `public/demos` 加进部署脚本符号链接（或 Nginx alias），否则后台上传的 demo 前台 404。
+**后台上传 Demo（2026-09-02）**：编辑器笔记类型 Demo 字段区有「⬆ 上传 .zip / .html」按钮——`POST /api/demo-upload`（admin-server，依赖 adm-zip）：单 html 直接写 `public/demos/<名>/index.html`；zip 解压（过滤 `../` 路径穿越、zip 外层包一级目录自动上移、无 index.html 取首个 html 当入口），目录名取 query `name` 或文件名主干（仅小写字母数字连字符，重名自动加 `-n` 后缀），返回 `/demos/<名>/` 并自动填入 demo 输入框、demoLabel 填文件名。**部署注意（已处理）**：`scripts/deploy-c2.sh` 已把 `public/demos`、`public/code` 与 uploads 一样在 standalone 里替换为指向仓库真实目录的符号链接，`scripts/nginx-my-blog.conf` 也已加 `/demos/`、`/code/` 直连 alias，后台上传的 demo/代码文件前台可直接访问。
+
+* **笔记代码查看面板（2026-09-05，`components/note-code.tsx`）**：笔记 frontmatter 新增 `code`（`/code/xxx.py` 或 https 外链）+ 可选 `codeLabel`；有 `demo` 的笔记仍只显示 DEMO 入口，**没有 demo 时**标题右侧出现「查看代码」，点击经 createPortal 打开只读代码侧栏——支持按扩展名语法高亮（.py/.sh/.js/.ts/.css/.html 等，CodeMirror 6 + `@codemirror/lang-python` + `@codemirror/legacy-modes`）、复制、新窗口、关闭；复用 demo 面板的 fixed 右半屏布局与 CSS 变量主题。后台笔记编辑器新增「代码 Code（可选）」字段：`⬆ 上传 .py / .sh / ...` → `POST /api/code-upload`（admin-server 白名单扩展名，写入 `public/code/`，重名自动加 `-n` 后缀）自动填地址，另有面板标题输入框。**部署已随 demos 一并处理**：deploy-c2.sh 符号链接 + Nginx `/code/` alias 已就位。
 
 现有 8 个示例（`F:\learn_webgis\05-leaflet\examples` 的 01~08 全部接入）：`leaflet-hello-map`(01 第一张地图)、`leaflet-basemap-switch`(02 底图与瓦片源，依赖 leaflet-providers)、`leaflet-marker-icons`(03 标记与图标)、`leaflet-geojson`(05 GeoJSON 图层)、`leaflet-events`(06 事件与交互，替换了原 04 popup)、`leaflet-layer-controls`(07 图层组织与控件)、`leaflet-plugins`(08 常用插件，依赖 markercluster/heat/minimap/fullscreen 四插件)、`leaflet-popup-click`(04 点击查看详情，已不在笔记挂载但文件保留)。每个 demo 目录只拷依赖的 lib（`lib/leaflet/dist/{leaflet.css,leaflet.js,images/}` + 各插件 dist），不拷整库。
 

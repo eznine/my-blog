@@ -54,6 +54,10 @@ export interface Note extends BasePost {
   demoLabel?: string;
   /** 演示面板 iframe 高度（px，默认 440） */
   demoHeight?: number;
+  /** 代码文件地址（/code/xxx.py 或外链）；无 demo 时标题右侧出现 CODE 入口 */
+  code?: string;
+  /** 代码面板标题（默认取文件名） */
+  codeLabel?: string;
 }
 
 export interface Research extends BasePost {
@@ -87,6 +91,8 @@ interface RawFrontmatter {
   demo?: string;
   demoLabel?: string;
   demoHeight?: number;
+  code?: string;
+  codeLabel?: string;
   github?: string;
 }
 
@@ -341,6 +347,8 @@ export const getNotes = ttl('notes', () =>
     demo: fm.demo,
     demoLabel: fm.demoLabel,
     demoHeight: fm.demoHeight !== undefined ? Number(fm.demoHeight) || undefined : undefined,
+    code: fm.code,
+    codeLabel: fm.codeLabel,
   }))
 );
 

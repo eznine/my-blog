@@ -6,6 +6,7 @@ import { ReadingProgress } from './reading-progress';
 import { TagChip } from './tag-chip';
 import { SparkField } from './spark-field';
 import { NoteDemo, DEMO_PAGE_ID, type DemoSpec } from './note-demo';
+import { NoteCode, type CodeSpec } from './note-code';
 
 export interface AdjacentLink {
   href: string;
@@ -19,6 +20,7 @@ export function ArticleShell({
   tags,
   metaExtra,
   demo,
+  code,
   html,
   headings,
   backHref,
@@ -33,6 +35,8 @@ export function ArticleShell({
   metaExtra?: React.ReactNode;
   /** 演示 Demo：有值则标题右侧出现 DEMO 按钮，点击展开演示面板 */
   demo?: DemoSpec;
+  /** 代码文件：无 demo 时标题右侧出现「查看代码」按钮 */
+  code?: CodeSpec;
   html: string;
   headings: Heading[];
   backHref: string;
@@ -71,6 +75,7 @@ export function ArticleShell({
                   {title}
                 </h1>
                 {demo && <NoteDemo demo={{ ...demo, label: demo.label ?? title }} />}
+                {!demo && code && <NoteCode code={code} />}
               </div>
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2.5 border-b border-line pb-7 text-[15px] text-ink-soft">
                 <span className="font-mono text-[13px] tracking-[0.08em]">{dateText}</span>

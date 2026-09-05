@@ -4,7 +4,7 @@
 #   sudo bash /srv/my-blog/scripts/deploy-c2.sh
 #
 # 关键点：
-#   1. standalone 里的 content / public/uploads / public/content-images
+#   1. standalone 里的 content / public/uploads / public/content-images / public/demos / public/code
 #      一律用【符号链接】指向仓库根目录的真实目录——后台改文案/传图片
 #      立即生效（standalone 里若是复制副本，改动永远不会反映）。
 #   2. git / npm / build 一律以 eznine 身份执行（runuser），不再产生
@@ -77,20 +77,24 @@ cp -r .next/static $S/.next/static
 # public：先整体复制，再将三个"活目录"换成符号链接
 rm -rf $S/public
 cp -r public $S/public
-mkdir -p content public/uploads public/content-images
+mkdir -p content public/uploads public/content-images public/demos public/code
 rm -rf $S/content
 ln -sfn ../../content $S/content
 rm -rf $S/public/uploads
 ln -sfn ../../../public/uploads $S/public/uploads
 rm -rf $S/public/content-images
 ln -sfn ../../../public/content-images $S/public/content-images
+rm -rf $S/public/demos
+ln -sfn ../../../public/demos $S/public/demos
+rm -rf $S/public/code
+ln -sfn ../../../public/code $S/public/code
 
 echo "==> [5/8] 修正属主（web 服务以 eznine 运行）"
 if [ "$(id -u)" = "0" ]; then
-  chown -R eznine:eznine .next public/uploads public/content-images 2>/dev/null || true
+  chown -R eznine:eznine .next public/uploads public/content-images public/demos public/code 2>/dev/null || true
 fi
 
-echo "==> [6/8] 写入 Nginx 站点配置（/uploads/ 与 /content-images/ 由 Nginx 直连仓库目录，"
+echo "==> [6/8] 写入 Nginx 站点配置（/uploads/、/content-images/、/demos/、/code/ 由 Nginx 直连仓库目录，"
 echo "          绕开 Next 静态服务——Next 对服务启动后新增的图片文件会 404）"
 echo "          配置来源：scripts/nginx-my-blog.conf（独立文件，不内嵌在脚本里）——"
 echo "          【血泪】若内嵌 heredoc，脚本自更新 + { } 复合命令会让 bash 执行旧内存版，"

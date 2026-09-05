@@ -1040,15 +1040,20 @@ iframe {
 /* ============ 笔记 Demo 演示模式 ============ */
 /* 演示模式（容器 data-demo="open"）：右侧 demo 固定贴屏幕右侧，永不跟随滚动；正文留出右半 */
 .demo-page { transition: max-width 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
-.demo-page[data-demo='open'] { max-width: none; }
+.demo-page[data-demo='open'],
+.demo-page[data-code='open'] { max-width: none; }
 .demo-page[data-demo='open'] .demo-panel-row { padding-right: var(--demo-split, 50%); }
-.demo-page[data-demo='open'] .desktop-toc-col { display: none; }
+.demo-page[data-code='open'] .demo-panel-row { padding-right: var(--code-split, 50%); }
+.demo-page[data-demo='open'] .desktop-toc-col,
+.demo-page[data-code='open'] .desktop-toc-col { display: none; }
 /* 演示模式在手机（<768px）上 demo 占满全屏，正文不额外留白（被盖住即可） */
 @media (max-width: 767.98px) {
-  .demo-page[data-demo='open'] .demo-panel-row { padding-right: 0; }
+  .demo-page[data-demo='open'] .demo-panel-row,
+  .demo-page[data-code='open'] .demo-panel-row { padding-right: 0; }
 }
 /* 右侧演示栏：portal 到 body + fixed 贴右（桌面 50% 宽，手机全屏），脱离文档流 → 左侧独立滚动 */
-#note-demo-sidebar {
+#note-demo-sidebar,
+#note-code-sidebar {
   position: fixed;
   /* 下移避开 top 固定导航栏（z-40，高约 65px），否则顶部操作栏被盖住 */
   top: 65px;
@@ -1059,9 +1064,11 @@ iframe {
   border-left: 1px solid var(--line);
 }
 @media (min-width: 768px) {
-  #note-demo-sidebar { width: var(--demo-split, 50%); } /* 左右分栏宽度由 --demo-split 驱动，可拖动 */
+  #note-demo-sidebar { width: var(--demo-split, 50%); } /* demo 左右分栏宽度由 --demo-split 驱动，可拖动 */
+  #note-code-sidebar { width: var(--code-split, 50%); } /* 代码面板独立分栏，互不继承 */
 }
-#note-demo-sidebar.demo-frame-wrap {
+#note-demo-sidebar.demo-frame-wrap,
+#note-code-sidebar.demo-frame-wrap {
   display: flex;
   flex-direction: column;
   background: var(--panel);
@@ -1069,7 +1076,8 @@ iframe {
 #note-demo-sidebar .demo-frame { flex: 1 1 auto; min-height: 0; }
 
 /* 顶部操作栏：更明显的标题 + 按钮态 */
-#note-demo-sidebar .demo-frame-bar {
+#note-demo-sidebar .demo-frame-bar,
+#note-code-sidebar .demo-frame-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1079,12 +1087,14 @@ iframe {
   border-bottom: 1px solid var(--line-strong);
   background: var(--panel-solid);
 }
-#note-demo-sidebar .demo-frame-bar-dot {
+#note-demo-sidebar .demo-frame-bar-dot,
+#note-code-sidebar .demo-frame-bar-dot {
   width: 8px; height: 8px; flex: none; border-radius: 9999px;
   background: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
-#note-demo-sidebar .demo-frame-bar-btn {
+#note-demo-sidebar .demo-frame-bar-btn,
+#note-code-sidebar .demo-frame-bar-btn {
   display: inline-flex; align-items: center; gap: 0.4rem;
   border: 1px solid var(--line-strong);
   border-radius: 0.5rem;
@@ -1097,7 +1107,8 @@ iframe {
   line-height: 1.2;
   transition: all 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
-#note-demo-sidebar .demo-frame-bar-btn:hover {
+#note-demo-sidebar .demo-frame-bar-btn:hover,
+#note-code-sidebar .demo-frame-bar-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
   transform: translateY(-1px);
@@ -1169,7 +1180,8 @@ iframe {
   gap: 0.5rem;
   min-width: 0;
 }
-#note-demo-sidebar .demo-code-error {
+#note-demo-sidebar .demo-code-error,
+#note-code-sidebar .demo-code-error {
   padding: 0.35rem 0.9rem 0;
   font-family: var(--font-mono, ui-monospace, SFMono-Regular, monospace);
   font-size: 11px;
@@ -1202,7 +1214,8 @@ iframe {
   transform: none;
   box-shadow: none;
 }
-#note-demo-sidebar .demo-code-cm {
+#note-demo-sidebar .demo-code-cm,
+#note-code-sidebar .demo-code-cm {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
@@ -1210,16 +1223,20 @@ iframe {
 }
 /* 绝对定位填满容器：保证 .cm-editor 高度被约束，内部 .cm-scroller 才能滚动（auto-height 会被 overflow 裁掉导致滚不动） */
 #note-demo-sidebar .demo-code-cm .cm-theme,
-#note-demo-sidebar .demo-code-cm .cm-editor {
+#note-demo-sidebar .demo-code-cm .cm-editor,
+#note-code-sidebar .demo-code-cm .cm-theme,
+#note-code-sidebar .demo-code-cm .cm-editor {
   position: absolute;
   inset: 0;
   height: 100%;
 }
-#note-demo-sidebar .demo-code-cm .cm-scroller {
+#note-demo-sidebar .demo-code-cm .cm-scroller,
+#note-code-sidebar .demo-code-cm .cm-scroller {
   overflow: auto;
   overscroll-behavior: contain;
 }
-#note-demo-sidebar .demo-code-loading {
+#note-demo-sidebar .demo-code-loading,
+#note-code-sidebar .demo-code-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1231,11 +1248,13 @@ iframe {
   opacity: 0.6;
 }
 /* 上下拖动分隔条：调节「代码区 / 下方展示区」比例（拖拽实时跟手，范围 90px ~ 留足 iframe） */
-#note-demo-sidebar.demo-dragging iframe {
+#note-demo-sidebar.demo-dragging iframe,
+#note-code-sidebar.demo-dragging iframe {
   pointer-events: none; /* 拖拽期间禁止 iframe 抢指针事件，保证 setPointerCapture 之后依然跟手 */
 }
 /* 左右分栏拖动条：左侧文章 | 右侧演示面板（贴面板左缘，hover/拖拽橙色竖线；移动端整屏隐藏） */
-#note-demo-sidebar .demo-colsplit-resizer {
+#note-demo-sidebar .demo-colsplit-resizer,
+#note-code-sidebar .demo-colsplit-resizer {
   position: absolute;
   left: -8px;
   top: 0;
@@ -1246,7 +1265,8 @@ iframe {
   touch-action: none;
   user-select: none;
 }
-#note-demo-sidebar .demo-colsplit-resizer::after {
+#note-demo-sidebar .demo-colsplit-resizer::after,
+#note-code-sidebar .demo-colsplit-resizer::after {
   content: "";
   position: absolute;
   left: 6px;
@@ -1258,12 +1278,15 @@ iframe {
   transition: background 0.15s, box-shadow 0.15s;
 }
 #note-demo-sidebar .demo-colsplit-resizer:hover::after,
-#note-demo-sidebar .demo-colsplit-resizer.is-dragging::after {
+#note-demo-sidebar .demo-colsplit-resizer.is-dragging::after,
+#note-code-sidebar .demo-colsplit-resizer:hover::after,
+#note-code-sidebar .demo-colsplit-resizer.is-dragging::after {
   background: var(--accent);
   box-shadow: 0 0 10px var(--accent-glow);
 }
 @media (max-width: 767.98px) {
-  #note-demo-sidebar .demo-colsplit-resizer { display: none; }
+  #note-demo-sidebar .demo-colsplit-resizer,
+  #note-code-sidebar .demo-colsplit-resizer { display: none; }
 }
 #note-demo-sidebar .demo-code-resizer {
   position: relative;

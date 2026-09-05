@@ -40,6 +40,17 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
       }
     : undefined;
 
+  /* 代码文件：站内路径补 basePath 前缀；未配置 demo 时标题右侧出现 CODE 入口 */
+  const code = note.code
+    ? {
+        src: /^(https?:|\/\/|data:)/.test(note.code)
+          ? note.code
+          : `${base}${note.code}`,
+        fileName: decodeURIComponent(note.code.split('/').pop() || 'code.txt'),
+        label: note.codeLabel,
+      }
+    : undefined;
+
   /* 相邻文章：同章节（同大类+同章节）优先切换；章节内只有本篇时回退到同大类 */
   const inChapter = notes.filter((n) => (n.category ?? '') === (note.category ?? '') && (n.chapter ?? '') === (note.chapter ?? ''));
   const pool = (
@@ -56,6 +67,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
       dateText={formatDate(note.date)}
       tags={note.tags}
       demo={demo}
+      code={code}
       html={note.html}
       headings={headings}
       backHref="/notes"

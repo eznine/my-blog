@@ -13,7 +13,9 @@
   "dependencies": {
     "@codemirror/commands": "^6.11.0",
     "@codemirror/lang-html": "^6.4.12",
+    "@codemirror/lang-python": "^6.2.1",
     "@codemirror/language": "^6.12.4",
+    "@codemirror/legacy-modes": "^6.5.4",
     "@codemirror/state": "^6.7.2",
     "@codemirror/view": "^6.43.10",
     "@lezer/highlight": "^1.2.3",

@@ -8,6 +8,7 @@ import {
   api,
   uploadImage,
   uploadDemo,
+  uploadCode,
   TYPE_LABELS,
   type PostType,
   type Taxonomy,
@@ -35,6 +36,8 @@ interface FormState {
   demo: string;
   demoLabel: string;
   demoHeight: string;
+  code: string;
+  codeLabel: string;
   github: string;
   slug: string;
   content: string;
@@ -54,6 +57,8 @@ const EMPTY: FormState = {
   demo: '',
   demoLabel: '',
   demoHeight: '',
+  code: '',
+  codeLabel: '',
   github: '',
   slug: '',
   content: '',
@@ -101,6 +106,8 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           demo: str(m.demo),
           demoLabel: str(m.demoLabel),
           demoHeight: str(m.demoHeight ?? ''),
+          code: str(m.code),
+          codeLabel: str(m.codeLabel),
           github: str(m.github),
           content: prefill.content.replace(/^\n+/, ''),
         });
@@ -127,6 +134,8 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
           demo: str(meta.demo),
           demoLabel: str(meta.demoLabel),
           demoHeight: str(meta.demoHeight ?? ''),
+          code: str(meta.code),
+          codeLabel: str(meta.codeLabel),
           github: str(meta.github),
           slug,
           content: content.replace(/^\n+/, ''),
@@ -260,6 +269,24 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
     }
   };
 
+  /* ---- Code 上传（.py/.sh/... 单文件）→ 自动填入 code 地址 ---- */
+  const onCodeFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setUploading(true);
+    setError('');
+    try {
+      const url = await uploadCode(file);
+      set('code', url);
+      if (!form.codeLabel) set('codeLabel', file.name);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Code 上传失败');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const onPaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const files = Array.from(e.clipboardData.files || []);
     if (files.length) {
@@ -298,6 +325,8 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
         demo: form.demo,
         demoLabel: form.demoLabel.trim(),
         demoHeight: form.demoHeight.trim(),
+        code: form.code,
+        codeLabel: form.codeLabel.trim(),
         github: form.github,
         content: form.content,
       };
@@ -533,6 +562,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
             )}
 
             {type === 'notes' && (
+              <>
               <div className="md:col-span-2 lg:col-span-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <label className={labelCls}>演示 Demo（可选）</label>
@@ -572,6 +602,39 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
                   填了会在文章标题右侧出现 DEMO 入口，点击展开演示面板；高度单位 px，留空默认 440
                 </p>
               </div>
+              <div className="md:col-span-2 lg:col-span-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <label className={labelCls}>代码 Code（可选）</label>
+                  <label className="cursor-pointer rounded-lg border border-line px-3 py-1.5 font-mono text-[12px] tracking-[0.14em] text-ink-soft transition-colors hover:border-accent/60 hover:text-accent">
+                    {uploading ? '上传中…' : '⬆ 上传 .py / .sh / ...'}
+                    <input
+                      type="file"
+                      accept=".py,.sh,.bash,.zsh,.js,.mjs,.cjs,.ts,.tsx,.jsx,.css,.scss,.html,.htm,.md,.txt,.json,.yaml,.yml,.toml,.r,.m,.ipynb,.bat,.cmd,.ps1,.c,.cpp,.h,.hpp,.java,.go,.rs,.rb,.php,.sql"
+                      className="hidden"
+                      onChange={onCodeFile}
+                      disabled={uploading}
+                    />
+                  </label>
+                </div>
+                <div className="grid gap-3 md:grid-cols-[1fr_200px]">
+                  <input
+                    className={`${inputCls} font-mono text-[13px]`}
+                    value={form.code}
+                    onChange={(e) => set('code', e.target.value)}
+                    placeholder="/code/check-env.py 或 https:// 外链"
+                  />
+                  <input
+                    className={`${inputCls} font-mono text-[13px]`}
+                    value={form.codeLabel}
+                    onChange={(e) => set('codeLabel', e.target.value)}
+                    placeholder="面板标题（留空用文件名）"
+                  />
+                </div>
+                <p className="mt-1.5 font-mono text-[11px] text-ink-faint">
+                  没有 DEMO 时，文章标题右侧会出现「查看代码」按钮，点击打开代码面板
+                </p>
+              </div>
+              </>
             )}
 
             <div className={type === 'notes' ? 'md:col-span-2' : ''}>

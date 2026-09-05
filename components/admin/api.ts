@@ -95,6 +95,24 @@ export async function uploadDemo(file: File, name?: string): Promise<string> {
   return data.url || '';
 }
 
+/** 上传代码文件（.py/.sh/...），返回 /code/<name> 地址 */
+export async function uploadCode(file: File): Promise<string> {
+  const q = new URLSearchParams({ filename: file.name });
+  let res: Response;
+  try {
+    res = await fetch(apiUrl(`/api/code-upload?${q}`), {
+      method: 'POST',
+      headers: { 'x-admin-token': getToken() },
+      body: file,
+    });
+  } catch {
+    throw new ApiError('无法连接后台服务：请运行 npm run dev（会自动带上后台），或单独运行 npm run admin', 0);
+  }
+  const data = (await res.json().catch(() => ({}))) as { url?: string; file?: string; error?: string };
+  if (!res.ok) throw new ApiError(data.error || '上传失败', res.status);
+  return data.url || '';
+}
+
 /* ---------------- 类型 ---------------- */
 
 export type PostType = 'notes' | 'research' | 'projects';

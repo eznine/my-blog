@@ -21,6 +21,13 @@ const ROOT = process.cwd();
 const CONTENT = path.join(ROOT, 'content');
 const UPLOADS = path.join(ROOT, 'public', 'uploads');
 const DEMOS = path.join(ROOT, 'public', 'demos');
+const CODE = path.join(ROOT, 'public', 'code');
+const CODE_EXT = new Set([
+  '.py', '.sh', '.bash', '.zsh', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx',
+  '.css', '.scss', '.html', '.htm', '.md', '.txt', '.json', '.yaml', '.yml',
+  '.toml', '.r', '.m', '.ipynb', '.bat', '.cmd', '.ps1', '.c', '.cpp', '.h',
+  '.hpp', '.java', '.go', '.rs', '.rb', '.php', '.sql',
+]);
 const SALT = '::eznine-admin';
 
 let cfg = {};
@@ -647,6 +654,8 @@ function buildFrontmatter(meta) {
   if (meta.demoLabel) lines.push(`demoLabel: ${yamlStr(meta.demoLabel)}`);
   if (meta.demoHeight !== undefined && meta.demoHeight !== null && meta.demoHeight !== '')
     lines.push(`demoHeight: ${Number(meta.demoHeight) || 0}`);
+  if (meta.code) lines.push(`code: ${yamlStr(meta.code)}`);
+  if (meta.codeLabel) lines.push(`codeLabel: ${yamlStr(meta.codeLabel)}`);
   if (meta.github) lines.push(`github: ${yamlStr(meta.github)}`);
   if (Array.isArray(meta.links) && meta.links.length)
     lines.push(`links: ${JSON.stringify(meta.links.map((l) => ({ label: l.label, url: l.url })))}`);
@@ -1350,6 +1359,35 @@ async function handle(req, res) {
     }
 
     return json(res, 200, { ok: true, url: `/demos/${path.basename(target)}/`, dir: path.basename(target) });
+  }
+
+  /* ---- 代码文件上传：单文件（.py/.sh/...）→ public/code/<name>，返回 /code/<name> ---- */
+  if (p === '/api/code-upload' && req.method === 'POST') {
+    const fileName = url.searchParams.get('filename') || 'code.txt';
+    const ext = path.extname(fileName).toLowerCase();
+    if (!CODE_EXT.has(ext)) return json(res, 400, { error: '不支持的文件类型' });
+    const buf = await readBody(req);
+    if (!buf.length) return json(res, 400, { error: '空文件' });
+
+    let stem = path.basename(fileName, ext)
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 40);
+    if (!stem) stem = 'code-' + crypto.randomBytes(3).toString('hex');
+
+    let name = `${stem}${ext}`;
+    let target = path.join(CODE, name);
+    let n = 1;
+    while (fs.existsSync(target) && n < 100) {
+      name = `${stem}-${n}${ext}`;
+      target = path.join(CODE, name);
+      n++;
+    }
+    if (fs.existsSync(target)) return json(res, 409, { error: '文件已存在，请换一个名字' });
+    fs.mkdirSync(CODE, { recursive: true });
+    fs.writeFileSync(target, buf);
+    return json(res, 200, { ok: true, url: `/code/${name}`, file: name });
   }
 
   return json(res, 404, { error: '接口不存在' });
