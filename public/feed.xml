@@ -5,7 +5,7 @@
     <link>https://github.com/eznine/</link>
     <description>地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sun, 06 Sep 2026 05:09:36 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 06 Sep 2026 15:57:30 GMT</lastBuildDate>
     <atom:link href="https://github.com/eznine/feed.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>第 01 节 · Node.js 与 npm</title>
@@ -60,6 +60,13 @@
       <title>第 03 节 · 标记与图标</title>
       <link>https://github.com/eznine/notes/webgis-leaflet-03/</link>
       <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-03/</guid>
+      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 04 节 · 弹窗与提示</title>
+      <link>https://github.com/eznine/notes/webgis-leaflet-04/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-leaflet-04/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>
@@ -207,13 +214,6 @@
       <title>第 13 节 · 渲染机制</title>
       <link>https://github.com/eznine/notes/webgis-react-next-13/</link>
       <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-13/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 14 节 · 状态管理全景</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-14/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-14/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>

@@ -8,6 +8,8 @@ tags: ["web","leaflet"]
 demo: "/demos/leaflet-geojson/"
 demoLabel: "省界 + 当日地震 · 面与点"
 demoHeight: 560
+code: "/code/05-geojson-src.zip"
+codeLabel: "05-geojson · 源码包"
 ---
 
 
@@ -102,7 +104,7 @@ quakeLayer.clearLayers().addData(newData);   // 原地更新（保留图层引�
 
 ## 四、动手跟练：05 · 省界 + 地震点渲染
 
-配套文件：`05-leaflet/examples/05-省界+地震点渲染.html`（需联网；两个数据源都开放 CORS，直接 fetch）
+配套文件：[05-geojson 源码包](/code/05-geojson-src.zip)（含 lib，解压后直接打开 index.html；需联网拉取数据源）
 
 **步骤：**
 
