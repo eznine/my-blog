@@ -27,6 +27,7 @@ const CODE_EXT = new Set([
   '.css', '.scss', '.html', '.htm', '.md', '.txt', '.json', '.yaml', '.yml',
   '.toml', '.r', '.m', '.ipynb', '.bat', '.cmd', '.ps1', '.c', '.cpp', '.h',
   '.hpp', '.java', '.go', '.rs', '.rb', '.php', '.sql',
+  '.zip', // 源码包（Vite/Next 项目）：排除 node_modules/dist 后整包上传，前台提供下载
 ]);
 const SALT = '::eznine-admin';
 
@@ -1361,7 +1362,7 @@ async function handle(req, res) {
     return json(res, 200, { ok: true, url: `/demos/${path.basename(target)}/`, dir: path.basename(target) });
   }
 
-  /* ---- 代码文件上传：单文件（.py/.sh/...）→ public/code/<name>，返回 /code/<name> ---- */
+  /* ---- 代码文件上传：单文件（.py/.sh/...）或 .zip 源码包 → public/code/<name>，返回 /code/<name> ---- */
   if (p === '/api/code-upload' && req.method === 'POST') {
     const fileName = url.searchParams.get('filename') || 'code.txt';
     const ext = path.extname(fileName).toLowerCase();

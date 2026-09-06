@@ -5,8 +5,43 @@
     <link>https://github.com/eznine/</link>
     <description>地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sat, 05 Sep 2026 15:53:11 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 06 Sep 2026 05:09:36 GMT</lastBuildDate>
     <atom:link href="https://github.com/eznine/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>第 01 节 · Node.js 与 npm</title>
+      <link>https://github.com/eznine/notes/webgis-01-node-js-npm/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-01-node-js-npm/</guid>
+      <pubDate>Sun, 06 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 02 节 · Git 与远程仓库</title>
+      <link>https://github.com/eznine/notes/webgis-02-git/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-02-git/</guid>
+      <pubDate>Sun, 06 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 03 节 · VS Code 与插件</title>
+      <link>https://github.com/eznine/notes/webgis-03-vs-code/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-03-vs-code/</guid>
+      <pubDate>Sun, 06 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 04 节 · 浏览器开发者工具</title>
+      <link>https://github.com/eznine/notes/webgis-04/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-04/</guid>
+      <pubDate>Sun, 06 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 05 节 · Vite 快速上手</title>
+      <link>https://github.com/eznine/notes/webgis-05-vite/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-05-vite/</guid>
+      <pubDate>Sun, 06 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
     <item>
       <title>第 01 节 · 第一张地图</title>
       <link>https://github.com/eznine/notes/webgis-leaflet-01/</link>
@@ -179,41 +214,6 @@
       <title>第 14 节 · 状态管理全景</title>
       <link>https://github.com/eznine/notes/webgis-react-next-14/</link>
       <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-14/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 15 节 · 性能优化</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-15/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-15/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 16 节 · React + TS 实战模式</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-16-react-ts/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-16-react-ts/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 17 节 · Vue 认知：差异地图</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-17-vue/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-17-vue/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 18 节 · 读懂国产 GIS 的 Vue 示例</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-18-gis-vue/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-18-gis-vue/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 19 节 · 为什么有 Next.js</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-19-next-js/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-19-next-js/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>

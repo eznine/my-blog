@@ -162,6 +162,22 @@ export function NoteCode({ code }: { code: CodeSpec }) {
   }
 
   const label = code.label || code.fileName || 'CODE';
+  const isZip = /\.zip$/i.test(code.fileName);
+
+  // zip 源码包（Vite/Next 项目）不读取文本，直接下载；下载后本地 npm install 即可运行
+  if (isZip) {
+    return (
+      <a
+        href={code.src}
+        download={code.fileName || true}
+        className="demo-toggle"
+        aria-label={`下载源码包 ${code.fileName}`}
+      >
+        <span className="demo-live-dot" aria-hidden="true" />
+        下载源码包 ⭳
+      </a>
+    );
+  }
 
   return (
     <>

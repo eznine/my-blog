@@ -26,6 +26,7 @@
   },
   "chapters": {
     "WebGIS 开发": [
+      "环境与工具链",
       "Web基础",
       "React-Next",
       "GIS基础",

@@ -606,10 +606,10 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <label className={labelCls}>代码 Code（可选）</label>
                   <label className="cursor-pointer rounded-lg border border-line px-3 py-1.5 font-mono text-[12px] tracking-[0.14em] text-ink-soft transition-colors hover:border-accent/60 hover:text-accent">
-                    {uploading ? '上传中…' : '⬆ 上传 .py / .sh / ...'}
+                    {uploading ? '上传中…' : '⬆ 上传 .py / .sh / .zip / ...'}
                     <input
                       type="file"
-                      accept=".py,.sh,.bash,.zsh,.js,.mjs,.cjs,.ts,.tsx,.jsx,.css,.scss,.html,.htm,.md,.txt,.json,.yaml,.yml,.toml,.r,.m,.ipynb,.bat,.cmd,.ps1,.c,.cpp,.h,.hpp,.java,.go,.rs,.rb,.php,.sql"
+                      accept=".py,.sh,.bash,.zsh,.js,.mjs,.cjs,.ts,.tsx,.jsx,.css,.scss,.html,.htm,.md,.txt,.json,.yaml,.yml,.toml,.r,.m,.ipynb,.bat,.cmd,.ps1,.c,.cpp,.h,.hpp,.java,.go,.rs,.rb,.php,.sql,.zip"
                       className="hidden"
                       onChange={onCodeFile}
                       disabled={uploading}
@@ -631,7 +631,7 @@ export function PostEditor({ type, slug, prefill, onBack }: Props) {
                   />
                 </div>
                 <p className="mt-1.5 font-mono text-[11px] text-ink-faint">
-                  没有 DEMO 时，文章标题右侧会出现「查看代码」按钮，点击打开代码面板
+                  DEMO 与代码可并存；zip 源码包只提供下载，不再打开代码编辑器
                 </p>
               </div>
               </>

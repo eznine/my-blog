@@ -20,6 +20,63 @@ export interface NoteMeta {
 
 type ViewMode = 'atlas' | 'timeline';
 
+/** 页内筛选状态，与 URL 查询串一一对应 */
+type FilterState = {
+  query: string;
+  category: string | null;
+  chapter: string | null;
+  tag: string | null;
+  sortAsc: boolean;
+  viewMode: ViewMode;
+};
+
+/**
+ * 从 URL 查询串还原筛选状态。首屏挂载与浏览器前进/后退共用这一套解析，
+ * 保证「后退到的地址」和「页内显示的状态」永远一致。
+ */
+function readFilterState(search: string, useStoredView = true): FilterState {
+  const sp = new URLSearchParams(search);
+  const t = sp.get('tag');
+  const c = sp.get('category');
+  const q = sp.get('q');
+  const ch = sp.get('chapter');
+  const view = sp.get('view');
+  let mode: ViewMode = 'atlas';
+  if (view === 'timeline') mode = 'timeline';
+  else if (t || q) mode = 'timeline';
+  else if (!t && !q && useStoredView) {
+    try {
+      if (window.localStorage.getItem('notes-view') === 'timeline') mode = 'timeline';
+    } catch {
+      mode = 'atlas';
+    }
+  }
+  // 带分类的图集链接（?category=X）留在图集的「图幅详情」，不跟着历史偏好跑
+  if (c && view !== 'timeline') mode = 'atlas';
+  return {
+    query: q ?? '',
+    category: c,
+    chapter: c ? ch : null,
+    tag: t,
+    sortAsc: sp.get('sort') === 'oldest',
+    viewMode: mode,
+  };
+}
+
+/** 状态 → 查询串（保留地址里未知的其他参数，只重写已知六个） */
+function buildSearch(prevSearch: string, s: FilterState): string {
+  const sp = new URLSearchParams(prevSearch);
+  const known = ['q', 'category', 'chapter', 'tag', 'view', 'sort'] as const;
+  for (const key of known) sp.delete(key);
+  if (s.query.trim()) sp.set('q', s.query.trim());
+  if (s.category) sp.set('category', s.category);
+  if (s.chapter) sp.set('chapter', s.chapter);
+  if (s.tag) sp.set('tag', s.tag);
+  if (s.sortAsc) sp.set('sort', 'oldest');
+  if (s.viewMode === 'timeline') sp.set('view', 'timeline');
+  return sp.toString();
+}
+
 function countBy(items: string[]): [string, number][] {
   const map = new Map<string, number>();
   for (const it of items) map.set(it, (map.get(it) ?? 0) + 1);
@@ -65,53 +122,58 @@ export function NotesBrowser({
   const [viewMode, setViewMode] = useState<ViewMode>('atlas');
   const [ready, setReady] = useState(false);
   const [swapKey, setSwapKey] = useState(0);
+  /** 最近一次写进地址栏的状态，用来判断「这次变化算不算换了一层」 */
+  const stateRef = useRef<FilterState>({
+    query: '',
+    category: null,
+    chapter: null,
+    tag: null,
+    sortAsc: false,
+    viewMode: 'atlas',
+  });
+  const firstSyncRef = useRef(true);
 
   useEffect(() => {
-    const sp = new URLSearchParams(window.location.search);
-    const t = sp.get('tag');
-    const c = sp.get('category');
-    const q = sp.get('q');
-    const ch = sp.get('chapter');
-    const view = sp.get('view');
-    let mode: ViewMode = 'atlas';
-    if (view === 'timeline') mode = 'timeline';
-    else if (t || q) mode = 'timeline';
-    else if (!t && !q) {
-      try {
-        if (window.localStorage.getItem('notes-view') === 'timeline') mode = 'timeline';
-      } catch {
-        mode = 'atlas';
-      }
-    }
-    if (t) setTag(t);
-    if (c) {
-      setCategory(c);
-      if (ch) setChapter(ch);
-    }
-    if (q) setQuery(q);
-    if (c && view !== 'timeline') mode = 'atlas';
-    setViewMode(mode);
+    const initial = readFilterState(window.location.search);
+    stateRef.current = initial;
+    setQuery(initial.query);
+    setCategory(initial.category);
+    setChapter(initial.chapter);
+    setTag(initial.tag);
+    setSortAsc(initial.sortAsc);
+    setViewMode(initial.viewMode);
     setReady(true);
   }, []);
 
   useEffect(() => {
     if (!ready) return;
-    const sp = new URLSearchParams(window.location.search);
-    const known = ['q', 'category', 'chapter', 'tag', 'view', 'sort'] as const;
-    for (const key of known) sp.delete(key);
-    if (query.trim()) sp.set('q', query.trim());
-    if (category) sp.set('category', category);
-    if (chapter) sp.set('chapter', chapter);
-    if (tag) sp.set('tag', tag);
-    if (sortAsc) sp.set('sort', 'oldest');
-    if (viewMode === 'timeline') sp.set('view', 'timeline');
-    const qs = sp.toString();
-    const url = `${window.location.pathname}${qs ? `?${qs}` : ''}`;
-    window.history.replaceState(null, '', url);
+    const prev = stateRef.current;
+    const next: FilterState = { query, category, chapter, tag, sortAsc, viewMode };
+    const isFirstSync = firstSyncRef.current;
+    firstSyncRef.current = false;
+    stateRef.current = next;
+
     try {
       window.localStorage.setItem('notes-view', viewMode);
     } catch {
       // 隐私模式等场景下不阻断页面
+    }
+
+    const qs = buildSearch(window.location.search, next);
+    const url = `${window.location.pathname}${qs ? `?${qs}` : ''}`;
+    if (url === `${window.location.pathname}${window.location.search}`) return;
+
+    // 只有「换层级」（分类 / 章节 / 标签 / 视图）才 push，浏览器后退就能一层层退；
+    // 打字改关键词、改排序用 replace，不往历史记录里堆垃圾条目。
+    const levelChanged =
+      prev.category !== next.category ||
+      prev.chapter !== next.chapter ||
+      prev.tag !== next.tag ||
+      prev.viewMode !== next.viewMode;
+    if (isFirstSync || !levelChanged) {
+      window.history.replaceState(null, '', url);
+    } else {
+      window.history.pushState(null, '', url);
     }
   }, [ready, query, category, chapter, tag, sortAsc, viewMode]);
 
@@ -120,6 +182,28 @@ export function NotesBrowser({
     swap();
     fn();
   };
+
+  /** 浏览器前进/后退：按地址栏还原筛选层级，与页内「返回上一级」同一套语义 */
+  useEffect(() => {
+    const onPopState = () => {
+      // 地址里没有 view 参数就是图集（useStoredView=false），
+      // 否则刚被 localStorage 记住的时间线偏好会把后退「咬」回时间线。
+      const popped = readFilterState(window.location.search, false);
+      stateRef.current = popped;
+      commit(() => {
+        setQuery(popped.query);
+        setCategory(popped.category);
+        setChapter(popped.chapter);
+        setTag(popped.tag);
+        setSortAsc(popped.sortAsc);
+        setViewMode(popped.viewMode);
+      });
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+    // commit 只用到 setSwapKey（稳定），监听挂一次即可
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const categories = useMemo(() => {
     const list = countBy(notes.map((n) => n.category));
@@ -245,6 +329,10 @@ export function NotesBrowser({
         commit(() => setTag(null));
         return;
       }
+      if (chapter) {
+        commit(() => setChapter(null));
+        return;
+      }
       if (category) {
         commit(() => {
           setCategory(null);
@@ -262,7 +350,7 @@ export function NotesBrowser({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [query, tag, category, viewMode]);
+  }, [query, tag, chapter, category, viewMode]);
 
   const enterCategory = (cat: string) => {
     commit(() => {
@@ -287,6 +375,41 @@ export function NotesBrowser({
       setTag(null);
     });
   };
+
+  /** 「返回上一级」：章节 → 分类 → 图集总览，与 Esc、浏览器后退同一套层级语义 */
+  const backTarget: 'chapter' | 'category' | 'view' | null = chapter
+    ? 'chapter'
+    : category
+      ? 'category'
+      : viewMode === 'timeline'
+        ? 'view'
+        : null;
+
+  const goBack = () => {
+    if (backTarget === 'chapter') {
+      commit(() => setChapter(null));
+      return;
+    }
+    if (backTarget === 'category') {
+      if (viewMode === 'atlas') {
+        goAtlasOverview();
+      } else {
+        commit(() => {
+          setCategory(null);
+          setChapter(null);
+        });
+      }
+      return;
+    }
+    if (backTarget === 'view') goAtlasOverview();
+  };
+
+  const backLabel =
+    backTarget === 'chapter'
+      ? site.notesBrowser.backToChapters
+      : backTarget === 'category' && viewMode === 'timeline'
+        ? site.notesBrowser.backAllNotes
+        : site.notesBrowser.backToAtlas;
 
   const switchView = (next: ViewMode) => {
     if (next === viewMode) {
@@ -457,25 +580,7 @@ export function NotesBrowser({
 
       {kind === 'detail' && category && (
         <div key={`detail-${swapKey}`} className={swapCls}>
-          <div className="mt-5">
-            <button
-              type="button"
-              onClick={goAtlasOverview}
-              className="flex items-center gap-2 rounded-md px-1 py-1 font-mono text-[13px] tracking-[0.08em] text-ink-soft transition-colors hover:text-accent"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                aria-hidden="true"
-              >
-                <path d="M19 12H5m5-6-6 6 6 6" />
-              </svg>
-              {site.notesBrowser.backToAtlas}
-            </button>
-          </div>
+          <BackButton className="mt-5" label={backLabel} onClick={goBack} />
 
           <section className="explore-card relative mt-3 rounded-2xl p-6 md:p-7">
             <span className="corner" aria-hidden="true" />
@@ -505,8 +610,9 @@ export function NotesBrowser({
                 </div>
               </div>
 
+              {/* 章节行 pt-2：给 hover 上浮的 chips 留出顶部空间，避免被 overflow-x-auto 裁掉上边缘 */}
               {currentChapters.length > 0 && (
-                <div className="mt-5 flex gap-2 overflow-x-auto pb-1 overscroll-x-contain [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-line-strong/70 [&::-webkit-scrollbar-track]:bg-transparent">
+                <div className="mt-3 flex gap-2 overflow-x-auto pt-2 pb-1 overscroll-x-contain [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-line-strong/70 [&::-webkit-scrollbar-track]:bg-transparent">
                   <FilterButton
                     small
                     active={chapter === null}
@@ -596,8 +702,13 @@ export function NotesBrowser({
 
       {kind === 'timeline' && (
         <div key={`timeline-${swapKey}`} className={swapCls}>
+          {backTarget && (
+            <BackButton className="mt-5" label={backLabel} onClick={goBack} />
+          )}
           {/* 分类 */}
-          <div className="mt-5 flex flex-wrap items-center gap-2">
+          <div
+            className={`${backTarget ? 'mt-1' : 'mt-5'} flex flex-wrap items-center gap-2`}
+          >
             <span className={labelCls} style={{ fontSize: 'var(--fs-filter)' }}>
               {site.notesBrowser.cat}
             </span>
@@ -730,6 +841,39 @@ function ViewButton({
   );
 }
 
+/** 层级返回按钮（图集详情 / 时间线共用，始终只退一层） */
+function BackButton({
+  label,
+  onClick,
+  className,
+}: {
+  label: string;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex items-center gap-2 rounded-md px-1 py-1 font-mono text-[13px] tracking-[0.08em] text-ink-soft transition-colors hover:text-accent"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          className="h-4 w-4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          aria-hidden="true"
+        >
+          <path d="M19 12H5m5-6-6 6 6 6" />
+        </svg>
+        {label}
+      </button>
+    </div>
+  );
+}
+
 /**
  * 章节面板：点选分类后展开（grid-rows 0fr→1fr 过渡），真实占位把
  * 标签/排序/列表往下挤开，不悬浮不重叠；章节行横向滑动选择。
@@ -759,7 +903,7 @@ function ChapterPanel({
     >
       <div className="overflow-hidden">
         <div className="rounded-xl border border-line bg-panel/70 p-3.5 backdrop-blur">
-          <div className="mb-2.5 flex items-baseline justify-between gap-3">
+          <div className="mb-0.5 flex items-baseline justify-between gap-3">
             <span className="mono-label truncate" style={{ fontSize: 'var(--fs-filter)' }}>
               {category} · {site.notesBrowser.chap}
             </span>
@@ -768,7 +912,7 @@ function ChapterPanel({
             </span>
           </div>
           <div
-            className={`flex gap-2 overflow-x-auto pb-1 overscroll-x-contain [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-line-strong/70 [&::-webkit-scrollbar-track]:bg-transparent ${
+            className={`flex gap-2 overflow-x-auto pt-2 pb-1 overscroll-x-contain [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-0 [&::-webkit-scrollbar-thumb]:bg-line-strong/70 [&::-webkit-scrollbar-track]:bg-transparent ${
               open ? '' : 'pointer-events-none'
             }`}
           >

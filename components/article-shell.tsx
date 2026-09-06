@@ -75,7 +75,8 @@ export function ArticleShell({
                   {title}
                 </h1>
                 {demo && <NoteDemo demo={{ ...demo, label: demo.label ?? title }} />}
-                {!demo && code && <NoteCode code={code} />}
+                {/* Demo（只读/可编辑）与源码下载可并存：zip 走下载，单文件走代码面板 */}
+                {code && <NoteCode code={code} />}
               </div>
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2.5 border-b border-line pb-7 text-[15px] text-ink-soft">
                 <span className="font-mono text-[13px] tracking-[0.08em]">{dateText}</span>

@@ -40,7 +40,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
       }
     : undefined;
 
-  /* 代码文件：站内路径补 basePath 前缀；未配置 demo 时标题右侧出现 CODE 入口 */
+  /* 代码文件：站内路径补 basePath 前缀；zip 源码包直接下载，单文件打开代码面板 */
   const code = note.code
     ? {
         src: /^(https?:|\/\/|data:)/.test(note.code)

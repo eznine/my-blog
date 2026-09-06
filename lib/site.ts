@@ -181,6 +181,8 @@ export interface SiteConfig {
     viewAtlas: string;
     viewTimeline: string;
     backToAtlas: string;
+    backToChapters: string;
+    backAllNotes: string;
     sheet: string;
     notesUnit: string;
     chaptersUnit: string;

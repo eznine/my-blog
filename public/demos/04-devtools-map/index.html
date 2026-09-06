@@ -1,0 +1,61 @@
+<!doctype html>
+<!-- 文档类型声明：告诉浏览器按现代 HTML5 标准解析页面 -->
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>l4 · 抓一次瓦片请求</title>
+
+    <!-- 本地引入 Leaflet 1.9.4：不依赖 CDN，file:// 双击也能打开 -->
+    <link rel="stylesheet" href="lib/leaflet/dist/leaflet.css" />
+    <script src="lib/leaflet/dist/leaflet.js"></script>
+
+    <style>
+      /* 地图容器必须有明确高度，否则高度为 0，地图会"看不见" */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      // ────────────────────────────────────────────────────────
+      // 1. 创建地图实例：绑定到 #map 容器，设置初始中心和缩放级别
+      //    [39.9, 116.4] 是北京，顺序是 [纬度, 经度]，不是 xy
+      //    10 是缩放级别 z，数字越大看得越细
+      // ────────────────────────────────────────────────────────
+      const map = L.map("map").setView([39.9, 116.4], 10);
+
+      // ────────────────────────────────────────────────────────
+      // 2. 加载高德栅格瓦片
+      //    模板 URL 里的 {z} {x} {y} {s} 是占位符：
+      //    Leaflet 根据当前视口算出具体数字，拼成真实请求
+      //    subdomains 指定 1~4 四个子域，把并发请求分散开
+      //    打开 F12 的 Network 面板，就能看到这些请求
+      // ────────────────────────────────────────────────────────
+      L.tileLayer(
+        "https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+        {
+          maxZoom: 18,
+          subdomains: ["1", "2", "3", "4"],
+          attribution: "&copy; 高德地图",
+        },
+      ).addTo(map);
+
+      // ────────────────────────────────────────────────────────
+      // 3. 加一个标记与弹窗，初步体验"点要素"
+      // ────────────────────────────────────────────────────────
+      L.marker([39.9042, 116.4074])
+        .addTo(map)
+        .bindPopup("你好，WebGIS！<br>这是第一个标记")
+        .openPopup();
+    </script>
+  </body>
+</html>

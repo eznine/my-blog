@@ -1,0 +1,22 @@
+{
+  // 自动保存：焦点离开文件时就保存
+  "files.autoSave": "onFocusChange",
+  // 保存时用 Prettier 自动格式化
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // 前端惯例：2 空格缩进
+  "editor.tabSize": 2,
+  // 显示空白符边界，缩进问题一眼可见
+  "editor.renderWhitespace": "boundary",
+  // 括号配对染色，嵌套层级更清楚
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  // 统一 UTF-8，避免中文乱码
+  "files.encoding": "utf8",
+  // 文件树里的彩色图标
+  "workbench.iconTheme": "vs-seti",
+  // 嵌套文件夹不自动折叠成一行
+  "explorer.compactFolders": false,
+  // 集成终端默认用 Git Bash
+  "terminal.integrated.defaultProfile.windows": "Git Bash"
+}
