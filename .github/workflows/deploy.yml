@@ -45,6 +45,9 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.cfg.outputs.base }}
           SITE_URL: ${{ steps.cfg.outputs.site }}
+          NEXT_PUBLIC_AI_BASE_URL: ${{ vars.NEXT_PUBLIC_AI_BASE_URL }}
+          NEXT_PUBLIC_AI_API_KEY: ${{ secrets.NEXT_PUBLIC_AI_API_KEY }}
+          NEXT_PUBLIC_AI_MODEL: ${{ vars.NEXT_PUBLIC_AI_MODEL }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

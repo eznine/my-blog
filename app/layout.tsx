@@ -6,6 +6,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { CursorGlow } from '@/components/cursor-glow';
 import { CardProximityGlow } from '@/components/card-proximity-glow';
 import { ScrollProgressDot } from '@/components/scroll-progress-dot';
+import { AiChatWidget } from '@/components/ai-chat';
 import { SiteProvider } from '@/components/site-provider';
 import { getSite } from '@/lib/site-server';
 import { buildAppearanceCss } from '@/lib/appearance-server';
@@ -60,6 +61,8 @@ export default function RootLayout({
             <main className="flex-1 pt-14">{children}</main>
             <SiteFooter />
           </div>
+          {/* 全站 AI 悬浮助手（可拖拽定位，admin 页不显示） */}
+          <AiChatWidget />
           </SiteProvider>
         </ThemeProvider>
       </body>
