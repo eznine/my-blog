@@ -3,7 +3,7 @@ title: "第 24 节 · API Routes 与部署"
 date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "React-Next"
-order: 65
+order: 63
 tags: ["web"]
 ---
 

@@ -5,6 +5,8 @@ category: "WebGIS 开发"
 chapter: "Web基础"
 demo: "/demos/04-1/"
 demoLabel: "04-选择器练习页"
+order: 4
+tags: ["web"]
 ---
 
 # 第 04 节 · CSS 引入与选择器

@@ -3,7 +3,7 @@ title: "第 19 节 · 为什么有 Next.js"
 date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "React-Next"
-order: 56
+order: 54
 tags: ["web"]
 ---
 

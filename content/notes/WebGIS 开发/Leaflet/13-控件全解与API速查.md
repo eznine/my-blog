@@ -3,7 +3,7 @@ title: "第 13 节 · 控件全解与 API 速查手册（模块 05 收官）"
 date: "2026-09-01"
 category: "WebGIS 开发"
 chapter: "Leaflet"
-order: 42
+order: 40
 tags: ["web","leaflet"]
 ---
 

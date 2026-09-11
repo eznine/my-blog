@@ -5,6 +5,8 @@ category: "WebGIS 开发"
 chapter: "Web基础"
 demo: "/demos/01-1/"
 demoLabel: "01-简历骨架"
+order: 1
+tags: ["web"]
 ---
 
 # 第 01 节 · HTML 文档结构
