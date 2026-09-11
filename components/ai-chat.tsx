@@ -364,7 +364,7 @@ export function AiChatWidget() {
         <div
           role="dialog"
           aria-label="AI 助手"
-          className="ez-ai-panel fixed z-40 flex flex-col overflow-hidden rounded-2xl border border-line bg-panel/95 backdrop-blur-xl"
+          className="ez-ai-panel fixed z-40 flex flex-col overflow-hidden rounded-2xl border border-line bg-panel-solid md:bg-panel/95 md:backdrop-blur-xl"
           style={{ ...panelStyle, boxShadow: 'var(--shadow)' }}
         >
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
