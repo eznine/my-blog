@@ -2,7 +2,7 @@
 title: "第 05 节 · Vite 快速上手"
 date: "2026-09-06"
 category: "WebGIS 开发"
-chapter: "环境与工具链"
+chapter: "环境与工具"
 order: 105
 tags: ["vite","node","npm"]
 demo: "/demos/05-vite-vanilla/"
@@ -11,6 +11,7 @@ demoHeight: 520
 code: "/code/05-vite-vanilla-src.zip"
 codeLabel: "05-vite-vanilla · 源码包"
 ---
+
 
 
 

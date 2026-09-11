@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>08 · 三端自适应页</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Microsoft YaHei", sans-serif;
+      }
+
+      /* ───────── 基础样式 = 手机优先（<768px 的样子） ───────── */
+      .navbar {
+        background: #001529;
+        color: #fff;
+        padding: 12px 16px;
+        /* TODO 1：导航项目太多会挤——给 navbar 开 Flex + wrap + gap */
+      }
+      .navbar .logo {
+        font-weight: bold;
+        font-size: 18px;
+      }
+      .navbar .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .navbar a {
+        color: #fff;
+        text-decoration: none;
+      }
+
+      .layout {
+        display: flex;
+      }
+      .sidebar {
+        background: #e6f4ff;
+        padding: 16px;
+        /* TODO 2：手机上隐藏侧栏（display: none） */
+      }
+      .content {
+        flex: 1;
+        padding: 16px;
+      }
+
+      h1 {
+        /* TODO 3：把下面的 font-size: 32px 改成 clamp 写法 */
+
+        font-size: 32px;
+      }
+
+      .cards {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 14px;
+      }
+      .card img {
+        width: 100%;
+        border-radius: 6px;
+      }
+      .card h3 {
+        margin: 8px 0 4px;
+      }
+      .card p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+      }
+
+      /* 数据表：小屏放不下 → 外壳横滚，而不是整页横滚 */
+      .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        margin-top: 16px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 560px; /* 撑出可滚动的最小宽 */
+      }
+      th,
+      td {
+        border-bottom: 1px solid #eee;
+        padding: 8px 12px;
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      .page-footer {
+        text-align: center;
+        color: #999;
+        padding: 16px;
+        /* TODO 6：把下面的 padding-bottom: 16px 改成适配 iPhone 底部安全区的写法 */
+
+        padding-bottom: 16px;
+      }
+
+      /* ───────── 平板 ≥768px ───────── */
+      @media (min-width: 768px) {
+        .cards {
+          /* TODO 4a：卡片墙变成横向排列，放不下换行 */
+        }
+
+        .card {
+          /* TODO 4b：单张卡片按两列基准分配宽度 */
+        }
+      }
+
+      /* ───────── 桌面 ≥1024px ───────── */
+      @media (min-width: 1024px) {
+        .sidebar {
+          /* TODO 2b：侧栏显示出来，并作为 Flex 子项固定宽度 */
+        }
+
+        .card {
+          /* TODO 5：单张卡片按三列基准分配宽度 */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">GeoLearn</div>
+      <div class="links">
+        <a href="#">地图</a><a href="#">数据</a><a href="#">分析</a
+        ><a href="#">关于</a>
+      </div>
+    </nav>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <strong>目录</strong>
+        <p>· 城市卡片</p>
+        <p>· 城市数据表</p>
+        <p>· 关于</p>
+      </aside>
+
+      <main class="content">
+        <h1>三端自适应演示</h1>
+        <p>
+          按 F12 → Ctrl+Shift+M 切换设备；或直接拖拽窗口宽度观察断点（768 /
+          1024）。
+        </p>
+
+        <div class="cards">
+          <div class="card">
+            <img src="./assets/city-river.svg" alt="杭州城市河景占位图" />
+            <h3>杭州</h3>
+            <p>30.27N, 120.16E · 西湖所在</p>
+          </div>
+          <div class="card">
+            <img src="./assets/city-plains.svg" alt="南京城市平原占位图" />
+            <h3>南京</h3>
+            <p>32.06N, 118.80E · 六朝古都</p>
+          </div>
+          <div class="card">
+            <img src="./assets/city-mountain.svg" alt="重庆城市山地占位图" />
+            <h3>重庆</h3>
+            <p>29.56N, 106.55E · 山城立体交通</p>
+          </div>
+          <div class="card">
+            <img src="./assets/city-river.svg" alt="武汉城市河景占位图" />
+            <h3>武汉</h3>
+            <p>30.59N, 114.30E · 两江交汇</p>
+          </div>
+          <div class="card">
+            <img src="./assets/city-mountain.svg" alt="西安城市山地占位图" />
+            <h3>西安</h3>
+            <p>34.34N, 108.94E · 古丝绸之路起点</p>
+          </div>
+          <div class="card">
+            <img src="./assets/city-plains.svg" alt="成都城市平原占位图" />
+            <h3>成都</h3>
+            <p>30.66N, 104.07E · 天府之国</p>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>城市</th>
+                <th>纬度</th>
+                <th>经度</th>
+                <th>人口(万)</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>杭州</td>
+                <td>30.27</td>
+                <td>120.16</td>
+                <td>1237</td>
+                <td>西湖所在</td>
+              </tr>
+              <tr>
+                <td>南京</td>
+                <td>32.06</td>
+                <td>118.80</td>
+                <td>949</td>
+                <td>六朝古都</td>
+              </tr>
+              <tr>
+                <td>重庆</td>
+                <td>29.56</td>
+                <td>106.55</td>
+                <td>3213</td>
+                <td>山城立体交通</td>
+              </tr>
+              <tr>
+                <td>武汉</td>
+                <td>30.59</td>
+                <td>114.30</td>
+                <td>1233</td>
+                <td>两江交汇</td>
+              </tr>
+              <tr>
+                <td>西安</td>
+                <td>34.34</td>
+                <td>108.94</td>
+                <td>1295</td>
+                <td>古丝绸之路起点</td>
+              </tr>
+              <tr>
+                <td>成都</td>
+                <td>30.66</td>
+                <td>104.07</td>
+                <td>2094</td>
+                <td>天府之国</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+
+    <footer class="page-footer">© 2026 GeoLearn · 三端自适应演示页</footer>
+  </body>
+</html>

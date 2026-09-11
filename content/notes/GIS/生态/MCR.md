@@ -1,16 +1,9 @@
 ---
 title: "MCR"
-date: "2026-09-01"
+date: "2026-03-21"
 category: "GIS"
 chapter: "生态"
-order: 137
-hidden: true
 ---
-
-
-
-
-
 
 
 # MCR

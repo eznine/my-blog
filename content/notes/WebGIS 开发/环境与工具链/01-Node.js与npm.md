@@ -2,12 +2,13 @@
 title: "第 01 节 · Node.js 与 npm"
 date: "2026-09-06"
 category: "WebGIS 开发"
-chapter: "环境与工具链"
+chapter: "环境与工具"
 order: 101
 tags: ["node","npm"]
 code: "/code/01-check-env.js"
 codeLabel: "01-check-env.js · 环境检查"
 ---
+
 
 
 

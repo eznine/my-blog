@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>05 · 卡片布局（盒模型实战）</title>
+    <style>
+      /* TODO 1：新增下面这条完整规则，让全站换 border-box */
+
+      body {
+        font-family: "Microsoft YaHei", sans-serif;
+        background: #f0f2f5;
+        padding: 24px;
+      }
+
+      /* 卡片：当前素坯——拥挤、无间距、宽度失控 */
+      .card {
+        width: 300px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        /* TODO 2：在已有 .card 规则里加下面这行，让文字不贴边 */
+
+        /* TODO 3：继续在已有 .card 规则里加下面这行，拉开卡片间距 */
+
+        /* TODO 4：继续在已有 .card 规则里加下面两行，让卡片水平居中 */
+      }
+
+      .card img {
+        width: 100%;
+        border-radius: 6px;
+        /* TODO 6：在已有 .card img 规则里加下面这行，给图片下方留白 */
+      }
+
+      /* TODO 5：h3 默认自带 margin，在空规则里加下面这行，
+         覆盖浏览器默认样式，让标题间距由这里明确控制 */
+      .card h3 {
+      }
+      .card p {
+        margin: 0;
+        color: #666;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>城市卡片（盒模型实战）</h1>
+
+    <div class="card">
+      <img src="./assets/city-river.svg" alt="武汉城市河景占位图" />
+      <h3>武汉</h3>
+      <p>长江与汉江交汇处，GPS 坐标约 30.59N, 114.30E</p>
+    </div>
+
+    <div class="card">
+      <img src="./assets/city-mountain.svg" alt="西安城市山地占位图" />
+      <h3>西安</h3>
+      <p>古丝绸之路起点，GPS 坐标约 34.34N, 108.94E</p>
+    </div>
+
+    <div class="card">
+      <img src="./assets/city-plains.svg" alt="成都城市平原占位图" />
+      <h3>成都</h3>
+      <p>天府之国，GPS 坐标约 30.66N, 104.07E</p>
+    </div>
+  </body>
+</html>

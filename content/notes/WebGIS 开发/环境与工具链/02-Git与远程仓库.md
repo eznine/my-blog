@@ -2,12 +2,13 @@
 title: "第 02 节 · Git 与远程仓库"
 date: "2026-09-06"
 category: "WebGIS 开发"
-chapter: "环境与工具链"
+chapter: "环境与工具"
 order: 102
 tags: ["git","github"]
 code: "/code/02-git-practice.sh"
 codeLabel: "02-git-practice.sh · 本地 Git 练习"
 ---
+
 
 
 

@@ -5,8 +5,64 @@
     <link>https://github.com/eznine/</link>
     <description>地理信息科学方向研究生，关注生态安全格局、InSAR 形变监测与 WebGIS 可视化。喜欢把研究过程写成笔记，把想法做成能跑的项目。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sun, 06 Sep 2026 15:57:30 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 11 Sep 2026 06:28:37 GMT</lastBuildDate>
     <atom:link href="https://github.com/eznine/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>第 01 节 · HTML 文档结构</title>
+      <link>https://github.com/eznine/notes/webgis-web-01-html/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-web-01-html/</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 02 节 · 常用标签与超链接</title>
+      <link>https://github.com/eznine/notes/webgis-web-02/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-web-02/</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 03 节 · 表单与输入控件</title>
+      <link>https://github.com/eznine/notes/webgis-web-03/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-web-03/</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 04 节 · CSS 引入与选择器</title>
+      <link>https://github.com/eznine/notes/webgis-web-04-css/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-web-04-css/</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 05 节 · 盒模型与布局流</title>
+      <link>https://github.com/eznine/notes/webgis-web-05/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-web-05/</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 06 节 · Flex 弹性布局</title>
+      <link>https://github.com/eznine/notes/webgis-web-06-flex/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-web-06-flex/</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 07 节 · 定位与层叠</title>
+      <link>https://github.com/eznine/notes/webgis-web-07/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-web-07/</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
+    <item>
+      <title>第 08 节 · 响应式与媒体查询</title>
+      <link>https://github.com/eznine/notes/webgis-web-08/</link>
+      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-web-08/</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description></description>
+    </item>
     <item>
       <title>第 01 节 · Node.js 与 npm</title>
       <link>https://github.com/eznine/notes/webgis-01-node-js-npm/</link>
@@ -158,62 +214,6 @@
       <title>第 04 节 · useEffect：副作用与数据加载</title>
       <link>https://github.com/eznine/notes/webgis-react-next-04-useeffect/</link>
       <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-04-useeffect/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 05 节 · 列表渲染与 key</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-05-key/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-05-key/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 06 节 · 受控表单</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-06/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-06/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 07 节 · 组件通信</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-07/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-07/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 09 节 · 项目组织</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-09/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-09/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 10 节 · 组件库 Ant Design 上手</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-10-antdesign/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-10-antdesign/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 11 节 · React 生态地图</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-11-react/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-11-react/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 12 节 · Hooks 全解（逐参数讲透）</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-12-hooks/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-12-hooks/</guid>
-      <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
-      <description></description>
-    </item>
-    <item>
-      <title>第 13 节 · 渲染机制</title>
-      <link>https://github.com/eznine/notes/webgis-react-next-13/</link>
-      <guid isPermaLink="true">https://github.com/eznine/notes/webgis-react-next-13/</guid>
       <pubDate>Tue, 01 Sep 2026 00:00:00 GMT</pubDate>
       <description></description>
     </item>

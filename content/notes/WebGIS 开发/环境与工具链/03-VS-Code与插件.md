@@ -2,12 +2,13 @@
 title: "第 03 节 · VS Code 与插件"
 date: "2026-09-06"
 category: "WebGIS 开发"
-chapter: "环境与工具链"
+chapter: "环境与工具"
 order: 103
 tags: ["vscode","tool"]
 code: "/code/03-settings.json"
 codeLabel: "03-settings.json · VS Code 推荐配置"
 ---
+
 
 
 

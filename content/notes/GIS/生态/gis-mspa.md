@@ -1,19 +1,11 @@
 ---
-title: "MSPA/MCR构建生态网络"
-date: "2026-09-01"
+title: "MSPA形态学空间格局分析"
+date: "2026-03-31"
 category: "GIS"
 chapter: "生态"
-order: 138
-hidden: true
 ---
 
-
-
-
-
-
-
-# MSPA/MCR构建生态网络
+# MSPA形态学空间格局分析
 
 > **分类**：GIS / 生态
 
