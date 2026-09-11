@@ -58,7 +58,7 @@ export function ArticleShell({
 
         <div className="demo-panel-row mt-8 flex gap-12">
           {/* 左侧固定目录（xl+）；演示模式（容器 data-demo=open）时 CSS 隐藏 */}
-          <div className="desktop-toc-col">
+          <div className="desktop-toc-col hidden xl:block">
             <DesktopToc headings={headings} />
           </div>
           {/* 移动端右侧章节滑轨（<xl） */}
