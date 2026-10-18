@@ -145,15 +145,19 @@ S2 SR 详情页第一句就在讲版本：2022-01-25 之后，PROCESSING_BASELIN
 ```javascript
 // GEE 009｜找到数据集，并在代码中验证
 // 数据集 ID 均从 Earth Engine Data Catalog 复制
+
 // 1. 教学矩形：沿用上一篇的东湖范围（不是真实水域边界）
 var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]);
+
 // 2. 按 ID 读取：SRTM 是一幅 Image，Sentinel-2 是一组 ImageCollection
 var dem = ee.Image('USGS/SRTMGL1_003');
 var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED');
+
 // 3. 对照 SRTM 详情页：对象类型、波段名、像元大小
 print('dem：', dem);
 print('dem 的波段：', dem.bandNames());
 print('dem 像元大小（米）：', dem.projection().nominalScale());
+
 // 4. 对照 Sentinel-2 详情页：只看前 2 景，再取一景查波段
 print('s2（只展示前 2 景）：', s2.limit(2));
 var oneImage = s2.first();
@@ -161,6 +165,7 @@ print('一景 S2 的波段：', oneImage.bandNames());
 print('B4 像元大小（米）：', oneImage.select('B4').projection().nominalScale());
 print('B5 像元大小（米）：', oneImage.select('B5').projection().nominalScale());
 print('B1 像元大小（米）：', oneImage.select('B1').projection().nominalScale());
+
 // 5. 地图上只显示 DEM，用分色代替默认灰度
 var demVis = {min: 15, max: 90, palette: ['1a9850', 'fee08b', 'd73027']};
 Map.centerObject(roi, 12);
@@ -194,7 +199,35 @@ Map.addLayer(dem.clip(roi), demVis, 'dem（SRTM 高程）');
 
 波段显示、集合筛选、云掩膜和数值换算的具体写法，后面都会分篇讲解。下面是本篇完整代码，可以一次粘贴到 Code Editor 运行。
 
-// GEE 009｜找到数据集，并在代码中验证 // 数据集 ID 均从 Earth Engine Data Catalog 复制 // 1. 教学矩形：沿用上一篇的东湖范围（不是真实水域边界） var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]); // 2. 按 ID 读取：SRTM 是一幅 Image，Sentinel-2 是一组 ImageCollection var dem = ee.Image('USGS/SRTMGL1_003'); var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED'); // 3. 对照 SRTM 详情页：对象类型、波段名、像元大小 print('dem：', dem); print('dem 的波段：', dem.bandNames()); print('dem 像元大小（米）：', dem.projection().nominalScale()); // 4. 对照 Sentinel-2 详情页：只看前 2 景，再取一景查波段 print('s2（只展示前 2 景）：', s2.limit(2)); var oneImage = s2.first(); print('一景 S2 的波段：', oneImage.bandNames()); print('B4 像元大小（米）：', oneImage.select('B4').projection().nominalScale()); print('B5 像元大小（米）：', oneImage.select('B5').projection().nominalScale()); print('B1 像元大小（米）：', oneImage.select('B1').projection().nominalScale()); // 5. 地图上只显示 DEM，用分色代替默认灰度 var demVis = {min: 15, max: 90, palette: ['1a9850', 'fee08b', 'd73027']}; Map.centerObject(roi, 12); Map.addLayer(dem.clip(roi), demVis, 'dem（SRTM 高程）');
+```javascript
+// GEE 009｜找到数据集，并在代码中验证
+// 数据集 ID 均从 Earth Engine Data Catalog 复制
+
+// 1. 教学矩形：沿用上一篇的东湖范围（不是真实水域边界）
+var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]);
+
+// 2. 按 ID 读取：SRTM 是一幅 Image，Sentinel-2 是一组 ImageCollection
+var dem = ee.Image('USGS/SRTMGL1_003');
+var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED');
+
+// 3. 对照 SRTM 详情页：对象类型、波段名、像元大小
+print('dem：', dem);
+print('dem 的波段：', dem.bandNames());
+print('dem 像元大小（米）：', dem.projection().nominalScale());
+
+// 4. 对照 Sentinel-2 详情页：只看前 2 景，再取一景查波段
+print('s2（只展示前 2 景）：', s2.limit(2));
+var oneImage = s2.first();
+print('一景 S2 的波段：', oneImage.bandNames());
+print('B4 像元大小（米）：', oneImage.select('B4').projection().nominalScale());
+print('B5 像元大小（米）：', oneImage.select('B5').projection().nominalScale());
+print('B1 像元大小（米）：', oneImage.select('B1').projection().nominalScale());
+
+// 5. 地图上只显示 DEM，用分色代替默认灰度
+var demVis = {min: 15, max: 90, palette: ['1a9850', 'fee08b', 'd73027']};
+Map.centerObject(roi, 12);
+Map.addLayer(dem.clip(roi), demVis, 'dem（SRTM 高程）');
+```
 
 ## 下一篇
 
@@ -202,6 +235,20 @@ Map.addLayer(dem.clip(roi), demVis, 'dem（SRTM 高程）');
 
 数据找到了，怎么在地图上显示清楚？Map.addLayer() 里的 min、max、palette 分别管什么？真彩色和假彩色有什么区别？下一篇讲影像显示。
 
-官方文档与延伸阅读（网址可复制到浏览器） [1] Earth Engine Data Catalog：https://developers.google.com/earth-engine/datasets [2] Sentinel-2 SR Harmonized（L2A）：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED [3] Sentinel-2 Harmonized（L1C，TOA）：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_HARMONIZED [4] Sentinel-2 SR（已弃用）：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR [5] SRTM 30m：https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003 [6] Code Editor 概览（搜索与 Imports）：https://developers.google.com/earth-engine/guides/playground [7] Scale（计算尺度）：https://developers.google.com/earth-engine/guides/scale
+官方文档与延伸阅读（网址可复制到浏览器）
+
+[1] Earth Engine Data Catalog：https://developers.google.com/earth-engine/datasets
+
+[2] Sentinel-2 SR Harmonized（L2A）：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED
+
+[3] Sentinel-2 Harmonized（L1C，TOA）：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_HARMONIZED
+
+[4] Sentinel-2 SR（已弃用）：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR
+
+[5] SRTM 30m：https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+
+[6] Code Editor 概览（搜索与 Imports）：https://developers.google.com/earth-engine/guides/playground
+
+[7] Scale（计算尺度）：https://developers.google.com/earth-engine/guides/scale
 
 欢迎关注，后续继续分享 GEE 教程与遥感实战。

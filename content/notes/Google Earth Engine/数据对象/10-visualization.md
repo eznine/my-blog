@@ -34,6 +34,7 @@ var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]);
 var dem = ee.Image('NASA/NASADEM_HGT/001');
 var elevation = dem.select('elevation');
 print('elevation', elevation);
+
 Map.centerObject(roi, 12);
 Map.addLayer(elevation, {}, '高程 默认显示');
 ```
@@ -63,7 +64,9 @@ Map.addLayer(elevation, {min: 15, max: 65}, '高程 min15 max65');
 
 ### Inspector 读数的注意事项
 
-截图里写着 at 38m/px，这是当前缩放级别下的显示尺度，不是 NASADEM 的 30 m 原始分辨率。 所以对比不同图层时，要在**同一位置、同一缩放级别**下点。要严格按指定分辨率取值，得用带 `scale` 参数的采样方法，后面讲统计时再展开。
+截图里写着 at 38m/px，这是当前缩放级别下的显示尺度，不是 NASADEM 的 30 m 原始分辨率。
+
+所以对比不同图层时，要在**同一位置、同一缩放级别**下点。要严格按指定分辨率取值，得用带 `scale` 参数的采样方法，后面讲统计时再展开。
 
 ## PART 02 · 单波段的 min、max、palette
 
@@ -95,10 +98,13 @@ print('elev pct', pct);
 ```javascript
 // PART 02｜同一幅 elevation，三组 min / max
 var pal = ['2c7bb6', 'abd9e9', 'ffffbf', 'fdae61', 'd7191c'];
+
 // A：范围过宽（直接套用数据集目录里的全球范围）
 Map.addLayer(elevation, {min: -512, max: 8768, palette: pal}, 'A 过宽 -512~8768');
+
 // B：范围过窄
 Map.addLayer(elevation, {min: 20, max: 30, palette: pal}, 'B 过窄 20~30');
+
 // C：范围合适（约为东湖矩形内 2%~98% 百分位）
 Map.addLayer(elevation, {min: 15, max: 65, palette: pal}, 'C 合适 15~65');
 ```
@@ -115,7 +121,9 @@ Map.addLayer(elevation, {min: 15, max: 65, palette: pal}, 'C 合适 15~65');
 
 ### min / max 没有标准答案
 
-同一幅数据，换一个研究区，合适的范围就变了。按百分位数取，是比较稳妥的起点，再按想突出的对象微调。 还要注意：这里的 palette 是我们自己写的显示参数，和数据集详情页示例代码里的配色不是一回事。
+同一幅数据，换一个研究区，合适的范围就变了。按百分位数取，是比较稳妥的起点，再按想突出的对象微调。
+
+还要注意：这里的 palette 是我们自己写的显示参数，和数据集详情页示例代码里的配色不是一回事。
 
 ## PART 03 · 多波段：真彩色与假彩色
 
@@ -126,8 +134,10 @@ Map.addLayer(elevation, {min: 15, max: 65, palette: pal}, 'C 合适 15~65');
 ```javascript
 // PART 03｜多波段：真彩色与假彩色
 var s2 = ee.Image('COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU');
+
 // 真彩色：红、绿、蓝波段依次放进 R、G、B
 Map.addLayer(s2, {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000}, '真彩色 B4/B3/B2');
+
 // 假彩色：近红外 B8 放进 R 通道
 Map.addLayer(s2, {bands: ['B8', 'B4', 'B3'], min: 0, max: 3000}, '假彩色 B8/B4/B3');
 ```
@@ -142,7 +152,9 @@ Map.addLayer(s2, {bands: ['B8', 'B4', 'B3'], min: 0, max: 3000}, '假彩色 B8/B
 
 ### 为什么是 0～3000
 
-上一篇讲过，S2_SR_HARMONIZED 的反射率波段 Scale 是 0.0001，像元值 3000 相当于反射率 0.3。 实测东湖矩形里 B4、B3、B2 的 98% 百分位分别是 2461、2235、1979，3000 能把绝大多数像元包进来。B8 的 98% 百分位是 4511，所以假彩色里不少植被已经顶到最亮，想看植被内部差异，可以单独把 max 调高再对比。
+上一篇讲过，S2_SR_HARMONIZED 的反射率波段 Scale 是 0.0001，像元值 3000 相当于反射率 0.3。
+
+实测东湖矩形里 B4、B3、B2 的 98% 百分位分别是 2461、2235、1979，3000 能把绝大多数像元包进来。B8 的 98% 百分位是 4511，所以假彩色里不少植被已经顶到最亮，想看植被内部差异，可以单独把 max 调高再对比。
 
 一个常见报错：多波段配 palette
 
@@ -180,6 +192,7 @@ var elev = dem.select('elevation');
 var elevCn = elev.rename('gaocheng');
 print('原始波段名', elev.bandNames());
 print('改名后', elevCn.bandNames());
+
 var clipped = elev.clip(roi);
 Map.centerObject(roi, 11);
 Map.addLayer(clipped, {min: 15, max: 65, palette: ['2c7bb6', 'ffffbf', 'd7191c']}, '裁剪后的高程');
@@ -195,7 +208,9 @@ Map.addLayer(clipped, {min: 15, max: 65, palette: ['2c7bb6', 'ffffbf', 'd7191c']
 
 clip() 不是“定位”，也不是显示必需
 
-`Map.centerObject()` 只是把视角移过去，影像本身一点没变；`clip()` 才会生成一幅范围外被掩膜的新影像。 官方 Best Practices 明确建议：**不需要裁剪时不要用 `clip()`**，不必要的裁剪会增加计算时间。只是为了看某个地方，用 `Map.centerObject()` 就够了；导出时，应尽量在导出函数的区域参数里指定范围。
+`Map.centerObject()` 只是把视角移过去，影像本身一点没变；`clip()` 才会生成一幅范围外被掩膜的新影像。
+
+官方 Best Practices 明确建议：**不需要裁剪时不要用 `clip()`**，不必要的裁剪会增加计算时间。只是为了看某个地方，用 `Map.centerObject()` 就够了；导出时，应尽量在导出函数的区域参数里指定范围。
 
 ## PART 05 · 综合显示与图层面板
 
@@ -208,10 +223,12 @@ clip() 不是“定位”，也不是显示必需
 // Map.addLayer(对象, 可视化参数, 图层名, 是否显示, 不透明度)
 Map.addLayer(s2, {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000}, 'S2 真彩色');
 Map.addLayer(s2, {bands: ['B8', 'B4', 'B3'], min: 0, max: 3000}, 'S2 假彩色', false);
+
 // 高程半透明叠加在真彩色上
 Map.addLayer(dem.select('elevation'),
   {min: 15, max: 65, palette: ['2c7bb6', 'ffffbf', 'd7191c']},
   'NASADEM 高程', true, 0.6);
+
 // 水陆分类：0 = 陆地，255 = 水体（约 2000 年）
 Map.addLayer(dem.select('swb'), {min: 0, max: 255, palette: ['f0e6d2', '1f78b4']}, 'NASADEM swb', false);
 ```
@@ -229,7 +246,9 @@ Map.addLayer(dem.select('swb'), {min: 0, max: 255, palette: ['f0e6d2', '1f78b4']
 
 ### swb 只作显示示例
 
-`swb` 是 NASADEM 的水陆标记，0 = 陆地，255 = 水体，来自 2000 年 2 月 SRTM 任务时期的数据。 它和 2023 年的 Sentinel-2 相隔二十多年，**不能拿两者对比来判断水域变化**，这里只是演示分类数据怎么用 palette 显示。
+`swb` 是 NASADEM 的水陆标记，0 = 陆地，255 = 水体，来自 2000 年 2 月 SRTM 任务时期的数据。
+
+它和 2023 年的 Sentinel-2 相隔二十多年，**不能拿两者对比来判断水域变化**，这里只是演示分类数据怎么用 palette 显示。
 
 ## PART 06 · 本篇小结
 
@@ -244,7 +263,38 @@ Map.addLayer(dem.select('swb'), {min: 0, max: 255, palette: ['f0e6d2', '1f78b4']
 
 下面是本篇完整代码，可以一次粘贴到 Code Editor 运行。为了不让图层互相遮挡，A、B、C 三组和假彩色默认不勾选，在 Layers 面板里逐个打开对比。
 
-// GEE 010｜影像与地图可视化 // 东湖教学矩形沿用前几篇（不是真实水域边界） var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]); // 1. 读取数据：NASADEM 高程与 Sentinel-2 单景 var dem = ee.Image('NASA/NASADEM_HGT/001'); var elevation = dem.select('elevation'); var s2 = ee.Image('COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU'); print('elevation', elevation); Map.centerObject(roi, 12); // 2. 单波段：同一份高程，三组 min / max 对比（默认不勾选，在 Layers 里逐个打开） var pal = ['2c7bb6', 'abd9e9', 'ffffbf', 'fdae61', 'd7191c']; Map.addLayer(elevation, {min: -512, max: 8768, palette: pal}, 'A 过宽 -512~8768', false); Map.addLayer(elevation, {min: 20, max: 30, palette: pal}, 'B 过窄 20~30', false); Map.addLayer(elevation, {min: 15, max: 65, palette: pal}, 'C 合适 15~65', false); // 3. 多波段：真彩色与假彩色 Map.addLayer(s2, {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000}, 'S2 真彩色'); Map.addLayer(s2, {bands: ['B8', 'B4', 'B3'], min: 0, max: 3000}, 'S2 假彩色', false); // 4. 显示前整理：select 已在上面用过，这里演示 rename 和 clip var elevCn = elevation.rename('gaocheng'); print('改名后', elevCn.bandNames()); var demVis = {min: 15, max: 65, palette: ['2c7bb6', 'ffffbf', 'd7191c']}; Map.addLayer(elevation.clip(roi), demVis, '裁剪后的高程', false); // 5. 综合显示：高程半透明叠加；swb 水陆分类（约 2000 年，仅作显示示例） Map.addLayer(elevation, demVis, 'NASADEM 高程', true, 0.6); Map.addLayer(dem.select('swb'), {min: 0, max: 255, palette: ['f0e6d2', '1f78b4']}, 'NASADEM swb', false);
+```javascript
+// GEE 010｜影像与地图可视化
+// 东湖教学矩形沿用前几篇（不是真实水域边界）
+var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]);
+
+// 1. 读取数据：NASADEM 高程与 Sentinel-2 单景
+var dem = ee.Image('NASA/NASADEM_HGT/001');
+var elevation = dem.select('elevation');
+var s2 = ee.Image('COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU');
+print('elevation', elevation);
+Map.centerObject(roi, 12);
+
+// 2. 单波段：同一份高程，三组 min / max 对比（默认不勾选，在 Layers 里逐个打开）
+var pal = ['2c7bb6', 'abd9e9', 'ffffbf', 'fdae61', 'd7191c'];
+Map.addLayer(elevation, {min: -512, max: 8768, palette: pal}, 'A 过宽 -512~8768', false);
+Map.addLayer(elevation, {min: 20, max: 30, palette: pal}, 'B 过窄 20~30', false);
+Map.addLayer(elevation, {min: 15, max: 65, palette: pal}, 'C 合适 15~65', false);
+
+// 3. 多波段：真彩色与假彩色
+Map.addLayer(s2, {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000}, 'S2 真彩色');
+Map.addLayer(s2, {bands: ['B8', 'B4', 'B3'], min: 0, max: 3000}, 'S2 假彩色', false);
+
+// 4. 显示前整理：select 已在上面用过，这里演示 rename 和 clip
+var elevCn = elevation.rename('gaocheng');
+print('改名后', elevCn.bandNames());
+var demVis = {min: 15, max: 65, palette: ['2c7bb6', 'ffffbf', 'd7191c']};
+Map.addLayer(elevation.clip(roi), demVis, '裁剪后的高程', false);
+
+// 5. 综合显示：高程半透明叠加；swb 水陆分类（约 2000 年，仅作显示示例）
+Map.addLayer(elevation, demVis, 'NASADEM 高程', true, 0.6);
+Map.addLayer(dem.select('swb'), {min: 0, max: 255, palette: ['f0e6d2', '1f78b4']}, 'NASADEM swb', false);
+```
 
 ## 下一篇
 
@@ -252,6 +302,18 @@ Map.addLayer(dem.select('swb'), {min: 0, max: 255, palette: ['f0e6d2', '1f78b4']
 
 会显示了，下一步是让波段之间“算”起来：addBands、updateMask、normalizedDifference，用真实影像算一次 NDVI。
 
-官方文档与延伸阅读（网址可复制到浏览器） [1] Image Visualization（影像可视化）：https://developers.google.com/earth-engine/guides/image_visualization [2] Map.addLayer：https://developers.google.com/earth-engine/apidocs/map-addlayer [3] Coding Best Practices（clip 的使用建议）：https://developers.google.com/earth-engine/guides/best_practices [4] NASADEM：https://developers.google.com/earth-engine/datasets/catalog/NASA_NASADEM_HGT_001 [5] Sentinel-2 SR Harmonized：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED [6] Code Editor 概览（Inspector 与 Layers）：https://developers.google.com/earth-engine/guides/playground
+官方文档与延伸阅读（网址可复制到浏览器）
+
+[1] Image Visualization（影像可视化）：https://developers.google.com/earth-engine/guides/image_visualization
+
+[2] Map.addLayer：https://developers.google.com/earth-engine/apidocs/map-addlayer
+
+[3] Coding Best Practices（clip 的使用建议）：https://developers.google.com/earth-engine/guides/best_practices
+
+[4] NASADEM：https://developers.google.com/earth-engine/datasets/catalog/NASA_NASADEM_HGT_001
+
+[5] Sentinel-2 SR Harmonized：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED
+
+[6] Code Editor 概览（Inspector 与 Layers）：https://developers.google.com/earth-engine/guides/playground
 
 欢迎关注，后续继续分享 GEE 教程与遥感实战。

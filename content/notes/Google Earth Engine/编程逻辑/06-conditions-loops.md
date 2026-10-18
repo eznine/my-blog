@@ -170,6 +170,7 @@ function makeVis(cfg){
     return {bands:cfg.bands,min:0,max:3000};
   }
 }
+
 function addConfiguredLayer(cfg){
   if (cfg.enabled){
     Map.addLayer(cfg.image,makeVis(cfg),cfg.name,cfg.shown);
@@ -256,7 +257,47 @@ print('实际比较结果：',value.gt(0.3));
 
 以下代码可直接粘贴到 Code Editor 运行（请整段复制，勿从排版卡片拼接）：
 
-// GEE006 · 条件判断与循环 // 数据 ID 延用原版武汉东湖案例 var worldcover = ee.ImageCollection('ESA/WorldCover/v200').first(); var s2 = ee.Image( 'COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU'); // 配置数组：每个对象对应一个图层 var layers = [ {name: 'WorldCover 2021', image: worldcover, type: 'categorical', bands: ['Map'], enabled: true, shown: false}, {name: 'S2 真彩色', image: s2, type: 'continuous', bands: ['B4', 'B3', 'B2'], enabled: true, shown: true}, {name: 'S2 假彩色', image: s2, type: 'continuous', bands: ['B8', 'B4', 'B3'], enabled: true, shown: false}, {name: 'S2 短波红外', image: s2, type: 'continuous', bands: ['B12', 'B8', 'B4'], enabled: false, shown: true} ]; // type 是普通 JS 字符串，由 if 判断 function makeVis(cfg) { if (cfg.type === 'categorical') { return {bands: cfg.bands}; } else { return {bands: cfg.bands, min: 0, max: 3000}; } } function addConfiguredLayer(cfg) { if (cfg.enabled) { Map.addLayer(cfg.image, makeVis(cfg), cfg.name, cfg.shown); } else { print('跳过：' + cfg.name); } } Map.setCenter(114.39, 30.56, 12); for (var i = 0; i < layers.length; i++) { addConfiguredLayer(layers[i]); }
+```javascript
+// GEE006 · 条件判断与循环
+// 数据 ID 延用原版武汉东湖案例
+var worldcover = ee.ImageCollection('ESA/WorldCover/v200').first();
+var s2 = ee.Image(
+  'COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU');
+
+// 配置数组：每个对象对应一个图层
+var layers = [
+  {name: 'WorldCover 2021', image: worldcover,
+    type: 'categorical', bands: ['Map'], enabled: true, shown: false},
+  {name: 'S2 真彩色', image: s2,
+    type: 'continuous', bands: ['B4', 'B3', 'B2'], enabled: true, shown: true},
+  {name: 'S2 假彩色', image: s2,
+    type: 'continuous', bands: ['B8', 'B4', 'B3'], enabled: true, shown: false},
+  {name: 'S2 短波红外', image: s2,
+    type: 'continuous', bands: ['B12', 'B8', 'B4'], enabled: false, shown: true}
+];
+
+// type 是普通 JS 字符串，由 if 判断
+function makeVis(cfg) {
+  if (cfg.type === 'categorical') {
+    return {bands: cfg.bands};
+  } else {
+    return {bands: cfg.bands, min: 0, max: 3000};
+  }
+}
+
+function addConfiguredLayer(cfg) {
+  if (cfg.enabled) {
+    Map.addLayer(cfg.image, makeVis(cfg), cfg.name, cfg.shown);
+  } else {
+    print('跳过：' + cfg.name);
+  }
+}
+
+Map.setCenter(114.39, 30.56, 12);
+for (var i = 0; i < layers.length; i++) {
+  addConfiguredLayer(layers[i]);
+}
+```
 
 ## 下一篇
 
@@ -264,6 +305,14 @@ print('实际比较结果：',value.gt(0.3));
 
 为什么普通 if 无法正确判断 ee.Number？ee 对象在哪里计算？下一篇从客户端与服务端机制讲起。
 
-官方入口与延伸阅读（复制到浏览器打开） [1] Map.addLayer API：developers.google.com/earth-engine/apidocs/map-addlayer [2] ESA WorldCover v200：developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v200 [3] Client vs. Server：developers.google.com/earth-engine/guides/client_server 界面与 API 可能更新，以官方为准。
+官方入口与延伸阅读（复制到浏览器打开）
+
+[1] Map.addLayer API：developers.google.com/earth-engine/apidocs/map-addlayer
+
+[2] ESA WorldCover v200：developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v200
+
+[3] Client vs. Server：developers.google.com/earth-engine/guides/client_server
+
+界面与 API 可能更新，以官方为准。
 
 GEE 系列 · 从零开始学习遥感与 GIS 云端分析

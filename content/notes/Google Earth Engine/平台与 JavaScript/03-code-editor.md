@@ -226,9 +226,17 @@ Code Editor 里有三个容易混淆的概念：
 
 这一篇不要求记住每个按钮，用到时回来查即可。更重要的是建立“写代码 → Save → Run → 看 Console 和地图”的操作习惯。
 
-纯文本代码（与 PART 04 相同）
-
-print('Hello, Earth Engine!'); var dem = ee.Image('USGS/SRTMGL1_003'); var demVis = { min: 0, max: 3000, palette: ['006837', '78c679', 'ffffbf', 'fdae61', 'a6611a', 'ffffff'] }; Map.setCenter(112.5, 37.5, 8); Map.addLayer(dem, demVis, 'SRTM DEM');
+```javascript
+print('Hello, Earth Engine!');
+var dem = ee.Image('USGS/SRTMGL1_003');
+var demVis = {
+  min: 0,
+  max: 3000,
+  palette: ['006837', '78c679', 'ffffbf', 'fdae61', 'a6611a', 'ffffff']
+};
+Map.setCenter(112.5, 37.5, 8);
+Map.addLayer(dem, demVis, 'SRTM DEM');
+```
 
 ## 下一篇
 
@@ -236,6 +244,14 @@ GEE004 ｜ JavaScript 速成①：变量与数据类型
 
 为什么代码中总有 var ？数字、字符串、数组和对象有什么区别？{}、[]、() 又分别代表什么？下一篇从刚刚运行的 SRTM 代码出发，带你认识 JavaScript 的基础语法，学会读懂 GEE 代码。
 
-官方入口与延伸阅读（复制到浏览器打开） [1] Earth Engine Code Editor：code.earthengine.google.com [2] Code Editor 官方说明：developers.google.com/earth-engine/guides/playground [3] 延迟计算说明：developers.google.com/earth-engine/guides/deferred_execution [4] SRTM 数据集说明：developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+官方入口与延伸阅读（复制到浏览器打开）
+
+[1] Earth Engine Code Editor：code.earthengine.google.com
+
+[2] Code Editor 官方说明：developers.google.com/earth-engine/guides/playground
+
+[3] 延迟计算说明：developers.google.com/earth-engine/guides/deferred_execution
+
+[4] SRTM 数据集说明：developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
 
 GEE 系列 · 从零开始学习遥感与 GIS 云端分析

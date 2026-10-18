@@ -168,6 +168,14 @@ GEE 03 ｜ Code Editor 界面全解析
 
 Scripts、Docs、Assets、Inspector、Console、Tasks 分别有什么用？为什么代码会分为客户端与服务器端？下一篇从界面和刚才的第一段代码开始，逐个讲清楚。
 
-官方入口与延伸阅读（复制到浏览器打开） [1] Google Earth Engine 官网：earthengine.google.com [2] Earth Engine Code Editor：code.earthengine.google.com [3] Earth Engine 访问与注册说明：developers.google.com/earth-engine/guides/access [4] SRTM 数据集说明：developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+官方入口与延伸阅读（复制到浏览器打开）
+
+[1] Google Earth Engine 官网：earthengine.google.com
+
+[2] Earth Engine Code Editor：code.earthengine.google.com
+
+[3] Earth Engine 访问与注册说明：developers.google.com/earth-engine/guides/access
+
+[4] SRTM 数据集说明：developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
 
 GEE 系列 · 从零开始学习遥感与 GIS 云端分析

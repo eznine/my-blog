@@ -54,18 +54,23 @@ summary: "上一期弄清了客户端和服务端：ee.Number 看起来像数字
 // Part 02｜Image 与 ImageCollection
 // 1. 教学矩形：大致框住武汉东湖，不是真实水域边界
 var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]);
+
 // 2. 一幅影像：SRTM 高程（只有一个波段）
 var dem = ee.Image('USGS/SRTMGL1_003');
+
 // 3. 一组影像：2023 年 9 月与 roi 相交的 Sentinel-2
 var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
   .filterBounds(roi)
   .filterDate('2023-09-01', '2023-10-01');
+
 // 4. 按整景云量属性排序，取出第一景 Image
 var best = s2.sort('CLOUDY_PIXEL_PERCENTAGE').first();
+
 print('dem：', dem);
 print('s2（只展示前 2 景）：', s2.limit(2));
 print('s2 里有几景影像：', s2.size());
 print('best 有几个波段：', best.bandNames().size());
+
 // 5. 显示：S2 真彩色做底图，DEM 用分色叠在矩形内
 var rgbVis = {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000};
 var demVis = {min: 15, max: 90, palette: ['1a9850', 'fee08b', 'd73027']};
@@ -114,17 +119,21 @@ Map.addLayer(dem.clip(roi), demVis, 'dem（SRTM 高程）');
 // Part 03｜Geometry、Feature、FeatureCollection
 // 1. Geometry：只有位置和形状
 var pointA = ee.Geometry.Point([114.39, 30.56]);
+
 // 2. Feature：几何 + 属性
 var siteA = ee.Feature(pointA, {name: '示例点A', category: '观察点'});
 var siteB = ee.Feature(ee.Geometry.Point([114.42, 30.58]), {
   name: '示例点B', category: '观察点'
 });
 var area = ee.Feature(roi, {name: '教学矩形', category: '范围'});
+
 // 3. FeatureCollection：把多个 Feature 放在一起
 var samples = ee.FeatureCollection([siteA, siteB, area]);
+
 print('pointA（Geometry）：', pointA);
 print('siteA（Feature）：', siteA);
 print('samples（FeatureCollection）：', samples);
+
 // 4. 显示：卫星底图 + 放大的点、半透明的面
 var fcStyle = {color: '00FFFF', pointSize: 8, fillColor: '00FFFF33'};
 var pointVis = {color: 'FF0000'};
@@ -164,6 +173,7 @@ var city = ee.String('武汉');
 var years = ee.List([2021, 2022, 2023]);
 var info = ee.Dictionary({city: '武汉', year: 2023});
 var day = ee.Date('2023-09-01');
+
 print('Number：', count);
 print('String：', city);
 print('List：', years);
@@ -193,11 +203,13 @@ var imageCount = s2.size();              // ImageCollection → Number
 var siteCount = samples.size();          // FeatureCollection → Number
 var siteName = siteA.get('name');        // Feature → 属性值
 var dayText = day.format('YYYY-MM-dd');  // Date → String
+
 print('best.bandNames()：', bands);
 print('s2.size()：', imageCount);
 print('samples.size()：', siteCount);
 print('siteA.get()：', siteName);
 print('day.format()：', dayText);
+
 // 2. 返回的到底是哪种 ee 对象？
 print('first() 是 ee.Image：', s2.first() instanceof ee.Image);
 print('size() 是 ee.Number：', imageCount instanceof ee.Number);
@@ -236,7 +248,95 @@ print('转成 ee.String 后：', ee.String(siteName).cat('·东湖'));
 
 影像和波段、几何与要素、集合筛选的具体方法，后面都会分篇讲解。下面是本篇完整代码，按 Part 02 → 05 排列，可以一次粘贴到 Code Editor 运行。
 
-// GEE 008｜认识 GEE 的核心数据对象 // 整段一次运行；Console 中的数量以实际运行为准 // Part 02｜Image 与 ImageCollection // 1. 教学矩形：大致框住武汉东湖，不是真实水域边界 var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]); // 2. 一幅影像：SRTM 高程（只有一个波段） var dem = ee.Image('USGS/SRTMGL1_003'); // 3. 一组影像：2023 年 9 月与 roi 相交的 Sentinel-2 var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED') .filterBounds(roi) .filterDate('2023-09-01', '2023-10-01'); // 4. 按整景云量属性排序，取出第一景 Image var best = s2.sort('CLOUDY_PIXEL_PERCENTAGE').first(); print('dem：', dem); print('s2（只展示前 2 景）：', s2.limit(2)); print('s2 里有几景影像：', s2.size()); print('best 有几个波段：', best.bandNames().size()); // 5. 显示：S2 真彩色做底图，DEM 用分色叠在矩形内 var rgbVis = {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000}; var demVis = {min: 15, max: 90, palette: ['1a9850', 'fee08b', 'd73027']}; Map.centerObject(roi, 12); Map.addLayer(best, rgbVis, 'best（集合中的一景）'); Map.addLayer(dem.clip(roi), demVis, 'dem（SRTM 高程）'); // Part 03｜Geometry、Feature、FeatureCollection // 1. Geometry：只有位置和形状 var pointA = ee.Geometry.Point([114.39, 30.56]); // 2. Feature：几何 + 属性 var siteA = ee.Feature(pointA, {name: '示例点A', category: '观察点'}); var siteB = ee.Feature(ee.Geometry.Point([114.42, 30.58]), { name: '示例点B', category: '观察点' }); var area = ee.Feature(roi, {name: '教学矩形', category: '范围'}); // 3. FeatureCollection：把多个 Feature 放在一起 var samples = ee.FeatureCollection([siteA, siteB, area]); print('pointA（Geometry）：', pointA); print('siteA（Feature）：', siteA); print('samples（FeatureCollection）：', samples); // 4. 显示：卫星底图 + 放大的点、半透明的面 var fcStyle = {color: '00FFFF', pointSize: 8, fillColor: '00FFFF33'}; var pointVis = {color: 'FF0000'}; Map.setOptions('SATELLITE'); Map.addLayer(samples.style(fcStyle), {}, 'samples（3 个 Feature）'); Map.addLayer(pointA, pointVis, 'pointA（Geometry）'); // Part 04｜基础 ee 对象 var count = ee.Number(12); var city = ee.String('武汉'); var years = ee.List([2021, 2022, 2023]); var info = ee.Dictionary({city: '武汉', year: 2023}); var day = ee.Date('2023-09-01'); print('Number：', count); print('String：', city); print('List：', years); print('Dictionary：', info); print('Date：', day); // Part 05｜对象 → 方法 → 返回类型 // 1. 方法跟着对象走，返回的类型也跟着变 var bands = best.bandNames(); // Image → List var imageCount = s2.size(); // ImageCollection → Number var siteCount = samples.size(); // FeatureCollection → Number var siteName = siteA.get('name'); // Feature → 属性值 var dayText = day.format('YYYY-MM-dd'); // Date → String print('best.bandNames()：', bands); print('s2.size()：', imageCount); print('samples.size()：', siteCount); print('siteA.get()：', siteName); print('day.format()：', dayText); // 2. 返回的到底是哪种 ee 对象？ print('first() 是 ee.Image：', s2.first() instanceof ee.Image); print('size() 是 ee.Number：', imageCount instanceof ee.Number); print('get() 是 ee.String：', siteName instanceof ee.String); print('转成 ee.String 后：', ee.String(siteName).cat('·东湖'));
+```javascript
+// GEE 008｜认识 GEE 的核心数据对象
+// 整段一次运行；Console 中的数量以实际运行为准
+
+// Part 02｜Image 与 ImageCollection
+// 1. 教学矩形：大致框住武汉东湖，不是真实水域边界
+var roi = ee.Geometry.Rectangle([114.32, 30.51, 114.47, 30.61]);
+
+// 2. 一幅影像：SRTM 高程（只有一个波段）
+var dem = ee.Image('USGS/SRTMGL1_003');
+
+// 3. 一组影像：2023 年 9 月与 roi 相交的 Sentinel-2
+var s2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+  .filterBounds(roi)
+  .filterDate('2023-09-01', '2023-10-01');
+
+// 4. 按整景云量属性排序，取出第一景 Image
+var best = s2.sort('CLOUDY_PIXEL_PERCENTAGE').first();
+
+print('dem：', dem);
+print('s2（只展示前 2 景）：', s2.limit(2));
+print('s2 里有几景影像：', s2.size());
+print('best 有几个波段：', best.bandNames().size());
+
+// 5. 显示：S2 真彩色做底图，DEM 用分色叠在矩形内
+var rgbVis = {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000};
+var demVis = {min: 15, max: 90, palette: ['1a9850', 'fee08b', 'd73027']};
+Map.centerObject(roi, 12);
+Map.addLayer(best, rgbVis, 'best（集合中的一景）');
+Map.addLayer(dem.clip(roi), demVis, 'dem（SRTM 高程）');
+
+// Part 03｜Geometry、Feature、FeatureCollection
+// 1. Geometry：只有位置和形状
+var pointA = ee.Geometry.Point([114.39, 30.56]);
+
+// 2. Feature：几何 + 属性
+var siteA = ee.Feature(pointA, {name: '示例点A', category: '观察点'});
+var siteB = ee.Feature(ee.Geometry.Point([114.42, 30.58]), {
+  name: '示例点B', category: '观察点'
+});
+var area = ee.Feature(roi, {name: '教学矩形', category: '范围'});
+
+// 3. FeatureCollection：把多个 Feature 放在一起
+var samples = ee.FeatureCollection([siteA, siteB, area]);
+
+print('pointA（Geometry）：', pointA);
+print('siteA（Feature）：', siteA);
+print('samples（FeatureCollection）：', samples);
+
+// 4. 显示：卫星底图 + 放大的点、半透明的面
+var fcStyle = {color: '00FFFF', pointSize: 8, fillColor: '00FFFF33'};
+var pointVis = {color: 'FF0000'};
+Map.setOptions('SATELLITE');
+Map.addLayer(samples.style(fcStyle), {}, 'samples（3 个 Feature）');
+Map.addLayer(pointA, pointVis, 'pointA（Geometry）');
+
+// Part 04｜基础 ee 对象
+var count = ee.Number(12);
+var city = ee.String('武汉');
+var years = ee.List([2021, 2022, 2023]);
+var info = ee.Dictionary({city: '武汉', year: 2023});
+var day = ee.Date('2023-09-01');
+
+print('Number：', count);
+print('String：', city);
+print('List：', years);
+print('Dictionary：', info);
+print('Date：', day);
+
+// Part 05｜对象 → 方法 → 返回类型
+// 1. 方法跟着对象走，返回的类型也跟着变
+var bands = best.bandNames();            // Image → List
+var imageCount = s2.size();              // ImageCollection → Number
+var siteCount = samples.size();          // FeatureCollection → Number
+var siteName = siteA.get('name');        // Feature → 属性值
+var dayText = day.format('YYYY-MM-dd');  // Date → String
+
+print('best.bandNames()：', bands);
+print('s2.size()：', imageCount);
+print('samples.size()：', siteCount);
+print('siteA.get()：', siteName);
+print('day.format()：', dayText);
+
+// 2. 返回的到底是哪种 ee 对象？
+print('first() 是 ee.Image：', s2.first() instanceof ee.Image);
+print('size() 是 ee.Number：', imageCount instanceof ee.Number);
+print('get() 是 ee.String：', siteName instanceof ee.String);
+print('转成 ee.String 后：', ee.String(siteName).cat('·东湖'));
+```
 
 ## 下一篇
 
@@ -244,6 +344,22 @@ print('转成 ee.String 后：', ee.String(siteName).cat('·东湖'));
 
 COPERNICUS/S2_SR_HARMONIZED 这串 ID 是从哪里查到的？一个数据集覆盖哪些年份、分辨率多少、有哪些波段，该看哪里？同样是 Sentinel-2，SR 和 TOA 该选哪个？下一篇进入 Data Catalog，学会选对数据。
 
-官方文档与延伸阅读（网址可复制到浏览器） [1] Image Overview：https://developers.google.com/earth-engine/guides/image_overview [2] ImageCollection Overview：https://developers.google.com/earth-engine/guides/ic_creating [3] Feature Overview：https://developers.google.com/earth-engine/guides/features [4] Dates：https://developers.google.com/earth-engine/guides/dates [5] Sentinel-2 SR Harmonized 数据目录：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED [6] Objects and Methods Overview：https://developers.google.com/earth-engine/guides/objects_methods_overview [7] Earth Engine Objects（含类型声明）：https://developers.google.com/earth-engine/tutorials/tutorial_js_02 [8] SRTM 数据目录：https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+官方文档与延伸阅读（网址可复制到浏览器）
+
+[1] Image Overview：https://developers.google.com/earth-engine/guides/image_overview
+
+[2] ImageCollection Overview：https://developers.google.com/earth-engine/guides/ic_creating
+
+[3] Feature Overview：https://developers.google.com/earth-engine/guides/features
+
+[4] Dates：https://developers.google.com/earth-engine/guides/dates
+
+[5] Sentinel-2 SR Harmonized 数据目录：https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED
+
+[6] Objects and Methods Overview：https://developers.google.com/earth-engine/guides/objects_methods_overview
+
+[7] Earth Engine Objects（含类型声明）：https://developers.google.com/earth-engine/tutorials/tutorial_js_02
+
+[8] SRTM 数据目录：https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
 
 欢迎关注，后续继续分享 GEE 教程与遥感实战。

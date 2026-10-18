@@ -31,6 +31,7 @@ summary: "上一期结尾留了一个问题：value.gt(0.3) 打印出来明明�
 varvalue = ee.Number(0.1);
 varcondition = value.gt(0.3);
 print('比较结果：', condition);
+
 // 2. 交给 JavaScript 的 if 判断
 if (condition) {
   print('进入 if');
@@ -81,10 +82,12 @@ GEE 004 里做过这个实验，现在可以解释它了：
 // 1. 普通数字与 ee.Number
 vara = 100;
 varb = ee.Number(100);
+
 // 2. 同样写"加 1"
 print('a + 1：', a + 1);
 print('b + 1：', b + 1);
 print('b.add(1)：', b.add(1));
+
 // 3. b 到底是什么
 print('typeof b：', typeofb);
 print('instanceof：', binstanceofee.ComputedObject);
@@ -114,12 +117,14 @@ print('instanceof：', binstanceofee.ComputedObject);
 // 1. 服务端比较
 varcondition = ee.Number(0.1).gt(0.3);
 print('gt 结果：', condition);
+
 // 2. 客户端 if（错误用法）
 if (condition) {
   print('JS if：进入真分支');
 } else {
   print('JS if：进入假分支');
 }
+
 // 3. 服务端选择 ee.Algorithms.If
 varresult = ee.Algorithms.If(condition, '大于 0.3', '不大于 0.3');
 print('ee.Algorithms.If：', result);
@@ -145,9 +150,11 @@ print('ee.Algorithms.If：', result);
 // 1. 服务端计算 100 + 1
 varsum = ee.Number(100).add(1);
 print('print：', sum);
+
 // 2. getInfo：同步取回
 varn = sum.getInfo();
 print('getInfo：', n, typeofn);
+
 // 3. evaluate：异步取回
 sum.evaluate(function(result, error) {
   if (error) {
@@ -184,9 +191,11 @@ print('脚本最后一行');
 vars2 = ee.Image('COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU');
 varvisParams = {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000};
 Map.setCenter(114.39, 30.56, 12);
+
 // 2. 云量属性是服务端对象
 varcloud = ee.Number(s2.get('CLOUDY_PIXEL_PERCENTAGE'));
 print('云量：', cloud);
+
 // 3. 取回后再用 JS if 判断
 cloud.evaluate(function(value, error) {
   if (error) {
@@ -236,7 +245,66 @@ cloud.evaluate(function(value, error) {
 
 下面是本篇的完整代码，把前面的实验集中在一起，可以直接粘贴到 Code Editor 运行，对照 Console 逐条检查。
 
-// GEE 007｜客户端与服务端 // 1. 普通数字与 ee.Number var a = 100; var b = ee.Number(100); print('a + 1：', a + 1); print('b + 1：', b + 1); print('b.add(1)：', b.add(1)); print('typeof b：', typeof b); print('instanceof：', b instanceof ee.ComputedObject); // 2. 服务端比较不能直接交给 JS if var condition = ee.Number(0.1).gt(0.3); print('gt 结果：', condition); if (condition) { print('JS if：进入真分支'); } else { print('JS if：进入假分支'); } var result = ee.Algorithms.If(condition, '大于 0.3', '不大于 0.3'); print('ee.Algorithms.If：', result); // 3. print、getInfo、evaluate var sum = b.add(1); print('print：', sum); var n = sum.getInfo(); print('getInfo：', n, typeof n); sum.evaluate(function(value, error) { if (error) { print('请求失败：', error); return; } print('evaluate：', value, typeof value); }); print('脚本最后一行'); // 4. 实战：取回云量，再决定是否加图层 var s2 = ee.Image('COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU'); var visParams = {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000}; Map.setCenter(114.39, 30.56, 12); var cloud = ee.Number(s2.get('CLOUDY_PIXEL_PERCENTAGE')); print('云量：', cloud); cloud.evaluate(function(value, error) { if (error) { print('云量读取失败：', error); return; } if (typeof value !== 'number') { print('云量属性缺失或类型异常'); return; } print('取回的云量：', value, typeof value); if (value < 20) { print('云量低于 20%，添加影像'); Map.addLayer(s2, visParams, 'Sentinel-2 真彩色'); } else { print('云量不低于 20%，不添加影像'); } });
+```javascript
+// GEE 007｜客户端与服务端
+// 1. 普通数字与 ee.Number
+var a = 100;
+var b = ee.Number(100);
+print('a + 1：', a + 1);
+print('b + 1：', b + 1);
+print('b.add(1)：', b.add(1));
+print('typeof b：', typeof b);
+print('instanceof：', b instanceof ee.ComputedObject);
+
+// 2. 服务端比较不能直接交给 JS if
+var condition = ee.Number(0.1).gt(0.3);
+print('gt 结果：', condition);
+if (condition) {
+  print('JS if：进入真分支');
+} else {
+  print('JS if：进入假分支');
+}
+var result = ee.Algorithms.If(condition, '大于 0.3', '不大于 0.3');
+print('ee.Algorithms.If：', result);
+
+// 3. print、getInfo、evaluate
+var sum = b.add(1);
+print('print：', sum);
+var n = sum.getInfo();
+print('getInfo：', n, typeof n);
+sum.evaluate(function(value, error) {
+  if (error) {
+    print('请求失败：', error);
+    return;
+  }
+  print('evaluate：', value, typeof value);
+});
+print('脚本最后一行');
+
+// 4. 实战：取回云量，再决定是否加图层
+var s2 = ee.Image('COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU');
+var visParams = {bands: ['B4', 'B3', 'B2'], min: 0, max: 3000};
+Map.setCenter(114.39, 30.56, 12);
+var cloud = ee.Number(s2.get('CLOUDY_PIXEL_PERCENTAGE'));
+print('云量：', cloud);
+cloud.evaluate(function(value, error) {
+  if (error) {
+    print('云量读取失败：', error);
+    return;
+  }
+  if (typeof value !== 'number') {
+    print('云量属性缺失或类型异常');
+    return;
+  }
+  print('取回的云量：', value, typeof value);
+  if (value < 20) {
+    print('云量低于 20%，添加影像');
+    Map.addLayer(s2, visParams, 'Sentinel-2 真彩色');
+  } else {
+    print('云量不低于 20%，不添加影像');
+  }
+});
+```
 
 ## 下一篇
 
@@ -244,6 +312,18 @@ cloud.evaluate(function(value, error) {
 
 ee.Image 和 ee.ImageCollection 有什么区别？Geometry、Feature、FeatureCollection 分别是什么？ee.List、ee.Dictionary、ee.Date 又用在哪里？下一篇把 GEE 的核心数据对象放在一起，理清它们的结构和关系。
 
-官方文档与延伸阅读（复制到浏览器打开） [1] Client vs. Server：developers.google.com/earth-engine/guides/client_server [2] Deferred Execution：developers.google.com/earth-engine/guides/deferred_execution [3] ee.Number.gt：developers.google.com/earth-engine/apidocs/ee-number-gt [4] ee.Algorithms.If：developers.google.com/earth-engine/apidocs/ee-algorithms-if [5] ee.Number.evaluate：developers.google.com/earth-engine/apidocs/ee-number-evaluate [6] Sentinel-2 地表反射率（Harmonized）：developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED
+官方文档与延伸阅读（复制到浏览器打开）
+
+[1] Client vs. Server：developers.google.com/earth-engine/guides/client_server
+
+[2] Deferred Execution：developers.google.com/earth-engine/guides/deferred_execution
+
+[3] ee.Number.gt：developers.google.com/earth-engine/apidocs/ee-number-gt
+
+[4] ee.Algorithms.If：developers.google.com/earth-engine/apidocs/ee-algorithms-if
+
+[5] ee.Number.evaluate：developers.google.com/earth-engine/apidocs/ee-number-evaluate
+
+[6] Sentinel-2 地表反射率（Harmonized）：developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED
 
 GEE 系列 · 从零开始学习遥感与 GIS 云端分析

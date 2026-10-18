@@ -29,6 +29,7 @@ summary: "上一期（GEE 004）我们拆开了变量、数据类型、数组与
 ```javascript
 var s2=ee.Image(
   'COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU');
+
 Map.setCenter(114.39,30.56,12);
 Map.addLayer(s2,{bands:['B4','B3','B2'],min:0,max:3000},'S2 真彩色');
 Map.addLayer(s2,{bands:['B8','B4','B3'],min:0,max:3000},'S2 假彩色',false);
@@ -158,6 +159,7 @@ function makeVis(bands){
 }
 var trueVis=makeVis(['B4','B3','B2']);
 var falseVis=makeVis(['B8','B4','B3']);
+
 Map.setCenter(114.39,30.56,12);
 Map.addLayer(s2,trueVis,'S2 真彩色');
 Map.addLayer(s2,falseVis,'S2 假彩色',false);
@@ -194,7 +196,26 @@ print('假彩色显示参数：',falseVis);
 
 以下代码可直接粘贴到 Code Editor 运行（请整段复制，勿从排版卡片拼接）：
 
-// GEE005 · 函数、参数与返回值 // 一幅 Sentinel-2 影像；数据 ID 延用原版案例 var s2 = ee.Image( 'COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU'); // bands 是形参；return 返回显示参数对象 function makeVis(bands) { return {bands: bands, min: 0, max: 3000}; } var trueVis = makeVis(['B4', 'B3', 'B2']); var falseVis = makeVis(['B8', 'B4', 'B3']); Map.setCenter(114.39, 30.56, 12); Map.addLayer(s2, trueVis, 'S2 真彩色'); Map.addLayer(s2, falseVis, 'S2 假彩色', false); print('真彩色显示参数：', trueVis); print('假彩色显示参数：', falseVis);
+```javascript
+// GEE005 · 函数、参数与返回值
+// 一幅 Sentinel-2 影像；数据 ID 延用原版案例
+var s2 = ee.Image(
+  'COPERNICUS/S2_SR_HARMONIZED/20230901T025531_20230901T030202_T50RKU');
+
+// bands 是形参；return 返回显示参数对象
+function makeVis(bands) {
+  return {bands: bands, min: 0, max: 3000};
+}
+
+var trueVis = makeVis(['B4', 'B3', 'B2']);
+var falseVis = makeVis(['B8', 'B4', 'B3']);
+
+Map.setCenter(114.39, 30.56, 12);
+Map.addLayer(s2, trueVis, 'S2 真彩色');
+Map.addLayer(s2, falseVis, 'S2 假彩色', false);
+print('真彩色显示参数：', trueVis);
+print('假彩色显示参数：', falseVis);
+```
 
 ## 下一篇
 
@@ -202,6 +223,14 @@ print('假彩色显示参数：',falseVis);
 
 一个函数能否按图层类型自动换显示规则？怎样用配置数组一次管理多个图层？下一篇讲 if / for 与多图层管理。
 
-官方入口与延伸阅读（复制到浏览器打开） [1] Map.addLayer API：developers.google.com/earth-engine/apidocs/map-addlayer [2] Sentinel-2 SR Harmonized：developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED [3] Image Visualization：developers.google.com/earth-engine/guides/image_visualization 界面与 API 可能更新，以官方为准。
+官方入口与延伸阅读（复制到浏览器打开）
+
+[1] Map.addLayer API：developers.google.com/earth-engine/apidocs/map-addlayer
+
+[2] Sentinel-2 SR Harmonized：developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED
+
+[3] Image Visualization：developers.google.com/earth-engine/guides/image_visualization
+
+界面与 API 可能更新，以官方为准。
 
 GEE 系列 · 从零开始学习遥感与 GIS 云端分析

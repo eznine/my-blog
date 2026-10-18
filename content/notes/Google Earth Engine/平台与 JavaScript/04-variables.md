@@ -87,6 +87,7 @@ print(height);
 // 这是一行注释
 varheight = 100; // 高程数值
 print(height);
+
 height = 200;
 print(height);
 ```
@@ -314,6 +315,7 @@ varb = ee.Number(100);
 ```javascript
 vara = 100;
 varb = ee.Number(100);
+
 print('普通 JS 加法:', a + 1);
 print('直接使用 +:', b + 1);
 print('Earth Engine 加法:', b.add(1));
@@ -331,7 +333,9 @@ print('Earth Engine 加法:', b.add(1));
 
 ### 先记住两点
 
-① 普通 JavaScript 数字可以直接用 + 运算；**对 ee.Number 这样的 Earth Engine 对象做计算，要用 .add() 这类 Earth Engine 方法**。 ② b + 1 没有报错，结果却不对。**写 GEE 代码时，不能只靠“有没有报错”来判断结果是否正确**，还要看输出本身。
+① 普通 JavaScript 数字可以直接用 + 运算；**对 ee.Number 这样的 Earth Engine 对象做计算，要用 .add() 这类 Earth Engine 方法**。
+
+② b + 1 没有报错，结果却不对。**写 GEE 代码时，不能只靠“有没有报错”来判断结果是否正确**，还要看输出本身。
 
 为什么会这样？因为普通 JavaScript 值和 Earth Engine 对象的处理方式不同。背后的原因，我们放到**GEE 006｜JavaScript：客户端与服务端**中专门讲。
 
@@ -426,7 +430,17 @@ map.addLayer(dem, demVis, 'SRTM DEM');
 
 下面是本篇使用的完整 SRTM 代码，与 GEE 003 一致，不含练习中的错误。建议先完整运行一次，再从 min/max、palette 和缩放级别开始动手修改。
 
-print('Hello, Earth Engine!'); var dem = ee.Image('USGS/SRTMGL1_003'); var demVis = { min: 0, max: 3000, palette: ['006837', '78c679', 'ffffbf', 'fdae61', 'a6611a', 'ffffff'] }; Map.setCenter(112.5, 37.5, 8); Map.addLayer(dem, demVis, 'SRTM DEM');
+```javascript
+print('Hello, Earth Engine!');
+var dem = ee.Image('USGS/SRTMGL1_003');
+var demVis = {
+  min: 0,
+  max: 3000,
+  palette: ['006837', '78c679', 'ffffbf', 'fdae61', 'a6611a', 'ffffff']
+};
+Map.setCenter(112.5, 37.5, 8);
+Map.addLayer(dem, demVis, 'SRTM DEM');
+```
 
 ## 下一篇
 
@@ -434,6 +448,14 @@ GEE 005｜JavaScript：函数与逻辑控制
 
 print()、ee.Image()、Map.setCenter()、Map.addLayer() 到底是什么？为什么括号里可以放不同数量的参数？能不能把重复的操作写成一段可以反复使用的代码？下一篇讲函数、参数、返回值，以及基本的条件判断。
 
-官方入口与延伸阅读（复制到浏览器打开） [1] Earth Engine Code Editor：code.earthengine.google.com [2] Earth Engine JavaScript 入门：developers.google.com/earth-engine/tutorials/tutorial_js_01 [3] ee.Number 文档：developers.google.com/earth-engine/apidocs/ee-number [4] SRTM 数据集说明：developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
+官方入口与延伸阅读（复制到浏览器打开）
+
+[1] Earth Engine Code Editor：code.earthengine.google.com
+
+[2] Earth Engine JavaScript 入门：developers.google.com/earth-engine/tutorials/tutorial_js_01
+
+[3] ee.Number 文档：developers.google.com/earth-engine/apidocs/ee-number
+
+[4] SRTM 数据集说明：developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003
 
 GEE 系列 · 从零开始学习遥感与 GIS 云端分析

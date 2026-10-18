@@ -197,7 +197,15 @@ GEE 流程
 
 ### 几个容易误会的点
 
-- EECU 小时是**计算量**，不是使用时长，150 EECU 小时不等于每月能用 150 个小时； · 额度每月 1 日（太平洋时间）重置，用不完不结转； · 用完不会被停，只是进入受限模式，变慢、并发降低； · 非商业资格每年要重新验证； · 要不要升级，看实际计算消耗，不只看研究区大小。
+- EECU 小时是**计算量**，不是使用时长，150 EECU 小时不等于每月能用 150 个小时；
+
+- 额度每月 1 日（太平洋时间）重置，用不完不结转；
+
+- 用完不会被停，只是进入受限模式，变慢、并发降低；
+
+- 非商业资格每年要重新验证；
+
+- 要不要升级，看实际计算消耗，不只看研究区大小。
 
 ## PART 08 · 接下来怎么学
 
@@ -218,6 +226,12 @@ GEE 流程
 
 手把手把环境准备好，每一步点哪里都有截图。
 
-参考资料（复制到浏览器打开） [1] Earth Engine 官网：earthengine.google.com [2] 非商业用途层级：developers.google.com/earth-engine/guides/noncommercial_tiers（2026-09-25 更新，2026-10-13 核对） [3] Earth Engine Data Catalog：developers.google.com/earth-engine/datasets
+参考资料（复制到浏览器打开）
+
+[1] Earth Engine 官网：earthengine.google.com
+
+[2] 非商业用途层级：developers.google.com/earth-engine/guides/noncommercial_tiers（2026-09-25 更新，2026-10-13 核对）
+
+[3] Earth Engine Data Catalog：developers.google.com/earth-engine/datasets
 
 有问题欢迎留言，我会挑大家问得多的单独写一篇。觉得有用的话，点个赞或在看，下次更新不容易错过。
