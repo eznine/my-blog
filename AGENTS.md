@@ -72,7 +72,7 @@ public/code/         后台上传的代码文件（.py/.sh/...）
 
 * 回到顶部：右下角毛玻璃圆钮，滚动超 480px 出现（全端）
 
-* **前台 AI 悬浮助手（2026-09-09，`components/ai-chat.tsx` + `lib/ai-config.ts`）**：右下角悬浮球（fixed 56px、可任意位置拖拽，pointer capture + 6px 位移阈值区分点击/拖动，位置存 localStorage `ez-ai-pos`）；点击展开对话框（自动避开悬浮球放进视口，尺寸 min(视口, 384×600)），流式对话（DashScope OpenAI 兼容 `POST {base}/chat/completions`，模型默认 `deepseek-v4-flash-0731`，忽略 `reasoning_content` 只显示正式回答，Enter 发送 / Shift+Enter 换行 / 停止 / 清空，聊天记录存 localStorage `ez-ai-chat`）；配置来自 `NEXT_PUBLIC_AI_BASE_URL / NEXT_PUBLIC_AI_API_KEY / NEXT_PUBLIC_AI_MODEL`（本地 `.env.local`，GitHub Actions 走 secrets/vars，服务器部署由 `deploy-c2.sh` 读取 `site.config.json` 的 `ai` 字段注入）；admin 页不显示。**安全提醒：浏览器直连会把 API Key 打进静态 JS，公开线上等于公开密钥，仅适合个人站点/低风险场景**
+* **前台 AI 悬浮助手已下线（2026-10-19）**：右下角悬浮球、`components/ai-chat.tsx`、`lib/ai-config.ts` 与构建期 `NEXT_PUBLIC_AI_*` 注入已删除。后台编辑器里的 AI 助手仍在（`components/admin/ai-assistant.tsx`，运行时读 `site.config.json` 的 `ai` 字段）。
 
 * **笔记 Demo 演示面板（2026-09-02）**：笔记 frontmatter 加 `demo`（路径/外链）+ `demoLabel`（面板标题，默认文章标题）+ `demoHeight`（iframe 高度 px，默认 440）。**桌面端（xl+）是「演示模式」**：标题右侧「运行 DEMO」按钮（accent 实底 CTA + 白色强呼吸圆点，`demo-ping` 1.1s 扩散 2.8 倍）点击后给最外层容器挂 `data-demo="open"`——**左右各半屏**：左侧目录隐藏、正文留出右半（`.demo-panel-row` padding-right 50%）、右侧面板 `position:fixed` 占满右半边屏幕（宽 50% 全高，iframe flex 填满），左边文章独立滚动，可边读边玩；再点「关闭 DEMO」还原。**窄屏（<xl）**按钮在正文上方展开面板、收起即销毁。iframe 首见才挂载 src（隐藏容器不下载）。面板经 `createPortal` 挂两个锚点：`#note-demo-sidebar`（正文行尾部，display 由 CSS 控制）与 `#note-demo-inline`（头部下方，`xl:hidden`）。站内路径自动补 basePath 前缀（GitHub Pages 子路径）**且以 / 结尾自动补 index.html**（Next 静态服务不做目录解析，`/demos/x/` 会 404；GH Pages/Nginx 才自动解析）；外链（https/协议相对/data:）原样。
 
@@ -206,6 +206,8 @@ public/code/         后台上传的代码文件（.py/.sh/...）
 
 41. **Google Earth Engine 公众号教程入库（2026-10-18）**：桌面 `GEE_tutorials/公众号` 的 GEE001–GEE010 转成笔记，大类 `Google Earth Engine`（图集排在最前），章节按大纲前三模块：平台与 JavaScript（01–04）、编程逻辑（05–07）、数据对象（08–10）。正文保留 PART、代码块和配图（图在各章 `images/`，渲染时由 `lib/content.ts` 复制到 `content-images`）。日期统一 2026-10-17，`order` 1–10，标题用 `GEE 01` 这种两位数，保证同日排序和上下篇顺序是 01→10。小红书物料和手册没有入库。
 
+42. **下线前台 AI 悬浮助手（2026-10-19）**：删掉 `components/ai-chat.tsx`、`lib/ai-config.ts`、`app/layout.tsx` 挂载和 `globals.css` 里 `.ez-ai-panel` / `.ai-cursor`。`deploy-c2.sh` 与 GitHub Actions 不再把 `NEXT_PUBLIC_AI_*` 打进前端包。后台助手（`components/admin/ai-assistant.tsx` + `scripts/admin-server.mjs`）保留，密钥仍只在服务器 `site.config.json` 的 `ai` 字段，运行时读取。线上要重新 `next build` 并重启 `my-blog-web`，只 `git pull` 去不掉已编译进 standalone 的悬浮球。
+
 ## 六、用户的偏好与协作习惯（重要！）
 
 * **快速**：不要无谓操作，小改动不用浏览器调试，大改动才确认；表述直接，不喜欢反复确认
@@ -236,7 +238,7 @@ public/code/         后台上传的代码文件（.py/.sh/...）
 
 ## 八、生产部署（自建服务器，2026-09 上线）
 
-* **前台 AI 配置（2026-09-09）**：本地开发读 `.env.local` 的 `NEXT_PUBLIC_AI_*`（已 gitignore）；GitHub Pages 需在 repo 加 secret `NEXT_PUBLIC_AI_API_KEY`（base/model 用 repository variables）；服务器动态分支由 `deploy-c2.sh` 构建时读取 `/srv/my-blog/site.config.json` 的 `ai` 字段（`baseURL/apiKey/model`）注入，改线上 AI 配置直接改服务器该文件再跑部署脚本
+* **后台 AI 配置（前台悬浮助手已于 2026-10-19 下线）**：后台助手在运行时读服务器 `site.config.json` 的 `ai` 字段（`baseURL/apiKey/model`），不进前端包。改线上后台 AI 配置后重启 `my-blog-admin`。本地 `.env.local` 里残留的 `NEXT_PUBLIC_AI_*` 已不再被前台读取，不必入库。
 
 * **双方案并存（2026-09 定稿）**：**GitHub Pages = A（静态 main 分支）**，**eznine.xyz = C（动态 standalone dynamic 分支，`my-blog-web.service` 端口 3210，Nginx 反代，保存即生效 3s TTL）**。**后台一律走 eznine.xyz/admin**（会连服务器真后台）；GitHub Pages 的后台请求发到访问者本机 127.0.0.1:3001，不是服务器，别在那登。**改文案刷新血泪：客户端组件不能 `import { site }`（构建期快照，改文案前台死也不刷）**——必须走 `SiteProvider`（`components/site-provider.tsx`）+ `useSite()`，layout 用 `getSite()`（`lib/site-server.ts` 导出的**真实对象**，不是 Proxy！Proxy 传给 client 组件 SSR 会崩 `undefined.map`）通过 `<SiteProvider value={site}>` 下发动态文案。现改为动态的组件：site-header / site-footer（server 直接读 site-server）/ site-utilities / hero-scroll / notes-browser（含 ChapterPanel 子组件）/ search-client；admin-app 保留静态 site（后台文案不需动态）。**改 JSON 测试文案必须无 BOM**（PowerShell `Set-Content -Encoding UTF8` 加 BOM → JSON.parse 失败 → 500；用 node 写）。**第二层血泪（2026-09-02）：standalone 里的 `content/`、`public/uploads/`、`public/content-images/` 必须是【符号链接】指回仓库根目录真实目录**——Next standalone 的 server.js 会 `process.chdir(__dirname)`，进程实际读的是 `.next/standalone/content/copy/`（构建时复制的副本），后台改的是 `/srv/my-blog/content/`，副本永远不变 → 前台死也不刷新；且构建用 sudo 跑会让 standalone 归 root，运行时写图片 EACCES 500。部署一律用 `sudo bash scripts/deploy-c2.sh`（已入库：拉代码→构建→复制静态资源→建符号链接→chown eznine→重启 web+admin 两个服务）。返回首页不重播封面靠 `hero-scroll.tsx` 的 1.2s 钉住循环（Next 路由切换的 smooth 滚动会把瞬时定位拉回顶部，单次 scrollTo 挡不住）。移动端卡顿优化：`topo-shader-field.tsx` <768px 时 dpr=1 + 30fps 限帧。后台左上角版本信息 = admin-server `GET /api/version`（git 提交号/时间 + 服务启动时间，免鉴权）
 

@@ -67,15 +67,9 @@ echo "==> [2/8] 安装依赖（如有变化）"
 AS_EZNINE npm install --no-audit --no-fund --loglevel=error
 
 echo "==> [3/8] 构建 standalone"
-# 前台 AI 配置从 site.config.json 的 ai 字段读入构建环境，避免把密钥写进脚本/仓库；
-# 本地开发用 .env.local 的 NEXT_PUBLIC_AI_*，服务器部署则改服务器上的 site.config.json。
-AI_BASE_URL=$(node -e "try{console.log(require('./site.config.json').ai?.baseURL||'')}catch{}" 2>/dev/null)
-AI_API_KEY=$(node -e "try{console.log(require('./site.config.json').ai?.apiKey||'')}catch{}" 2>/dev/null)
-AI_MODEL=$(node -e "try{console.log(require('./site.config.json').ai?.model||'')}catch{}" 2>/dev/null)
+# 前台悬浮助手已下线，构建不再注入 NEXT_PUBLIC_AI_*。
+# 后台助手仍在运行时读 site.config.json 的 ai 字段，不进前端包。
 AS_EZNINE env NEXT_PUBLIC_ADMIN_API=/api \
-  NEXT_PUBLIC_AI_BASE_URL="$AI_BASE_URL" \
-  NEXT_PUBLIC_AI_API_KEY="$AI_API_KEY" \
-  NEXT_PUBLIC_AI_MODEL="$AI_MODEL" \
   NODE_OPTIONS='--max-old-space-size=2048' \
   npx next build
 
