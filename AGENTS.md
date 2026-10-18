@@ -204,6 +204,8 @@ public/code/         后台上传的代码文件（.py/.sh/...）
 
 40. **前台 AI 悬浮球 + 流式对话（2026-09-09）**：右下角悬浮球任意拖拽（pointer capture、6px 阈值防误触、位置/聊天记录 localStorage），点击展开对话框，直接调 DashScope OpenAI 兼容端点流式对话（模型 `deepseek-v4-flash-0731`，key 走 `.env.local` 不进库）。组件：`components/ai-chat.tsx`；配置：`lib/ai-config.ts`；全站挂在 `app/layout.tsx`（admin 页隐藏）。修复两个拖拽细节：拖完松开不能误开面板（用 `suppressClickRef` 拦住 click）；松开时按 pointerup 坐标算最终位置再存，避免 React 状态未刷新导致存档偏一格。**部署**：GitHub Actions 在 build step 读 `NEXT_PUBLIC_AI_*`（key 用 repo secret）；服务器 `deploy-c2.sh` [3/8] 从 `site.config.json` 的 `ai` 字段读入构建环境，不在脚本里硬编码密钥。**安全提醒**：NEXT_PUBLIC 注入即公开（静态 JS 可被扒 key），个人站可接受，敏感场景应改后端代理。
 
+41. **Google Earth Engine 公众号教程入库（2026-10-18）**：桌面 `GEE_tutorials/公众号` 的 GEE001–GEE010 转成笔记，大类 `Google Earth Engine`（图集排在最前），章节按大纲前三模块：平台与 JavaScript（01–04）、编程逻辑（05–07）、数据对象（08–10）。正文保留 PART、代码块和配图（图在各章 `images/`，渲染时由 `lib/content.ts` 复制到 `content-images`）。日期统一 2026-10-17，`order` 1–10，标题用 `GEE 01` 这种两位数，保证同日排序和上下篇顺序是 01→10。小红书物料和手册没有入库。
+
 ## 六、用户的偏好与协作习惯（重要！）
 
 * **快速**：不要无谓操作，小改动不用浏览器调试，大改动才确认；表述直接，不喜欢反复确认

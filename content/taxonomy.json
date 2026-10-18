@@ -1,6 +1,7 @@
 {
   "categories": {
     "notes": [
+      "Google Earth Engine",
       "遥感",
       "WebGIS 开发",
       "GIS",
@@ -25,6 +26,11 @@
     ]
   },
   "chapters": {
+    "Google Earth Engine": [
+      "平台与 JavaScript",
+      "编程逻辑",
+      "数据对象"
+    ],
     "WebGIS 开发": [
       "环境与工具",
       "Web基础",
